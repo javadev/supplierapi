@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 @Data
@@ -20,12 +21,15 @@ public class PropertyTypeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotNull
     @Column
     private String code;
 
+    @NotNull
     @Column
     private String name;
 
+    @NotNull
     @Column(name = "code_source")
     private PropertyTypeSource codeSource;
 
