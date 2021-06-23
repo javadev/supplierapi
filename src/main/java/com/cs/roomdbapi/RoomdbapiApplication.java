@@ -8,7 +8,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(scanBasePackages = {"com.cs.roomdbapi"})
-@EntityScan(basePackages= {"com.cs.roomdbapi.model"})
+@EntityScan(basePackages= {"com.cs.roomdbapi.model", "com.cs.roomdbapi.converter"})
 @EnableJpaRepositories(basePackages= {"com.cs.roomdbapi.repository"})
 @ServletComponentScan("com.cs.roomdbapi")
 //@EnableAspectJAutoProxy

@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Tag(
-        name = "Country API",
+        name = "Countries",
         description = "API endpoints to access country names and codes. <br/>" +
                 "Each country has codes in different ISO formats: **Alpha-2**, **Alpha-3** and **Numeric**. <br/>" +
                 "It's possible to pick format by using endpoint with *codeFormat* parameter. <br/><br/>" +

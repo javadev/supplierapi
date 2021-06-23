@@ -14,9 +14,6 @@ public interface LanguageMapper {
 
     Language toDTO(LanguageEntity e);
 
-    /*
-     * Mapper to get codes of all types.
-     */
     List<Language> toListDTO(List<LanguageEntity> list);
 
 }
