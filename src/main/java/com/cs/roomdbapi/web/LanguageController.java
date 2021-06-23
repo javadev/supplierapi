@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Tag(
-        name = "Language API",
+        name = "Languages",
         description = "API endpoints to access language names and codes. <br/>" +
                 "Each language has codes in different ISO formats: <br/>" +
                 "- ISO 639-1 two-letter, <br/>" +
