@@ -31,7 +31,7 @@ public class CountryEntity {
     @Column(name = "code_num")
     private String codeNumeric;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "country_id")
     private List<CountryTranslationEntity> translations;
 
