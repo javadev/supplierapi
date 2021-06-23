@@ -5,6 +5,7 @@ import com.cs.roomdbapi.mapper.CountryMapper;
 import com.cs.roomdbapi.model.CountryEntity;
 import com.cs.roomdbapi.model.CountryTranslationEntity;
 import com.cs.roomdbapi.repository.CountryRepository;
+import com.cs.roomdbapi.repository.TranslationRepository;
 import com.cs.roomdbapi.utilities.AppUtils;
 import com.cs.roomdbapi.utilities.CountryCodeFormat;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +24,14 @@ public class CountryManagerImpl implements CountryManager {
 
     private final CountryRepository countryRepository;
 
+    private final TranslationRepository translationRepository;
+
     @Override
     public List<Country> getCountriesByFormat(CountryCodeFormat format, String langCode) {
         List<CountryEntity> all = countryRepository.findAll();
+
+        Map<Integer, CountryTranslationEntity> translationsForLang = getTranslationsForLang(langCode);
+        Map<Integer, CountryTranslationEntity> translationsDefaultLang = getTranslationsForDefaultLang();
 
         List<Country> countries = new ArrayList<>();
         for (CountryEntity entity : all) {
@@ -42,7 +51,7 @@ public class CountryManagerImpl implements CountryManager {
                     country = CountryMapper.MAPPER.toDTOWithCode(entity);
             }
 
-            setNamesForLanguage(langCode, country, entity);
+            setNamesForLanguage(country, translationsDefaultLang.get(country.getId()), translationsForLang.get(country.getId()));
             countries.add(country);
         }
 
@@ -58,7 +67,10 @@ public class CountryManagerImpl implements CountryManager {
             CountryEntity entity = countryEntity.get();
             country = CountryMapper.MAPPER.toDTO(entity);
 
-            setNamesForLanguage(langCode, country, entity);
+            CountryTranslationEntity translation = translationRepository.findByLanguage_CodeAndCountryId(langCode, id);
+            CountryTranslationEntity defaultTranslation = translationRepository.findByLanguage_CodeAndCountryId(AppUtils.DEFAULT_LANGUAGE_CODE, id);
+
+            setNamesForLanguage(country, defaultTranslation, translation);
         }
 
         return country;
@@ -73,36 +85,52 @@ public class CountryManagerImpl implements CountryManager {
             CountryEntity entity = countryEntity.get();
             country = CountryMapper.MAPPER.toDTO(entity);
 
-            setNamesForLanguage(langCode, country, entity);
+            CountryTranslationEntity translation = translationRepository.findByLanguage_CodeAndCountryId(langCode, country.getId());
+            CountryTranslationEntity defaultTranslation = translationRepository.findByLanguage_CodeAndCountryId(AppUtils.DEFAULT_LANGUAGE_CODE, country.getId());
+
+            setNamesForLanguage(country, defaultTranslation, translation);
         }
 
         return country;
     }
 
-    private void setNamesForLanguage(String langCode, Country country, CountryEntity entity) {
-        String name = "";
-        String fullName = "";
-        String defaultName = null;
-        String defaultFullName = null;
+    private Map<Integer, CountryTranslationEntity> getTranslationsForLang(String langCode) {
+        List<CountryTranslationEntity> translationsForLangList = translationRepository.findAllByLanguage_Code(langCode);
+        return translationsForLangList
+                .stream()
+                .collect(Collectors.toMap(CountryTranslationEntity::getCountryId, Function.identity()));
+    }
 
-        List<CountryTranslationEntity> translations = entity.getTranslations();
-        for (CountryTranslationEntity translation : translations) {
-            if (translation.getLanguage() != null) {
-                String code = translation.getLanguage().getCode();
-                if (code != null) {
-                    if (AppUtils.DEFAULT_LANGUAGE_CODE.equalsIgnoreCase(code)) {
-                        defaultName = translation.getName();
-                        defaultFullName = translation.getFullName();
-                    } else if (code.equalsIgnoreCase(langCode)) {
-                        name = translation.getName();
-                        fullName = translation.getFullName();
-                        break;
-                    }
-                }
+    private Map<Integer, CountryTranslationEntity> getTranslationsForDefaultLang() {
+        List<CountryTranslationEntity> translationsDefaultLangList = translationRepository.findAllByLanguage_Code(AppUtils.DEFAULT_LANGUAGE_CODE);
+        return translationsDefaultLangList
+                .stream()
+                .collect(Collectors.toMap(CountryTranslationEntity::getCountryId, Function.identity()));
+    }
+
+    private void setNamesForLanguage(Country country, CountryTranslationEntity defaultTranslation, CountryTranslationEntity langTranslation) {
+        String name = null;
+        String fullName = null;
+
+        if (langTranslation != null) {
+            if (!langTranslation.getName().isBlank()) {
+                name = langTranslation.getName();
+            }
+            if (!langTranslation.getFullName().isBlank()) {
+                fullName = langTranslation.getFullName();
             }
         }
 
-        country.setName(name.isBlank() ? defaultName : name);
-        country.setFullName(fullName.isBlank() ? defaultFullName : fullName);
+        if (defaultTranslation != null) {
+            if (!defaultTranslation.getName().isBlank() && name == null) {
+                name = defaultTranslation.getName();
+            }
+            if (!defaultTranslation.getFullName().isBlank() && fullName == null) {
+                fullName = defaultTranslation.getFullName();
+            }
+        }
+
+        country.setName(name);
+        country.setFullName(fullName);
     }
 }

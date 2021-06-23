@@ -28,9 +28,13 @@ public class CountryTranslationEntity {
     private String fullName;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id", nullable = false)
     private LanguageEntity language;
+
+    @NotNull
+    @Column(name = "country_id")
+    private Integer countryId;
 
     @Column
     @UpdateTimestamp
