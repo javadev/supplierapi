@@ -68,7 +68,7 @@ public class LanguageController {
                     String code
     ) {
 
-        return new ResponseEntity<>(languageManager.getLanguageByCode(code), HttpStatus.OK);
+        return new ResponseEntity<>(languageManager.getLanguageByCode(code.toLowerCase()), HttpStatus.OK);
     }
 
 }

@@ -33,7 +33,7 @@ public class LanguageManagerImpl implements LanguageManager {
 
     @Override
     public Language getLanguageByCode(String code) {
-        Optional<LanguageEntity> findResult = languageRepository.findByCode(code.toLowerCase());
+        Optional<LanguageEntity> findResult = languageRepository.findByCode(code);
 
         return getFromOptional(findResult);
     }
