@@ -4,17 +4,16 @@
 
 #### Setup
 
-Main config to **open connection** and **change port**:
+Main config to **open connection** and **change port**: <br/>
 `/etc/postgresql/10/main/postgresql.conf`
 
-Changed:
+Changes:
 ~~~~
 listen_addresses = '162.55.164.107,localhost'
 port = 7325
 ~~~~
 
-Host-based authentication file:
-
+Host-based authentication file: <br/>
 `/etc/postgresql/10/main/pg_hba.conf`
 
 Added:
