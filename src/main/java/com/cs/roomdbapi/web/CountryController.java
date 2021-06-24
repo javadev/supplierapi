@@ -52,7 +52,7 @@ public class CountryController {
             @Size(min = 2, max = 2)
                     String langCode
     ) {
-        List<Country> countries = countryManager.getCountriesByFormat(CountryCodeFormat.ALPHA2, langCode);
+        List<Country> countries = countryManager.getCountriesByFormat(CountryCodeFormat.ALPHA2, langCode.toLowerCase());
 
         return new ResponseEntity<>(countries, HttpStatus.OK);
     }
@@ -75,7 +75,7 @@ public class CountryController {
             @Size(min = 2, max = 2)
                     String langCode
     ) {
-        List<Country> countries = countryManager.getCountriesByFormat(codeFormat, langCode);
+        List<Country> countries = countryManager.getCountriesByFormat(codeFormat, langCode.toLowerCase());
 
         return new ResponseEntity<>(countries, HttpStatus.OK);
     }
@@ -94,7 +94,7 @@ public class CountryController {
             @Size(min = 2, max = 2)
                     String langCode
     ) {
-        return new ResponseEntity<>(countryManager.getCountryById(countryId, langCode), HttpStatus.OK);
+        return new ResponseEntity<>(countryManager.getCountryById(countryId, langCode.toLowerCase()), HttpStatus.OK);
     }
 
     @Operation(
@@ -111,7 +111,7 @@ public class CountryController {
             @Size(min = 2, max = 2)
                     String langCode
     ) {
-        return new ResponseEntity<>(countryManager.getCountryByCode(code, langCode), HttpStatus.OK);
+        return new ResponseEntity<>(countryManager.getCountryByCode(code, langCode.toLowerCase()), HttpStatus.OK);
     }
 
 }
