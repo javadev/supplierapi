@@ -15,7 +15,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-
 @Tag(
         name = "States",
         description = "API endpoints to access States, districts or any other country subdivisions."
