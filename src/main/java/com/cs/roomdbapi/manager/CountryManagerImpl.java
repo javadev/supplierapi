@@ -7,7 +7,7 @@ import com.cs.roomdbapi.model.CountryTranslationEntity;
 import com.cs.roomdbapi.repository.CountryRepository;
 import com.cs.roomdbapi.repository.TranslationRepository;
 import com.cs.roomdbapi.utilities.AppUtils;
-import com.cs.roomdbapi.utilities.CountryCodeFormat;
+import com.cs.roomdbapi.model.CountryCodeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

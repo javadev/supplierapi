@@ -1,29 +1,29 @@
 package com.cs.roomdbapi.converter;
 
-import com.cs.roomdbapi.model.SubdivisionCategory;
+import com.cs.roomdbapi.model.RoleName;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class SubdivisionCategoryConverter implements AttributeConverter<SubdivisionCategory, String> {
+public class RoleNameConverter implements AttributeConverter<RoleName, String> {
 
     @Override
-    public String convertToDatabaseColumn(SubdivisionCategory subdivisionCategory) {
-        if (subdivisionCategory == null) {
+    public String convertToDatabaseColumn(RoleName roleName) {
+        if (roleName == null) {
             return null;
         }
-        return subdivisionCategory.getCode();
+        return roleName.getCode();
     }
 
     @Override
-    public SubdivisionCategory convertToEntityAttribute(String code) {
+    public RoleName convertToEntityAttribute(String code) {
         if (code == null) {
             return null;
         }
 
-        return Stream.of(SubdivisionCategory.values())
+        return Stream.of(RoleName.values())
                 .filter(c -> c.getCode().equals(code))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);

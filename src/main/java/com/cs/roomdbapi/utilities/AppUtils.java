@@ -11,6 +11,7 @@ public class AppUtils {
 
     public static final String FAIL = "fail";
     public static final String SUCCESS = "success";
+    public static final String BEARER = "Bearer";
 
     public static final String DEFAULT_LANGUAGE_CODE = "en";
 }

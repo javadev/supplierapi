@@ -4,11 +4,13 @@ import com.cs.roomdbapi.dto.Language;
 import com.cs.roomdbapi.manager.LanguageManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
@@ -24,6 +26,9 @@ import java.util.List;
                 "- ISO 639-2/B three-letter. <br/>" +
                 "- ISO 639-3 three-letter. <br/>"
 )
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+        "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
 @CrossOrigin
 @RequiredArgsConstructor
 @RestController

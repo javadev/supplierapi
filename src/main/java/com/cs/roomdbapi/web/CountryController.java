@@ -3,14 +3,16 @@ package com.cs.roomdbapi.web;
 import com.cs.roomdbapi.dto.Country;
 import com.cs.roomdbapi.manager.CountryManager;
 import com.cs.roomdbapi.utilities.AppUtils;
-import com.cs.roomdbapi.utilities.CountryCodeFormat;
+import com.cs.roomdbapi.model.CountryCodeFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +33,9 @@ import java.util.List;
                 "For *langCode* parameter ISO 639-1 two-letter codes are used.<br/>" +
                 "If name for specified language does not exists in a system english version will be provided."
 )
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+        "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
 @CrossOrigin
 @RequiredArgsConstructor
 @RestController
