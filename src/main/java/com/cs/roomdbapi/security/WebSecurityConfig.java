@@ -32,7 +32,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()//
-                .antMatchers("/api/v1/suppliers/getToken").permitAll()//
+                .antMatchers("/api/v1/suppliers/get-token").permitAll()//
+                .antMatchers("/api/v1/suppliers/encode-password").permitAll()//
 //                .antMatchers("/users/signup").permitAll()//
                 // Disallow everything else..
                 .anyRequest().authenticated();

@@ -2,11 +2,14 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.annotation.IgnoreResponseBinding;
 import com.cs.roomdbapi.manager.SupplierManagerImpl;
+import com.cs.roomdbapi.response.SuccessResponse;
 import com.cs.roomdbapi.response.TokenResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +26,7 @@ import java.util.Date;
 )
 @CrossOrigin
 @RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/suppliers", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
@@ -40,7 +44,7 @@ public class SupplierController {
             summary = "Common call and get token base on clientId and clientSecret.",
             description = "API endpoint to generate new token."
     )
-    @PostMapping("/getToken")
+    @PostMapping("/get-token")
     public TokenResponse getToken(
             @RequestParam(name = "supplierId") String supplierId, //
             @RequestParam(name = "supplierSecret") String supplierSecret) {
@@ -70,6 +74,16 @@ public class SupplierController {
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return new TokenResponse(newToken, validity.getTime() / 1000L);
+    }
+
+    @Hidden // comment if you want to use this endpoint in Swagger
+    @GetMapping("/encode-password")
+    public SuccessResponse<String> encodePassword(String password) {
+        String encodedPassword = passwordEncoder.encode(password);
+
+        log.info("Encode password called.");
+
+        return new SuccessResponse<>(encodedPassword, "Success password encode.");
     }
 
 //  @PostMapping("/signup")
