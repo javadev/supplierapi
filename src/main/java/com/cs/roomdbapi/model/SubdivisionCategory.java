@@ -1,4 +1,4 @@
-package com.cs.roomdbapi.utilities;
+package com.cs.roomdbapi.model;
 
 public enum SubdivisionCategory {
     state("state"),

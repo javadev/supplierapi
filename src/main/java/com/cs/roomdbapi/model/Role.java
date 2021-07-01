@@ -13,27 +13,20 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "property_type")
-public class PropertyTypeEntity {
+@Table(name = "supplier_role")
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @NotNull
-    @Column
-    private String code;
+    @Column(name = "supplier_id")
+    private Integer supplierId;
 
     @NotNull
-    @Column
-    private String name;
-
-    @NotNull
-    @Column(name = "code_source")
-    private PropertyTypeSource codeSource;
-
-    @Column(name = "alternative_name")
-    private String alternativeName;
+    @Column(name = "role_name")
+    private RoleName roleName;
 
     @Column
     @UpdateTimestamp

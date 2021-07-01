@@ -1,7 +1,7 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.Country;
-import com.cs.roomdbapi.utilities.CountryCodeFormat;
+import com.cs.roomdbapi.model.CountryCodeFormat;
 
 import java.util.List;
 

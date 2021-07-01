@@ -1,6 +1,5 @@
 package com.cs.roomdbapi.model;
 
-import com.cs.roomdbapi.utilities.SubdivisionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

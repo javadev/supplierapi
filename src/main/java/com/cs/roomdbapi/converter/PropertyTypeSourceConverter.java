@@ -1,6 +1,6 @@
 package com.cs.roomdbapi.converter;
 
-import com.cs.roomdbapi.utilities.PropertyTypeSource;
+import com.cs.roomdbapi.model.PropertyTypeSource;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

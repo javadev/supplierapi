@@ -3,17 +3,25 @@ package com.cs.roomdbapi.web;
 import com.cs.roomdbapi.dto.Property;
 import com.cs.roomdbapi.manager.PropertyManager;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
-@Tag(name = "Property API", description = "Property API - some long description will be here.")
+@Tag(
+        name = "Property API",
+        description = "Property API - some long description will be here."
+)
+@SecurityRequirement(name = "bearerAuth")
+@PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+        "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/properties")
