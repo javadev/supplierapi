@@ -1,11 +1,12 @@
 package com.cs.roomdbapi.response;
 
-import com.cs.roomdbapi.utilities.AppUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SuccessResponse<T> {
 
@@ -13,17 +14,14 @@ public class SuccessResponse<T> {
     private Object result;
 
     @JsonProperty
-    private final String status = AppUtils.SUCCESS;
-
-    @JsonProperty
     private String message;
 
-    public SuccessResponse(T object) {
+    @JsonProperty
+    private final String status;
+
+    public SuccessResponse(T object, String status) {
         this.result = object;
+        this.status = status;
     }
 
-    public SuccessResponse(T object, String message) {
-        this.result = object;
-        this.message = message;
-    }
 }

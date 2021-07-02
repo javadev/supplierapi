@@ -4,6 +4,7 @@ import com.cs.roomdbapi.annotation.IgnoreResponseBinding;
 import com.cs.roomdbapi.manager.SupplierManagerImpl;
 import com.cs.roomdbapi.response.SuccessResponse;
 import com.cs.roomdbapi.response.TokenResponse;
+import com.cs.roomdbapi.utilities.AppUtils;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -83,7 +84,7 @@ public class SupplierController {
 
         log.info("Encode password called.");
 
-        return new SuccessResponse<>(encodedPassword, "Success password encode.");
+        return new SuccessResponse<>(encodedPassword, "Success password encode.", AppUtils.SUCCESS);
     }
 
 //  @PostMapping("/signup")
