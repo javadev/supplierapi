@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -74,6 +75,19 @@ public class LanguageController {
     ) {
 
         return new ResponseEntity<>(languageManager.getLanguageByCode(code.toLowerCase()), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN)")
+    @Operation(
+            summary = "Get language data by ISO 639-1 two-letter code."
+    )
+    @PostMapping
+    public ResponseEntity<Language> addLanguage(
+            @Valid @RequestBody Language language
+    ) {
+        Language newLanguage = languageManager.addLanguage(language);
+
+        return new ResponseEntity<>(newLanguage, HttpStatus.CREATED);
     }
 
 }

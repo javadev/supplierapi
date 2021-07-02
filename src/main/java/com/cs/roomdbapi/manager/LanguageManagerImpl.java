@@ -1,6 +1,7 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.Language;
+import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.mapper.LanguageMapper;
 import com.cs.roomdbapi.model.LanguageEntity;
 import com.cs.roomdbapi.repository.LanguageRepository;
@@ -46,4 +47,16 @@ public class LanguageManagerImpl implements LanguageManager {
 
         return result;
     }
+
+    @Override
+    public Language addLanguage(Language language) {
+        if (languageRepository.existsByCode(language.getCode())) {
+            throw new BadRequestException("Language with such code already exists", language);
+        }
+
+        LanguageEntity save = languageRepository.save(LanguageMapper.MAPPER.toEntity(language));
+        
+        return LanguageMapper.MAPPER.toDTO(save);
+    }
+    
 }
