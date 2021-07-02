@@ -13,5 +13,11 @@ public class AppUtils {
     public static final String SUCCESS = "success";
     public static final String BEARER = "Bearer";
 
+    public static final String LANGUAGE = "Language";
+
+    public static final String ID = "id";
+
+    public static final String CODE = "code";
+
     public static final String DEFAULT_LANGUAGE_CODE = "en";
 }

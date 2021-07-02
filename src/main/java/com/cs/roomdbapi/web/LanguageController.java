@@ -52,15 +52,15 @@ public class LanguageController {
     @Operation(
             summary = "Get language data by id."
     )
-    @GetMapping({"/{languageId}"})
+    @GetMapping({"/{id}"})
     public ResponseEntity<Language> getLanguage(
             @PathVariable
             @Parameter(description = "RoomDB internal language Id. Required.")
             @Min(1)
-                    Integer languageId
+                    Integer id
     ) {
 
-        return new ResponseEntity<>(languageManager.getLanguageById(languageId), HttpStatus.OK);
+        return new ResponseEntity<>(languageManager.getLanguageById(id), HttpStatus.OK);
     }
 
     @Operation(
@@ -79,7 +79,7 @@ public class LanguageController {
 
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN)")
     @Operation(
-            summary = "Get language data by ISO 639-1 two-letter code."
+            summary = "Add language."
     )
     @PostMapping
     public ResponseEntity<Language> addLanguage(
@@ -88,6 +88,21 @@ public class LanguageController {
         Language newLanguage = languageManager.addLanguage(language);
 
         return new ResponseEntity<>(newLanguage, HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN)")
+    @Operation(
+            summary = "Update language."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<Language> updateLanguage(
+            @PathVariable(name = "id")
+            @Parameter(description = "RoomDB internal language Id. Required.") Integer id,
+            @Valid @RequestBody Language language
+    ) {
+        Language updatedLang = languageManager.updateLanguage(id, language);
+
+        return new ResponseEntity<>(updatedLang, HttpStatus.OK);
     }
 
 }

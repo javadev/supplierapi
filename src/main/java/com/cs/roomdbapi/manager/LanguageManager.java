@@ -13,4 +13,6 @@ public interface LanguageManager {
     Language getLanguageByCode(String code);
 
     Language addLanguage(Language language);
+
+    Language updateLanguage(Integer id, Language language);
 }
