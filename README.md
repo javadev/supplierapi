@@ -16,6 +16,14 @@ IPv6	2a01:4f8:c010:69cb::/64
 db.roomdb.io A 162.55.164.107 <br/>
 api.supplier.roomdb.io A 116.202.15.234
 
+## Documentation
+
+Swagger is available here: <br/>
+https://doc.supplier.roomdb.io/swagger
+
+ReDoc here: <br/>
+https://doc.supplier.roomdb.io/redoc
+
 ## Security
 JWT tokens are used. <br/>
 To generate token should be used `"/api/v1/suppliers/get-token"` with existing supplierId and supplierSecret (our analog of username and password).
@@ -27,7 +35,7 @@ curl -X 'GET' \
   -H 'Authorization: Bearer <YOUR_TOKEN>'
 ~~~~
 <br/>
-On a Swagger token need to be added in "Authorize" popup. This will automatically add it to all calls.
+On a Swagger UI you need to add token in "Authorize" popup. This will automatically add token to each calls.
 
 ## Encode password
 There is a helper endpoint to encode password `"/api/v1/suppliers/encode-password"`. <br/>
@@ -41,7 +49,8 @@ curl -X 'GET' \
 ~~~~
 
 
-
 ## Additional info:
 
 [Data Base Information](README-DB.md)
+
+[ReDoc documentation. Install and run.](README-redoc.md)
