@@ -96,13 +96,14 @@ public class LanguageController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<Language> updateLanguage(
-            @PathVariable(name = "id")
-            @Parameter(description = "RoomDB internal language Id. Required.") Integer id,
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal language Id. Required.")
+            @Min(1) Integer id,
             @Valid @RequestBody Language language
     ) {
         Language updatedLang = languageManager.updateLanguage(id, language);
 
-        return new ResponseEntity<>(updatedLang, HttpStatus.OK);
+        return ResponseEntity.ok(updatedLang);
     }
 
 }
