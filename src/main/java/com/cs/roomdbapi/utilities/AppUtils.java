@@ -11,13 +11,29 @@ public class AppUtils {
 
     public static final String FAIL = "fail";
     public static final String SUCCESS = "success";
+
     public static final String BEARER = "Bearer";
 
+    /*
+     * Entity names
+     */
     public static final String LANGUAGE = "Language";
 
+    public static final String SUPPLIER = "Supplier";
+
+    public static final String NOTIFICATION = "Notification";
+
+    /*
+     * Field names
+     */
     public static final String ID = "id";
 
     public static final String CODE = "code";
 
+    public static final String NAME = "name";
+
+    /*
+     * Defaults
+     */
     public static final String DEFAULT_LANGUAGE_CODE = "en";
 }
