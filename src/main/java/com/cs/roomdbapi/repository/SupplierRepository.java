@@ -1,17 +1,15 @@
 package com.cs.roomdbapi.repository;
 
-import com.cs.roomdbapi.model.Supplier;
+import com.cs.roomdbapi.model.SupplierEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
-public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
+public interface SupplierRepository extends JpaRepository<SupplierEntity, Integer> {
 
-    boolean existsByName(String name);
+    Optional<SupplierEntity> findByName(String name);
 
-    Supplier findByName(String name);
-
-    @Transactional
-    void deleteByName(String name);
+    List<SupplierEntity> findByIsActiveIsTrueAndWebhookIsNotNull();
 
 }

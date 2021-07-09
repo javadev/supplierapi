@@ -7,6 +7,7 @@ import com.cs.roomdbapi.mapper.LanguageMapper;
 import com.cs.roomdbapi.model.LanguageEntity;
 import com.cs.roomdbapi.repository.LanguageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +16,12 @@ import static com.cs.roomdbapi.utilities.AppUtils.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LanguageManagerImpl implements LanguageManager {
 
     private final LanguageRepository languageRepository;
+
+    private final NotificationManager notificationManager;
 
     @Override
     public List<Language> getLanguages() {
@@ -49,6 +53,9 @@ public class LanguageManagerImpl implements LanguageManager {
         }
 
         LanguageEntity save = languageRepository.save(LanguageMapper.MAPPER.toEntity(language));
+        log.info("Language added: '{}'", save.toString());
+
+        notificationManager.addBatchNotifications(LANGUAGE, save.getId());
         
         return LanguageMapper.MAPPER.toDTO(save);
     }
@@ -72,6 +79,9 @@ public class LanguageManagerImpl implements LanguageManager {
         entity.setCode3(language.getCode3());
 
         LanguageEntity save = languageRepository.save(entity);
+        log.info("Language with id '{}' updated to: '{}'", entity.getId(), entity.toString());
+
+        notificationManager.addBatchNotifications(LANGUAGE, save.getId());
 
         return LanguageMapper.MAPPER.toDTO(save);
     }

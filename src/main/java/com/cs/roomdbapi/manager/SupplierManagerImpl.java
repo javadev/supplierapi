@@ -1,8 +1,12 @@
 package com.cs.roomdbapi.manager;
 
+import com.cs.roomdbapi.dto.Supplier;
+import com.cs.roomdbapi.dto.SupplierWebhook;
 import com.cs.roomdbapi.exception.CustomException;
+import com.cs.roomdbapi.exception.ResourceNotFoundException;
+import com.cs.roomdbapi.mapper.SupplierMapper;
 import com.cs.roomdbapi.model.Role;
-import com.cs.roomdbapi.model.Supplier;
+import com.cs.roomdbapi.model.SupplierEntity;
 import com.cs.roomdbapi.repository.SupplierRepository;
 import com.cs.roomdbapi.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.cs.roomdbapi.utilities.AppUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,50 +35,73 @@ public class SupplierManagerImpl implements SupplierManager {
 
     private final AuthenticationManager authenticationManager;
 
-    public String signIn(String name, String password) {
+    public String signIn(String supplierName, String password) {
         try {
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(name, password);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(supplierName, password);
             authenticationManager.authenticate(authentication);
 
-            Supplier supplier = supplierRepository.findByName(name);
-            List<Role> roles = supplier.getRoles();
+            SupplierEntity entity = supplierRepository.findByName(supplierName)
+                    .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
 
-            return jwtTokenProvider.createToken(name, roles);
+            List<Role> roles = entity.getRoles();
+
+            return jwtTokenProvider.createToken(supplierName, roles);
         } catch (AuthenticationException e) {
-            log.warn("UserManager::signIn invalid credentials for name '{}' and password '{}'", name, password);
+            log.warn("Invalid credentials for name '{}' and password '{}'", supplierName, password);
 
             throw new CustomException("Invalid name/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
-//    public String signup(Supplier supplier) {
-//        if (!userRepository.existsByUsername(supplier.getUsername())) {
-//            supplier.setPassword(passwordEncoder.encode(supplier.getPassword()));
-//            userRepository.save(supplier);
-//            return jwtTokenProvider.createToken(supplier.getUsername(), supplier.getRoles());
-//        } else {
-//            throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY); // TODO add logger
-//        }
-//    }
+    public String refreshToken(String supplierName) {
+        SupplierEntity entity = supplierRepository.findByName(supplierName)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
 
-//    public void delete(String name) {
-//        userRepository.deleteByUsername(name);
-//    }
-//
-//    public Supplier search(String name) {
-//        Supplier supplier = userRepository.findByUsername(name);
-//        if (supplier == null) {
-//            throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND); // TODO add logger
-//        }
-//        return supplier;
-//    }
-//
-//    public Supplier whoami(HttpServletRequest req) {
-//        return userRepository.findByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
-//    }
+        return jwtTokenProvider.createToken(supplierName, entity.getRoles());
+    }
 
-    public String refresh(String name) {
-        return jwtTokenProvider.createToken(name, supplierRepository.findByName(name).getRoles());
+    public SupplierWebhook saveWebhook(String supplierName, SupplierWebhook webhookUpdate) {
+        SupplierEntity entity = supplierRepository.findByName(supplierName)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
+
+
+        // TODO add validation that webhook url exists
+
+        entity.setWebhook(webhookUpdate.getWebHookUrl());
+        supplierRepository.save(entity);
+
+        log.info("Webhook for name '{}' updated to '{}'", supplierName, entity.getWebhook());
+
+        return new SupplierWebhook(entity.getWebhook());
+    }
+
+    public Supplier getByName(String supplierName) {
+        SupplierEntity entity = supplierRepository.findByName(supplierName)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
+
+        return SupplierMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
+    public List<Supplier> getSuppliers() {
+        List<SupplierEntity> all = supplierRepository.findAll();
+
+        return SupplierMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    public List<Supplier> getSuppliersActiveWithWebhook() {
+        List<SupplierEntity> all = supplierRepository.findByIsActiveIsTrueAndWebhookIsNotNull();
+
+        return SupplierMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    public String getWebhookById(Integer supplierId) {
+        SupplierEntity supplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, ID, supplierId));
+
+        return supplier.getWebhook();
     }
 
 }

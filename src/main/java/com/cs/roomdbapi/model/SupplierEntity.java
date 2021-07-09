@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "supplier")
-public class Supplier {
+public class SupplierEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,14 +21,14 @@ public class Supplier {
     @Column
     private String name;
 
-//    @Column
-//    private String email;
-
     @Column
     private String password;
 
     @Column
-    private Boolean isActive;
+    private String webhook;
+
+    @Column(name = "is_active")
+    private Boolean isActive; // TODO apply check in case supplier is not active
 
     @OneToMany(
             fetch = FetchType.EAGER,
