@@ -5,6 +5,14 @@
 Install npm: <br/>
 `# apt install nodejs npm`
 
+Check node version if it's less than 12 version, than need to install latest:
+~~~~
+# curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh 
+# sudo bash nodesource_setup.sh
+# apt install nodejs
+# node -v
+~~~~
+
 Install ReDoc cli <br/>
 `# npm install -g redoc-cli`
 
