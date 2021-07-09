@@ -1,7 +1,8 @@
 package com.cs.roomdbapi.security;
 
+import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.model.Role;
-import com.cs.roomdbapi.model.Supplier;
+import com.cs.roomdbapi.model.SupplierEntity;
 import com.cs.roomdbapi.repository.SupplierRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +15,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.cs.roomdbapi.utilities.AppUtils.NAME;
+import static com.cs.roomdbapi.utilities.AppUtils.SUPPLIER;
+
 @Service
 @RequiredArgsConstructor
 public class CSUserDetails implements UserDetailsService {
@@ -22,13 +26,15 @@ public class CSUserDetails implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        final Supplier supplier = supplierRepository.findByName(name);
+        final SupplierEntity entity = supplierRepository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, name));
 
-        if (supplier == null) {
+
+        if (entity == null) {
             throw new UsernameNotFoundException("User '" + name + "' not found");
         }
 
-        List<Role> roles = supplier.getRoles();
+        List<Role> roles = entity.getRoles();
 
         List<SimpleGrantedAuthority> rolesList = roles.stream()
                 .map(s -> new SimpleGrantedAuthority(s.getRoleName().getAuthority()))
@@ -36,7 +42,7 @@ public class CSUserDetails implements UserDetailsService {
 
         return org.springframework.security.core.userdetails.User//
                 .withUsername(name)//
-                .password(supplier.getPassword())//
+                .password(entity.getPassword())//
                 .authorities(rolesList)//
                 .accountExpired(false)//
                 .accountLocked(false)//
