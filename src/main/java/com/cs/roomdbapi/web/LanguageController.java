@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -51,15 +52,15 @@ public class LanguageController {
     @Operation(
             summary = "Get language data by id."
     )
-    @GetMapping({"/{languageId}"})
+    @GetMapping({"/{id}"})
     public ResponseEntity<Language> getLanguage(
             @PathVariable
             @Parameter(description = "RoomDB internal language Id. Required.")
             @Min(1)
-                    Integer languageId
+                    Integer id
     ) {
 
-        return new ResponseEntity<>(languageManager.getLanguageById(languageId), HttpStatus.OK);
+        return new ResponseEntity<>(languageManager.getLanguageById(id), HttpStatus.OK);
     }
 
     @Operation(
@@ -74,6 +75,35 @@ public class LanguageController {
     ) {
 
         return new ResponseEntity<>(languageManager.getLanguageByCode(code.toLowerCase()), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN)")
+    @Operation(
+            summary = "Add language."
+    )
+    @PostMapping
+    public ResponseEntity<Language> addLanguage(
+            @Valid @RequestBody Language language
+    ) {
+        Language newLanguage = languageManager.addLanguage(language);
+
+        return new ResponseEntity<>(newLanguage, HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN)")
+    @Operation(
+            summary = "Update language."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<Language> updateLanguage(
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal language Id. Required.")
+            @Min(1) Integer id,
+            @Valid @RequestBody Language language
+    ) {
+        Language updatedLang = languageManager.updateLanguage(id, language);
+
+        return ResponseEntity.ok(updatedLang);
     }
 
 }

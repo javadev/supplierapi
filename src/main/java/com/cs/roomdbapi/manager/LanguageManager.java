@@ -11,4 +11,8 @@ public interface LanguageManager {
     Language getLanguageById(Integer id);
 
     Language getLanguageByCode(String code);
+
+    Language addLanguage(Language language);
+
+    Language updateLanguage(Integer id, Language language);
 }

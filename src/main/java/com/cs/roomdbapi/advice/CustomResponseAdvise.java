@@ -1,7 +1,9 @@
 package com.cs.roomdbapi.advice;
 
 import com.cs.roomdbapi.annotation.IgnoreResponseBinding;
+import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.exception.CustomException;
+import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.response.ErrorResponse;
 import com.cs.roomdbapi.response.SuccessResponse;
 import com.cs.roomdbapi.utilities.AppUtils;
@@ -64,12 +66,24 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
                             msg = AppUtils.RESPONSE_CODE_NO_DATA_MSG;
                         }
 
-                        return new SuccessResponse<>(obj, msg);
+                        return new SuccessResponse<>(obj, msg, AppUtils.SUCCESS);
                     }
                 }
             }
         }
         return obj;
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseBody
+    public SuccessResponse<Object> resolveException(BadRequestException exception) {
+        return new SuccessResponse<>(exception.getObject(), exception.getMessage(), AppUtils.FAIL);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseBody
+    public SuccessResponse<Object> resolveException(ResourceNotFoundException exception) {
+        return new SuccessResponse<>(null, exception.getMessage(), AppUtils.FAIL);
     }
 
     @Bean

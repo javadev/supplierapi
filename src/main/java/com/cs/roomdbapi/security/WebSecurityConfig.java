@@ -32,7 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()//
-                .antMatchers("/api/v1/suppliers/getToken").permitAll()//
+                .antMatchers("/api/v1/suppliers/get-token").permitAll()//
+                .antMatchers("/api/v1/suppliers/encode-password").permitAll()//
+                .antMatchers("/api/v1/suppliers/test-receive-webhook").permitAll()//
 //                .antMatchers("/users/signup").permitAll()//
                 // Disallow everything else..
                 .anyRequest().authenticated();
@@ -57,6 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v3/api-docs")
                 .antMatchers("/v3/api-docs/swagger-config")
                 .antMatchers("/swagger-ui/**")
+                .antMatchers("/swagger")
         ;
     }
 
