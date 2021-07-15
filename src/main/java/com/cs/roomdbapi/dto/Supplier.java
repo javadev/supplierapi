@@ -28,7 +28,7 @@ public class Supplier {
     private String webhook;
 
     @JsonProperty
-    @Schema(description = "Is supplier accout is active or not", example = "true")
+    @Schema(description = "Is supplier account is active or not", example = "true")
     private Boolean isActive;
 
 }

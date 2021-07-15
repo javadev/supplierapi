@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -17,10 +18,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Property {
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer id;
+public class PropertySaveRequest {
 
     @JsonProperty
     @Size(min = 1, max = 255)
@@ -52,10 +50,8 @@ public class Property {
     @Schema(description = "Is this property for testing purpose", example = "false")
     private Boolean forTesting;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Currency homeCurrency;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Supplier supplier;
+    @JsonProperty
+    @Min(1)
+    private Integer homeCurrencyId;
 
 }
