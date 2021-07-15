@@ -17,8 +17,8 @@ public class BadRequestException extends RuntimeException {
 
     private Object object;
 
-    public BadRequestException(String message, Throwable cause) {
-        super(message, cause);
+    public BadRequestException(String message) {
+        this.message = message;
     }
 
 }
