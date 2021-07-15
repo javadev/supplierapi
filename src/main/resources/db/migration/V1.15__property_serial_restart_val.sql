@@ -1,0 +1,1 @@
+ALTER SEQUENCE property_id_seq RESTART WITH 1000000;

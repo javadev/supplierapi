@@ -29,6 +29,10 @@ public class AppUtils {
      */
     public static final String LANGUAGE = "Language";
 
+    public static final String PROPERTY = "Property";
+
+    public static final String CURRENCY = "Currency";
+
     public static final String SUPPLIER = "Supplier";
 
     public static final String NOTIFICATION = "Notification";
@@ -37,6 +41,8 @@ public class AppUtils {
      * Field names
      */
     public static final String ID = "id";
+
+    public static final String SUPPLIER_PROPERTY_ID = "SupplierPropertyId";
 
     public static final String CODE = "code";
 
