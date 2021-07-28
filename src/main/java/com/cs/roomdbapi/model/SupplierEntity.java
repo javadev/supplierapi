@@ -3,8 +3,10 @@ package com.cs.roomdbapi.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -37,5 +39,9 @@ public class SupplierEntity {
     )
     @JoinColumn(name = "supplier_id")
     private List<Role> roles;
+
+    @Column
+    @UpdateTimestamp
+    private Timestamp last_update;
 
 }
