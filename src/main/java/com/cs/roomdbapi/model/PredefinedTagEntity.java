@@ -13,23 +13,20 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "media_tag")
-public class MediaTagEntity {
+@Table(name = "predefined_tag")
+public class PredefinedTagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
-    @Column(name = "media_id")
-    private Integer mediaId;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "predefined_tag_id")
-    private PredefinedTagEntity predefinedTag;
-
     @Column
     private String text;
+
+    @NotNull
+    @Column(name = "parent_id")
+    private Integer parentId;
 
     @Column
     @UpdateTimestamp

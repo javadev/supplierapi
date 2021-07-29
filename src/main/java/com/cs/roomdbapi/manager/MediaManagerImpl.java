@@ -38,6 +38,8 @@ public class MediaManagerImpl implements MediaManager {
 
     private final LicenseTypeRepository licenseTypeRepository;
 
+    private final PredefinedTagRepository predefinedTagRepository;
+
     private final NotificationManager notificationManager;
 
     private final FTPFileWriter ftpFileWriter;
@@ -189,19 +191,25 @@ public class MediaManagerImpl implements MediaManager {
         mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new ResourceNotFoundException(MEDIA, ID, mediaId));
 
-        mediaTagRepository.deleteByMediaId(mediaId);
-
         List<MediaTagEntity> tags = new ArrayList<>();
         for (MediaTag tag : mediaTags.getTags()) {
-            if (tag.getText().isBlank()) {
-                continue;
+            if ((tag.getText() == null || tag.getText().isBlank()) && (tag.getPredefinedTagId() == null || tag.getPredefinedTagId() <= 0)) {
+                throw new BadRequestException("Tag Text and Predefined Tag Id both are empty. One of those two fields required to be not blank.");
             }
             MediaTagEntity entity = new MediaTagEntity();
+            if (tag.getPredefinedTagId() != null) {
+                PredefinedTagEntity predefinedTag = predefinedTagRepository.findById(tag.getPredefinedTagId())
+                        .orElseThrow(() -> new ResourceNotFoundException(PREDEFINED_TAG, ID, tag.getPredefinedTagId()));
+                entity.setPredefinedTag(predefinedTag);
+            } else {
+                entity.setText(tag.getText());
+            }
             entity.setMediaId(mediaId);
-            entity.setText(tag.getText());
 
             tags.add(entity);
         }
+
+        mediaTagRepository.deleteByMediaId(mediaId);
 
         List<MediaTagEntity> mediaTagEntities = null;
         if (tags.size() > 0) {

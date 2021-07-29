@@ -3,6 +3,7 @@ package com.cs.roomdbapi.web;
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.MediaManager;
+import com.cs.roomdbapi.manager.PredefinedTagManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,6 +39,8 @@ import java.util.List;
 public class MediaController {
 
     private final MediaManager mediaManager;
+
+    private final PredefinedTagManager predefinedTagManager;
 
     private final PropertyManager propertyManager;
 
@@ -161,7 +164,8 @@ public class MediaController {
     @Operation(
             summary = "Set tags to media.",
             description = "Previous tags will be removed and only new not blank tags will be attached to media. <br/>" +
-                    "If provided tags array empty all existing tags will be removed."
+                    "If provided tags array empty all existing tags will be removed. <br/>" +
+                    "For each tag one of those two fields should be provided: **text** or **predefinedTagId**"
     )
     @PostMapping({"/set-tags"})
     public ResponseEntity<List<MediaTag>> setTags(
@@ -271,6 +275,16 @@ public class MediaController {
         MediaAttribute mediaAttribute = mediaManager.addMediaAttribute(mediaAttributeSaveOne);
 
         return new ResponseEntity<>(mediaAttribute, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get list of all Predefined Tags."
+    )
+    @GetMapping({"/predefined-tag"})
+    public ResponseEntity<List<PredefinedTag>> getAllPredefinedTags() {
+        List<PredefinedTag> all = predefinedTagManager.getAllPredefinedTags();
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
 }

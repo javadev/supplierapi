@@ -13,6 +13,7 @@ public interface MediaTagMapper {
 
     MediaTagMapper MAPPER = Mappers.getMapper(MediaTagMapper.class);
 
+    @Mapping(target = "predefinedTagId", ignore = true)
     MediaTag toDTO(MediaTagEntity e);
 
     List<MediaTag> toListDTO(List<MediaTagEntity> list);

@@ -33,6 +33,8 @@ public class AppUtils {
 
     public static final String MEDIA = "Media";
 
+    public static final String PREDEFINED_TAG = "Predefined Tag";
+
     public static final String MEDIA_TYPE = "Media Type";
 
     public static final String MEDIA_ATTRIBUTE_TYPE = "Media Attribute Type";
