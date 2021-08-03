@@ -45,4 +45,6 @@ public interface FTPFileWriter {
      */
 
     boolean isConnected();
+
+    void removeFile(String filename);
 }

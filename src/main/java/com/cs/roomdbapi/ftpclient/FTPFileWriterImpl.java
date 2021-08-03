@@ -101,4 +101,18 @@ public class FTPFileWriterImpl implements FTPFileWriter {
         log.debug("Checking for connection to FTP server. Is connected: " + connected);
         return connected;
     }
+
+    public void removeFile(String filename) {
+        try {
+            log.debug("Trying to remove file at destination path: " + filename);
+
+            boolean b = ftpClient.deleteFile(filename);
+            log.debug("File removed: " + b);
+
+            b = ftpClient.removeDirectory(filename.substring(0, 24));
+            log.debug("Folder removed: " + b);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }
