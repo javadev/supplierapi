@@ -43,4 +43,6 @@ public interface MediaManager {
 
     MediaAttribute addMediaAttribute(MediaAttributeSaveOne req);
 
+    void deleteMedia(Integer mediaId);
+
 }

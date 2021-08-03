@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
@@ -270,7 +271,7 @@ public class MediaManagerImpl implements MediaManager {
         MediaAttributeTypeEntity mediaAttributeType = mediaAttributeTypeRepository.findById(mediaAttributeTypeId)
                 .orElseThrow(() -> new ResourceNotFoundException(MEDIA_ATTRIBUTE_TYPE, ID, mediaAttributeTypeId));
 
-        Optional<MediaAttributeEntity> existing = mediaAttributeRepository.findTopByMediaIdAndAndMediaAttributeType_Id(mediaId, mediaAttributeTypeId);
+        Optional<MediaAttributeEntity> existing = mediaAttributeRepository.findTopByMediaIdAndMediaAttributeType_Id(mediaId, mediaAttributeTypeId);
 
         if (req.getValue().isBlank()) {
             throw new BadRequestException(String.format("Value for media attribute type '%s' should not be blank.", mediaAttributeType.getName()));
@@ -281,21 +282,46 @@ public class MediaManagerImpl implements MediaManager {
             entity = existing.get();
 
             entity.setValue(req.getValue());
-            entity.setDimension(req.getDimension());
+            if (req.getDimension() != null && !req.getDimension().isBlank()) {
+                entity.setDimension(req.getDimension());
+            } else {
+                entity.setDimension("");
+            }
         } else {
             entity = new MediaAttributeEntity();
             entity.setMediaId(mediaId);
             entity.setMediaAttributeType(mediaAttributeType);
             entity.setValue(req.getValue());
 
-            if (!req.getDimension().isBlank()) {
+            if (req.getDimension() != null && !req.getDimension().isBlank()) {
                 entity.setDimension(req.getDimension());
             }
         }
 
         MediaAttributeEntity save = mediaAttributeRepository.save(entity);
+        save.getMediaAttributeType().setPredefinedValues(null); // avoid return predefined values
 
         return MediaAttributeMapper.MAPPER.toDTO(save);
     }
 
+    @Override
+    @Transactional
+    public void deleteMedia(Integer id) {
+        MediaEntity mediaEntity = mediaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MEDIA, ID, id));
+        String url = mediaEntity.getUrl();
+
+        mediaAttributeRepository.deleteByMediaId(id);
+        mediaRepository.delete(mediaEntity);
+
+        if (url != null && !url.isBlank()) {
+            String filename = url.replace(accessUrl, "");
+
+            ftpFileWriter.open();
+            if (ftpFileWriter.isConnected()) {
+                ftpFileWriter.removeFile(filename);
+            }
+            ftpFileWriter.close();
+        }
+    }
 }

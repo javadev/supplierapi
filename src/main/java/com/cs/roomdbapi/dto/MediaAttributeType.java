@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,6 +34,9 @@ public class MediaAttributeType {
     @Size(min = 1, max = 255)
     @Schema(description = "Name of the media attribute type", example = "Image Width")
     private String name;
+
+    @JsonProperty
+    private List<MediaAttributePredefinedValue> predefinedValues;
 
     @JsonProperty
     private MediaType mediaType;

@@ -15,8 +15,8 @@ public interface MediaAttributeRepository extends JpaRepository<MediaAttributeEn
     List<MediaAttributeEntity> findAllByMediaId(Integer mediaId);
 
     @Transactional(readOnly = true)
-    Optional<MediaAttributeEntity> findTopByMediaIdAndAndMediaAttributeType_Id(Integer mediaId, Integer mediaAttributeTypeId);
+    Optional<MediaAttributeEntity> findTopByMediaIdAndMediaAttributeType_Id(Integer mediaId, Integer mediaAttributeTypeId);
 
-    @Transactional(readOnly = false)
+    @Transactional()
     void deleteByMediaId(Integer mediaId);
 }

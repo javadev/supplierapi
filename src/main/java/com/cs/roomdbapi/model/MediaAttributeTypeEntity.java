@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -31,6 +32,14 @@ public class MediaAttributeTypeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "media_type_id")
     private MediaTypeEntity mediaType;
+
+    @OneToMany(
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(name = "media_attribute_type_id")
+    private List<MediaAttributePredefinedValueEntity> predefinedValues;
 
     @Column
     @UpdateTimestamp

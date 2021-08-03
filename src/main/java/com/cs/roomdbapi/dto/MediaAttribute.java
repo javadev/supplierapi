@@ -38,7 +38,6 @@ public class MediaAttribute {
     private String value;
 
     @JsonProperty
-    @NotBlank(message = "Dimension should be provided.")
     @Size(min = 1, max = 255)
     @Schema(description = "Dimension of the media attribute", example = "pixel")
     private String dimension;

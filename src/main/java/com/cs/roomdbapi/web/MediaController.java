@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Slf4j
 @Tag(
         name = "Media",
         description = "API endpoints to access media and additional information about it."
@@ -155,8 +157,10 @@ public class MediaController {
             @PathVariable
             @Parameter(description = "RoomDB internal media Id. Required.")
             @Min(1)
-                    Integer id
+                    Integer id,
+            HttpServletRequest req
     ) {
+        validateMediaAccess(id, req);
 
         return new ResponseEntity<>(mediaManager.getMediaById(id), HttpStatus.OK);
     }
@@ -285,6 +289,26 @@ public class MediaController {
         List<PredefinedTag> all = predefinedTagManager.getAllPredefinedTags();
 
         return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Delete media by id."
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMedia(
+            @PathVariable
+            @Parameter(description = "RoomDB internal media Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("API delete media called with id: {}.", id);
+
+        validateMediaAccess(id, req);
+
+        mediaManager.deleteMedia(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

@@ -46,8 +46,8 @@ public class MediaEntity {
 
     @OneToMany(
             fetch = FetchType.LAZY,
-            orphanRemoval = true,
-            cascade = CascadeType.ALL
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
     )
     @JoinColumn(name = "media_id")
     private List<MediaTagEntity> tags;
