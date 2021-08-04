@@ -30,7 +30,7 @@ public class PropertyTypeEntity {
 
     @NotNull
     @Column(name = "code_source")
-    private PropertyTypeSource codeSource;
+    private CodeSource codeSource;
 
     @Column(name = "alternative_name")
     private String alternativeName;
