@@ -31,6 +31,16 @@ public class AppUtils {
 
     public static final String PROPERTY = "Property";
 
+    public static final String MEDIA = "Media";
+
+    public static final String PREDEFINED_TAG = "Predefined Tag";
+
+    public static final String MEDIA_TYPE = "Media Type";
+
+    public static final String MEDIA_ATTRIBUTE_TYPE = "Media Attribute Type";
+
+    public static final String LICENSE_TYPE = "License Type";
+
     public static final String CURRENCY = "Currency";
 
     public static final String SUPPLIER = "Supplier";
@@ -52,4 +62,6 @@ public class AppUtils {
      * Defaults
      */
     public static final String DEFAULT_LANGUAGE_CODE = "en";
+
+    public static final String DEFAULT_LOGO_MEDIA_TYPE_CODE = "img";
 }

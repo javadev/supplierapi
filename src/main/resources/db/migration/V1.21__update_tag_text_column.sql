@@ -1,0 +1,1 @@
+ALTER TABLE media_tag ALTER COLUMN text DROP NOT NULL;

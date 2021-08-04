@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -13,32 +14,32 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "supplier")
-public class SupplierEntity {
+@Table(name = "media_attribute_type")
+public class MediaAttributeTypeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotNull
+    @Column
+    private String code;
+
+    @NotNull
     @Column
     private String name;
 
-    @Column
-    private String password;
-
-    @Column
-    private String webhook;
-
-    @Column(name = "is_active")
-    private Boolean isActive; // TODO apply check in case supplier is not active
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "media_type_id")
+    private MediaTypeEntity mediaType;
 
     @OneToMany(
             fetch = FetchType.EAGER,
             orphanRemoval = true,
             cascade = CascadeType.ALL
     )
-    @JoinColumn(name = "supplier_id")
-    private List<Role> roles;
+    @JoinColumn(name = "media_attribute_type_id")
+    private List<MediaAttributePredefinedValueEntity> predefinedValues;
 
     @Column
     @UpdateTimestamp

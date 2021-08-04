@@ -143,7 +143,7 @@ public class PropertyController {
         return ResponseEntity.ok(updatedProperty);
     }
 
-    private void validatePropertyAccess(HttpServletRequest req, Property property) {
+    protected static void validatePropertyAccess(HttpServletRequest req, Property property) {
 
         String propertyName = property.getSupplier().getName();
         String supplierName = req.getRemoteUser();
@@ -153,7 +153,7 @@ public class PropertyController {
         }
     }
 
-    private boolean isHasAllPropertiesPermission() {
+    private static boolean isHasAllPropertiesPermission() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth != null && auth.getAuthorities().stream().anyMatch(
                 a -> a.getAuthority().equals(RoleName.ROLE_SUPPLIER_ALL_PROPERTIES.getAuthority())
