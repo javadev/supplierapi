@@ -55,8 +55,12 @@ public class MediaController {
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
             @Min(1000000)
-                    Integer propertyId
+                    Integer propertyId,
+            HttpServletRequest req
     ) {
+        Property prop = propertyManager.getPropertyById(propertyId);
+        PropertyController.validatePropertyAccess(req, prop);
+
         List<Media> all = mediaManager.getAllMediaByPropertyId(propertyId);
 
         return new ResponseEntity<>(all, HttpStatus.OK);
@@ -122,11 +126,11 @@ public class MediaController {
             throw new BadRequestException("File not provided.");
         }
 
-        if (!mediaManager.mediaTypeExistsById(mediaTypeId)) {
+        if (mediaTypeId != null && mediaManager.mediaTypeNotExistsById(mediaTypeId)) {
             throw new BadRequestException("Media type with provided id does not exists in a system.");
         }
 
-        if (!mediaManager.licenseTypeExistsById(licenseTypeId)) {
+        if (licenseTypeId != null && mediaManager.licenseTypeNotExistsById(licenseTypeId)) {
             throw new BadRequestException("License type with provided id does not exists in a system.");
         }
 
@@ -186,7 +190,7 @@ public class MediaController {
     }
 
     private void validateMediaAccess(Integer mediaId, HttpServletRequest req) {
-        if (!mediaManager.mediaExistsById(mediaId)) {
+        if (mediaManager.mediaNotExistsById(mediaId)) {
             throw new BadRequestException("Media with provided id does not exists in a system.");
         }
 
@@ -216,7 +220,7 @@ public class MediaController {
             @Min(1)
                     Integer mediaTypeId
     ) {
-        if (!mediaManager.mediaTypeExistsById(mediaTypeId)) {
+        if (mediaManager.mediaTypeNotExistsById(mediaTypeId)) {
             throw new BadRequestException("Media type with provided id does not exists in a system.");
         }
 

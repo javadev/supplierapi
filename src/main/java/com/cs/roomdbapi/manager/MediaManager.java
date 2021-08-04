@@ -9,7 +9,7 @@ public interface MediaManager {
 
     List<Media> getAllMedia();
 
-    boolean mediaExistsById(Integer mediaId);
+    boolean mediaNotExistsById(Integer mediaId);
 
     Media getMediaById(Integer id);
 
@@ -21,13 +21,17 @@ public interface MediaManager {
 
     List<MediaType> getAllMediaTypes();
 
-    boolean mediaTypeExistsById(Integer mediaTypeId);
+    boolean mediaTypeNotExistsById(Integer mediaTypeId);
+
+    Integer getMediaTypeIdForLogo();
 
     List<LicenseType> getAllLicenseType();
 
-    boolean licenseTypeExistsById(Integer licenseTypeId);
+    boolean licenseTypeNotExistsById(Integer licenseTypeId);
 
     List<Media> getAllMediaByPropertyId(Integer propertyId);
+
+    List<Media> getAllLogosByPropertyId(Integer propertyId);
 
     String saveFile(MultipartFile file);
 

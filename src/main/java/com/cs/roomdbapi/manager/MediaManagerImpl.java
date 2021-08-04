@@ -7,6 +7,7 @@ import com.cs.roomdbapi.ftpclient.FTPFileWriter;
 import com.cs.roomdbapi.mapper.*;
 import com.cs.roomdbapi.model.*;
 import com.cs.roomdbapi.repository.*;
+import com.cs.roomdbapi.utilities.AppUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -60,8 +61,8 @@ public class MediaManagerImpl implements MediaManager {
     }
 
     @Override
-    public boolean mediaExistsById(Integer mediaId) {
-        return mediaRepository.existsById(mediaId);
+    public boolean mediaNotExistsById(Integer mediaId) {
+        return !mediaRepository.existsById(mediaId);
     }
 
     @Override
@@ -99,8 +100,13 @@ public class MediaManagerImpl implements MediaManager {
     }
 
     @Override
-    public boolean mediaTypeExistsById(Integer mediaTypeId) {
-        return mediaTypeRepository.existsById(mediaTypeId);
+    public boolean mediaTypeNotExistsById(Integer mediaTypeId) {
+        return !mediaTypeRepository.existsById(mediaTypeId);
+    }
+
+    @Override
+    public Integer getMediaTypeIdForLogo() {
+        return mediaTypeRepository.getMediaTypeIdByCode(AppUtils.DEFAULT_LOGO_MEDIA_TYPE_CODE);
     }
 
     @Override
@@ -111,13 +117,20 @@ public class MediaManagerImpl implements MediaManager {
     }
 
     @Override
-    public boolean licenseTypeExistsById(Integer licenseTypeId) {
-        return licenseTypeRepository.existsById(licenseTypeId);
+    public boolean licenseTypeNotExistsById(Integer licenseTypeId) {
+        return !licenseTypeRepository.existsById(licenseTypeId);
     }
 
     @Override
     public List<Media> getAllMediaByPropertyId(Integer propertyId) {
         List<MediaEntity> all = mediaRepository.findAllByProperty_Id(propertyId);
+
+        return MediaMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    public List<Media> getAllLogosByPropertyId(Integer propertyId) {
+        List<MediaEntity> all = mediaRepository.findAllByProperty_IdAndIsLogo(propertyId, true);
 
         return MediaMapper.MAPPER.toListDTO(all);
     }

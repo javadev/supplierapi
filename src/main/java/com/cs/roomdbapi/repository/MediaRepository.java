@@ -15,6 +15,9 @@ public interface MediaRepository extends JpaRepository<MediaEntity, Integer> {
     List<MediaEntity> findAllByProperty_Id(Integer propertyId);
 
     @Transactional(readOnly = true)
+    List<MediaEntity> findAllByProperty_IdAndIsLogo(Integer propertyId, boolean isLogo);
+
+    @Transactional(readOnly = true)
     @Query("select m.property.id from MediaEntity m where m.id = ?1")
     Integer getPropertyIdByMediaId(Integer mediaId);
 

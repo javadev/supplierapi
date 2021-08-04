@@ -62,4 +62,6 @@ public class AppUtils {
      * Defaults
      */
     public static final String DEFAULT_LANGUAGE_CODE = "en";
+
+    public static final String DEFAULT_LOGO_MEDIA_TYPE_CODE = "img";
 }
