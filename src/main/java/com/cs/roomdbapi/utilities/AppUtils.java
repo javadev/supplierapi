@@ -33,6 +33,10 @@ public class AppUtils {
 
     public static final String MEDIA = "Media";
 
+    public static final String POINT_OF_INTEREST = "Point Of Interest";
+
+    public static final String CATEGORY_CODE = "Category Code";
+
     public static final String PREDEFINED_TAG = "Predefined Tag";
 
     public static final String MEDIA_TYPE = "Media Type";
