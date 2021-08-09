@@ -13,8 +13,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "property_type")
-public class PropertyTypeEntity {
+@Table(name = "category_code")
+public class CategoryCodeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +31,6 @@ public class PropertyTypeEntity {
     @NotNull
     @Column(name = "code_source")
     private CodeSource codeSource;
-
-    @Column(name = "alternative_name")
-    private String alternativeName;
 
     @Column
     @UpdateTimestamp

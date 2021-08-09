@@ -1,13 +1,13 @@
 package com.cs.roomdbapi.model;
 
-public enum PropertyTypeSource {
+public enum CodeSource {
     ota("ota"),
     booking("booking"),
     cultswitch("cultswitch");
 
     private final String code;
 
-    PropertyTypeSource(String code) {
+    CodeSource(String code) {
         this.code = code;
     }
 
