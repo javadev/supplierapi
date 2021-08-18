@@ -18,4 +18,8 @@ public interface PointOfInterestRepository extends JpaRepository<PointOfInterest
     @Transactional(readOnly = true)
     List<PointOfInterestEntity> findAllByProperty_Id(Integer propertyId);
 
+    @Transactional(readOnly = true)
+    @Query(value = "select poixd.point_of_interest_id from point_of_interest_x_description poixd where poixd.description_id = ?1", nativeQuery = true)
+    Integer getPOIIdByDescriptionId(Integer descriptionId);
+
 }

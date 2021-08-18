@@ -23,6 +23,7 @@ public interface PointOfInterestMapper {
     @Mapping(target = "property", ignore = true)
     @Mapping(target = "categoryCode", ignore = true)
     @Mapping(target = "language", ignore = true)
+    @Mapping(target = "descriptions", ignore = true)
     @Mapping(target = "last_update", ignore = true)
     PointOfInterestEntity toEntity(PointOfInterestSaveRequest dto);
 }

@@ -50,6 +50,8 @@ public class MediaManagerImpl implements MediaManager {
 
     private final MediaTagRepository mediaTagRepository;
 
+    private final DescriptionManager descriptionManager;
+
     @Value("${media.access-url}")
     String accessUrl;
 
@@ -199,6 +201,11 @@ public class MediaManagerImpl implements MediaManager {
     }
 
     @Override
+    public Integer getMediaIdByDescriptionId(Integer descriptionId) {
+        return mediaRepository.getMediaIdByDescriptionId(descriptionId);
+    }
+
+    @Override
     public List<MediaTag> setMediaTags(MediaTagRequest mediaTags) {
         Integer mediaId = mediaTags.getMediaId();
 
@@ -274,6 +281,20 @@ public class MediaManagerImpl implements MediaManager {
         }
 
         return MediaAttributeMapper.MAPPER.toListDTO(attributeEntities);
+    }
+
+    @Override
+    @Transactional
+    public Description addMediaDescription(Integer mediaId, DescriptionSave descriptionToSave) {
+        DescriptionEntity savedDescription = descriptionManager.createDescription(descriptionToSave, DEFAULT_MEDIA_DESCRIPTION_TYPE_CODE);
+
+        MediaEntity mediaEntity = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEDIA, ID, mediaId));
+
+        mediaEntity.getDescriptions().add(savedDescription);
+        mediaRepository.save(mediaEntity);
+
+        return DescriptionMapper.MAPPER.toDTO(savedDescription);
     }
 
     @Override

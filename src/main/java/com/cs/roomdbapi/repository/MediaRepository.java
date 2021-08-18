@@ -21,4 +21,8 @@ public interface MediaRepository extends JpaRepository<MediaEntity, Integer> {
     @Query("select m.property.id from MediaEntity m where m.id = ?1")
     Integer getPropertyIdByMediaId(Integer mediaId);
 
+    @Transactional(readOnly = true)
+    @Query(value = "select mxd.media_id from media_x_description mxd where mxd.description_id = ?1", nativeQuery = true)
+    Integer getMediaIdByDescriptionId(Integer descriptionId);
+
 }

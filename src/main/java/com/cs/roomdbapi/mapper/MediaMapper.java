@@ -25,6 +25,7 @@ public interface MediaMapper {
     @Mapping(target = "mediaType", ignore = true)
     @Mapping(target = "licenseType", ignore = true)
     @Mapping(target = "url", ignore = true)
+    @Mapping(target = "descriptions", ignore = true)
     @Mapping(target = "last_update", ignore = true)
     MediaEntity saveRequestToEntity(MediaSaveRequest dto);
 

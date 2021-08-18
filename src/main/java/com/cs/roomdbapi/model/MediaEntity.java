@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -51,6 +52,13 @@ public class MediaEntity {
     )
     @JoinColumn(name = "media_id")
     private List<MediaTagEntity> tags;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "media_x_description",
+            joinColumns = @JoinColumn(name = "media_id"),
+            inverseJoinColumns = @JoinColumn(name = "description_id"))
+    Set<DescriptionEntity> descriptions;
 
     @Column
     @UpdateTimestamp

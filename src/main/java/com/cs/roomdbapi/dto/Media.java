@@ -14,6 +14,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -58,5 +59,9 @@ public class Media {
     @NotBlank(message = "Media url should be provided.")
     @URL(message = "Media url should be in proper url format")
     private String url;
+
+    @JsonProperty
+    @Schema(description = "Descriptions for the Media")
+    private Set<Description> descriptions;
 
 }

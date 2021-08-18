@@ -29,6 +29,8 @@ public class AppUtils {
      */
     public static final String LANGUAGE = "Language";
 
+    public static final String DESCRIPTION = "Description";
+
     public static final String PROPERTY = "Property";
 
     public static final String MEDIA = "Media";
@@ -42,6 +44,8 @@ public class AppUtils {
     public static final String MEDIA_TYPE = "Media Type";
 
     public static final String MEDIA_ATTRIBUTE_TYPE = "Media Attribute Type";
+
+    public static final String DESCRIPTION_TYPE = "Description Type";
 
     public static final String LICENSE_TYPE = "License Type";
 
@@ -68,4 +72,8 @@ public class AppUtils {
     public static final String DEFAULT_LANGUAGE_CODE = "en";
 
     public static final String DEFAULT_LOGO_MEDIA_TYPE_CODE = "img";
+
+    public static final String DEFAULT_MEDIA_DESCRIPTION_TYPE_CODE = "med";
+
+    public static final String DEFAULT_POI_DESCRIPTION_TYPE_CODE = "poi";
 }

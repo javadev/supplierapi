@@ -2,6 +2,7 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
+import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.MediaManager;
 import com.cs.roomdbapi.manager.PredefinedTagManager;
 import com.cs.roomdbapi.manager.PropertyManager;
@@ -45,6 +46,8 @@ public class MediaController {
     private final PredefinedTagManager predefinedTagManager;
 
     private final PropertyManager propertyManager;
+
+    private final DescriptionManager descriptionManager;
 
     @Operation(
             summary = "Get list of all media, by property id.",
@@ -311,6 +314,71 @@ public class MediaController {
         validateMediaAccess(id, req);
 
         mediaManager.deleteMedia(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add descriptions to media."
+    )
+    @PostMapping({"/description/{mediaId}"})
+    public ResponseEntity<Description> addDescription(
+            @PathVariable("mediaId")
+            @Parameter(description = "RoomDB internal media Id. Required.")
+            @Min(1)
+                    Integer mediaId,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        validateMediaAccess(mediaId, req);
+
+        Description description = mediaManager.addMediaDescription(mediaId, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update description for Media."
+    )
+    @PatchMapping("/description/{id}")
+    public ResponseEntity<Description> updateDescription(
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
+
+        validateMediaAccess(mediaId, req);
+
+        Description description = descriptionManager.updateDescription(id, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Delete description for Media."
+    )
+    @DeleteMapping("/description/{id}")
+    public ResponseEntity<Void> deleteDescription(
+            @PathVariable
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("API delete media description called with id: {}.", id);
+
+        Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
+        validateMediaAccess(mediaId, req);
+
+        descriptionManager.deleteMediaDescription(mediaId, id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

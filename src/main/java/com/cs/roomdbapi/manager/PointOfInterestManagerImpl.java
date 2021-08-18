@@ -1,15 +1,11 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.CategoryCode;
-import com.cs.roomdbapi.dto.PointOfInterest;
-import com.cs.roomdbapi.dto.PointOfInterestSaveRequest;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.CategoryCodeMapper;
+import com.cs.roomdbapi.mapper.DescriptionMapper;
 import com.cs.roomdbapi.mapper.PointOfInterestMapper;
-import com.cs.roomdbapi.model.CategoryCodeEntity;
-import com.cs.roomdbapi.model.LanguageEntity;
-import com.cs.roomdbapi.model.PointOfInterestEntity;
-import com.cs.roomdbapi.model.PropertyEntity;
+import com.cs.roomdbapi.model.*;
 import com.cs.roomdbapi.repository.CategoryCodeRepository;
 import com.cs.roomdbapi.repository.LanguageRepository;
 import com.cs.roomdbapi.repository.PointOfInterestRepository;
@@ -35,6 +31,8 @@ public class PointOfInterestManagerImpl implements PointOfInterestManager {
     private final PropertyRepository propertyRepository;
 
     private final LanguageRepository languageRepository;
+
+    private final DescriptionManager descriptionManager;
 
     @Override
     public List<PointOfInterest> getAllPOI() {
@@ -69,7 +67,6 @@ public class PointOfInterestManagerImpl implements PointOfInterestManager {
     }
 
     @Override
-    @Transactional
     public void deletePOI(Integer id) {
         PointOfInterestEntity entity = pointOfInterestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(POINT_OF_INTEREST, ID, id));
@@ -148,6 +145,25 @@ public class PointOfInterestManagerImpl implements PointOfInterestManager {
         log.info("Point Of Interest with id '{}' updated to: '{}'", entity.getId(), entity.toString());
 
         return PointOfInterestMapper.MAPPER.toDTO(save);
+    }
+
+    @Override
+    @Transactional
+    public Description addPOIDescription(Integer poiId, DescriptionSave descriptionToSave) {
+        DescriptionEntity savedDescription = descriptionManager.createDescription(descriptionToSave, DEFAULT_POI_DESCRIPTION_TYPE_CODE);
+
+        PointOfInterestEntity poiEntity = pointOfInterestRepository.findById(poiId)
+                .orElseThrow(() -> new ResourceNotFoundException(POINT_OF_INTEREST, ID, poiId));
+
+        poiEntity.getDescriptions().add(savedDescription);
+        pointOfInterestRepository.save(poiEntity);
+
+        return DescriptionMapper.MAPPER.toDTO(savedDescription);
+    }
+
+    @Override
+    public Integer getPOIIdByDescriptionId(Integer descriptionId) {
+        return pointOfInterestRepository.getPOIIdByDescriptionId(descriptionId);
     }
 
 }
