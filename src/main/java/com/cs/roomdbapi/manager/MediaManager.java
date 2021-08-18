@@ -39,11 +39,15 @@ public interface MediaManager {
 
     Integer getPropertyIdByMediaId(Integer mediaId);
 
+    Integer getMediaIdByDescriptionId(Integer descriptionId);
+
     List<MediaTag> setMediaTags(MediaTagRequest mediaTags);
 
     List<MediaAttribute> getAllMediaAttributesByMediaId(Integer mediaId);
 
     List<MediaAttribute> setMediaAttributes(MediaAttributeRequest mediaAttributes);
+
+    Description addMediaDescription(Integer mediaId, DescriptionSave descriptionToSave);
 
     MediaAttribute addMediaAttribute(MediaAttributeSaveOne req);
 

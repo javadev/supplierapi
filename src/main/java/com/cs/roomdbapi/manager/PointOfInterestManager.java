@@ -1,8 +1,6 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.CategoryCode;
-import com.cs.roomdbapi.dto.PointOfInterest;
-import com.cs.roomdbapi.dto.PointOfInterestSaveRequest;
+import com.cs.roomdbapi.dto.*;
 
 import java.util.List;
 
@@ -25,5 +23,9 @@ public interface PointOfInterestManager {
     List<CategoryCode> getAllCategoryCodes();
 
     PointOfInterest updatePOI(Integer id, PointOfInterestSaveRequest poi);
+
+    Description addPOIDescription(Integer poiId, DescriptionSave descriptionToSave);
+
+    Integer getPOIIdByDescriptionId(Integer descriptionId);
 
 }

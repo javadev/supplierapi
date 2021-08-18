@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -40,6 +42,13 @@ public class PointOfInterestEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private LanguageEntity language;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "point_of_interest_x_description",
+            joinColumns = @JoinColumn(name = "point_of_interest_id"),
+            inverseJoinColumns = @JoinColumn(name = "description_id"))
+    Set<DescriptionEntity> descriptions;
 
     @Column
     @UpdateTimestamp

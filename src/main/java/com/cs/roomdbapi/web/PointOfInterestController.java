@@ -2,6 +2,7 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
+import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PointOfInterestManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,9 +36,11 @@ import java.util.List;
 @RequestMapping(value = "/api/v1/poi", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PointOfInterestController {
 
-    private final PointOfInterestManager pointOfInterestManager;
+    private final PointOfInterestManager poiManager;
 
     private final PropertyManager propertyManager;
+
+    private final DescriptionManager descriptionManager;
 
     @Operation(
             summary = "Get list of all points of interest, by property id.",
@@ -54,7 +57,7 @@ public class PointOfInterestController {
         Property prop = propertyManager.getPropertyById(propertyId);
         PropertyController.validatePropertyAccess(req, prop);
 
-        List<PointOfInterest> all = pointOfInterestManager.getAllPointOfInterestByPropertyId(propertyId);
+        List<PointOfInterest> all = poiManager.getAllPointOfInterestByPropertyId(propertyId);
 
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
@@ -72,15 +75,15 @@ public class PointOfInterestController {
     ) {
         validatePOIAccess(id, req);
 
-        return new ResponseEntity<>(pointOfInterestManager.getPOIById(id), HttpStatus.OK);
+        return new ResponseEntity<>(poiManager.getPOIById(id), HttpStatus.OK);
     }
 
     private void validatePOIAccess(Integer poiId, HttpServletRequest req) {
-        if (pointOfInterestManager.poiNotExistsById(poiId)) {
+        if (poiManager.poiNotExistsById(poiId)) {
             throw new BadRequestException("Point of interest with provided id does not exists in a system.");
         }
 
-        Integer propertyId = pointOfInterestManager.getPropertyIdByPOIId(poiId);
+        Integer propertyId = poiManager.getPropertyIdByPOIId(poiId);
 
         Property prop = propertyManager.getPropertyById(propertyId);
         PropertyController.validatePropertyAccess(req, prop);
@@ -91,7 +94,7 @@ public class PointOfInterestController {
     )
     @GetMapping({"/category-codes"})
     public ResponseEntity<List<CategoryCode>> getAllCategoryCodes() {
-        List<CategoryCode> all = pointOfInterestManager.getAllCategoryCodes();
+        List<CategoryCode> all = poiManager.getAllCategoryCodes();
 
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
@@ -111,7 +114,7 @@ public class PointOfInterestController {
 
         validatePOIAccess(id, req);
 
-        pointOfInterestManager.deletePOI(id);
+        poiManager.deletePOI(id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -127,7 +130,7 @@ public class PointOfInterestController {
         Property prop = propertyManager.getPropertyById(poi.getPropertyId());
         PropertyController.validatePropertyAccess(req, prop);
 
-        PointOfInterest newPOI = pointOfInterestManager.addPOI(poi);
+        PointOfInterest newPOI = poiManager.addPOI(poi);
 
         return new ResponseEntity<>(newPOI, HttpStatus.CREATED);
     }
@@ -148,9 +151,74 @@ public class PointOfInterestController {
         Property prop = propertyManager.getPropertyById(poi.getPropertyId());
         PropertyController.validatePropertyAccess(req, prop);
 
-        PointOfInterest updated = pointOfInterestManager.updatePOI(id, poi);
+        PointOfInterest updated = poiManager.updatePOI(id, poi);
 
         return ResponseEntity.ok(updated);
+    }
+
+    @Operation(
+            summary = "Add descriptions to point of interest."
+    )
+    @PostMapping({"/description/{poiId}"})
+    public ResponseEntity<Description> addDescription(
+            @PathVariable("poiId")
+            @Parameter(description = "RoomDB internal point of interest Id. Required.")
+            @Min(1)
+                    Integer poiId,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        validatePOIAccess(poiId, req);
+
+        Description description = poiManager.addPOIDescription(poiId, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update description for Point of interest."
+    )
+    @PatchMapping("/description/{id}")
+    public ResponseEntity<Description> updateDescription(
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        Integer poiId = poiManager.getPOIIdByDescriptionId(id);
+
+        validatePOIAccess(poiId, req);
+
+        Description description = descriptionManager.updateDescription(id, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Delete description for Point of interest."
+    )
+    @DeleteMapping("/description/{id}")
+    public ResponseEntity<Void> deleteDescription(
+            @PathVariable
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("API delete point of interests description called with id: {}.", id);
+
+        Integer poiId = poiManager.getPOIIdByDescriptionId(id);
+        validatePOIAccess(poiId, req);
+
+        descriptionManager.deletePOIDescription(poiId, id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
