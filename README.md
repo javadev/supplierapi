@@ -2,6 +2,11 @@
 
 ###### APIs project to access RoomDB.
 
+For API calls should be used **https** only. <br/>
+https://api.supplier.roomdb.io
+
+Calls to http will be returned with Forbidden message by Nginx.
+
 ## Servers information
 
 **"RoomDB-Database"** server: <br/>
@@ -36,6 +41,12 @@ curl -X 'GET' \
 ~~~~
 <br/>
 On a Swagger UI you need to add token in "Authorize" popup. This will automatically add token to each calls.
+
+## Update security token strategy
+
+There are two possible ways to update token.
+1. Check expiration time of the current token. If it's expired then recall `get-token` API using supplierId and supplierSecret. If it's still valid but will expire in less than a minute (some small amount of time) `refresh-token` with token.
+2. Implement logic that will extract expiration period, save this period. Use expiration period (a bit less than it is) for scheduled call of the `refresh-token` API.         
 
 ## Encode password
 There is a helper endpoint to encode password `"/api/v1/suppliers/encode-password"`. <br/>
