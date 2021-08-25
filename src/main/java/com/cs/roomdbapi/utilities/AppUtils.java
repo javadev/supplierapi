@@ -33,7 +33,17 @@ public class AppUtils {
 
     public static final String PROPERTY = "Property";
 
+    public static final String PROPERTY_INFO = "Property info";
+
+    public static final String PROPERTY_TYPE = "Property type";
+
     public static final String MEDIA = "Media";
+
+    public static final String BRAND = "Brand";
+
+    public static final String STATE = "State";
+
+    public static final String GEO_CODE = "Geo Code";
 
     public static final String POINT_OF_INTEREST = "Point Of Interest";
 
@@ -59,6 +69,8 @@ public class AppUtils {
      * Field names
      */
     public static final String ID = "id";
+
+    public static final String PROPERTY_ID = "propertyId";
 
     public static final String SUPPLIER_PROPERTY_ID = "SupplierPropertyId";
 
