@@ -14,7 +14,9 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "Supplier API.",
                 version = "v1",
-                description = "Provides an API endpoints to access data on RoomDB."
+                description = "Provides an API endpoints to access data on RoomDB. <br/>" +
+                        "More detailed information can be found in project " +
+                        "<a href=\"https://repo.cultuzz.com/roomdb/supplierapi/-/blob/master/README.md\">README file</a> <br/>"
         )
 )
 @SecurityScheme(
