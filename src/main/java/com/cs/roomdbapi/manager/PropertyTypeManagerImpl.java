@@ -1,15 +1,16 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.PropertyType;
+import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.PropertyTypeMapper;
 import com.cs.roomdbapi.model.PropertyTypeEntity;
 import com.cs.roomdbapi.repository.PropertyTypeRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
+import static com.cs.roomdbapi.utilities.AppUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,24 +27,18 @@ public class PropertyTypeManagerImpl implements PropertyTypeManager {
 
     @Override
     public PropertyType getPropertyTypeById(Integer id) {
-        Optional<PropertyTypeEntity> findResult = propertyTypeRepository.findById(id);
+        PropertyTypeEntity entity = propertyTypeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_TYPE, ID, id));
 
-        return getFromOptional(findResult);
+        return PropertyTypeMapper.MAPPER.toDTO(entity);
     }
 
     @Override
     public PropertyType getPropertyTypeByCode(String code) {
-        Optional<PropertyTypeEntity> findResult = propertyTypeRepository.findByCode(code);
+        PropertyTypeEntity entity = propertyTypeRepository.findByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_TYPE, CODE, code));
 
-        return getFromOptional(findResult);
+        return PropertyTypeMapper.MAPPER.toDTO(entity);
     }
 
-    private PropertyType getFromOptional(@NonNull Optional<PropertyTypeEntity> findResult) {
-        PropertyType result = null;
-        if (findResult.isPresent()) {
-            result = PropertyTypeMapper.MAPPER.toDTO(findResult.get());
-        }
-
-        return result;
-    }
 }
