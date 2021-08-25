@@ -1,7 +1,6 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.Property;
-import com.cs.roomdbapi.dto.PropertySaveRequest;
+import com.cs.roomdbapi.dto.*;
 
 import java.util.List;
 
@@ -13,10 +12,18 @@ public interface PropertyManager {
 
     Property getPropertyById(Integer id);
 
+    Supplier getSupplierByPropertyId(Integer propertyId);
+
     Property getPropertyBySupplierPropertyId(String id);
 
     Property addProperty(PropertySaveRequest property, String supplierName);
 
     Property updateProperty(Integer id, PropertySaveRequest property, String supplierName);
+
+    PropertyInfo getPropertyInfoByPropertyId(Integer propertyId);
+
+    PropertyInfo addPropertyInfo(PropertyInfoSaveRequest info);
+
+    PropertyInfo updatePropertyInfo(PropertyInfoSaveRequest info);
 
 }

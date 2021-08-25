@@ -3,6 +3,7 @@ package com.cs.roomdbapi.web;
 import com.cs.roomdbapi.dto.Media;
 import com.cs.roomdbapi.dto.MediaSaveRequest;
 import com.cs.roomdbapi.dto.Property;
+import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.MediaManager;
 import com.cs.roomdbapi.manager.PropertyManager;
@@ -86,8 +87,8 @@ public class LogoController {
                     Integer sortOrder,
             HttpServletRequest req
     ) {
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
 
         if (file.isEmpty()) {
             throw new BadRequestException("File not provided.");
@@ -123,8 +124,8 @@ public class LogoController {
 
         Integer propertyId = mediaManager.getPropertyIdByMediaId(logoId);
 
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
     }
 
     @Operation(

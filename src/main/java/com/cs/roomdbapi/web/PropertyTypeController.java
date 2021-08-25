@@ -46,15 +46,15 @@ public class PropertyTypeController {
     @Operation(
             summary = "Get property type data by id."
     )
-    @GetMapping({"/{propertyTypeId}"})
+    @GetMapping({"/{id}"})
     public ResponseEntity<PropertyType> getPropertyType(
             @PathVariable
             @Parameter(description = "RoomDB internal property type Id. Required.")
             @Min(1)
-                    Integer propertyTypeId
+                    Integer id
     ) {
 
-        return new ResponseEntity<>(propertyTypeManager.getPropertyTypeById(propertyTypeId), HttpStatus.OK);
+        return new ResponseEntity<>(propertyTypeManager.getPropertyTypeById(id), HttpStatus.OK);
     }
 
     @Operation(

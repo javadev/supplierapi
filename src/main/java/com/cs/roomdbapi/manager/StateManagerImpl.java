@@ -1,15 +1,16 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.State;
+import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.StateMapper;
 import com.cs.roomdbapi.model.StateEntity;
 import com.cs.roomdbapi.repository.StateRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
+import static com.cs.roomdbapi.utilities.AppUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,16 +27,18 @@ public class StateManagerImpl implements StateManager {
 
     @Override
     public State getById(Integer id) {
-        Optional<StateEntity> findResult = stateRepository.findById(id);
+        StateEntity entity = stateRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(STATE, ID, id));
 
-        return getFromOptional(findResult);
+        return StateMapper.MAPPER.toDTO(entity);
     }
 
     @Override
     public State getStateByCode(String code) {
-        Optional<StateEntity> findResult = stateRepository.findByCode(code);
+        StateEntity entity = stateRepository.findByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException(STATE, CODE, code));
 
-        return getFromOptional(findResult);
+        return StateMapper.MAPPER.toDTO(entity);
     }
 
     @Override
@@ -45,12 +48,4 @@ public class StateManagerImpl implements StateManager {
         return StateMapper.MAPPER.toListDTO(all);
     }
 
-    private State getFromOptional(@NonNull Optional<StateEntity> findResult) {
-        State result = null;
-        if (findResult.isPresent()) {
-            result = StateMapper.MAPPER.toDTO(findResult.get());
-        }
-
-        return result;
-    }
 }
