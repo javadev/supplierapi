@@ -29,6 +29,7 @@ public class PointOfInterestSaveRequest {
     private Integer propertyId;
 
     @JsonProperty
+    @Min(1)
     @Schema(description = "Category code id for the point of interest.")
     private Integer categoryCodeId;
 
@@ -46,6 +47,7 @@ public class PointOfInterestSaveRequest {
     private String distanceUnit;
 
     @JsonProperty
+    @Min(1)
     @Schema(description = "Language id of language that is primary at the point of interest")
     private Integer languageId;
 

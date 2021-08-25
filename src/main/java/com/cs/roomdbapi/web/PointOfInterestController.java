@@ -54,8 +54,8 @@ public class PointOfInterestController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
 
         List<PointOfInterest> all = poiManager.getAllPointOfInterestByPropertyId(propertyId);
 
@@ -85,8 +85,8 @@ public class PointOfInterestController {
 
         Integer propertyId = poiManager.getPropertyIdByPOIId(poiId);
 
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
     }
 
     @Operation(
@@ -127,8 +127,9 @@ public class PointOfInterestController {
             @Valid @RequestBody PointOfInterestSaveRequest poi,
             HttpServletRequest req
     ) {
-        Property prop = propertyManager.getPropertyById(poi.getPropertyId());
-        PropertyController.validatePropertyAccess(req, prop);
+        Integer propertyId = poi.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
 
         PointOfInterest newPOI = poiManager.addPOI(poi);
 
@@ -147,9 +148,6 @@ public class PointOfInterestController {
             HttpServletRequest req
     ) {
         validatePOIAccess(id, req);
-
-        Property prop = propertyManager.getPropertyById(poi.getPropertyId());
-        PropertyController.validatePropertyAccess(req, prop);
 
         PointOfInterest updated = poiManager.updatePOI(id, poi);
 

@@ -61,8 +61,8 @@ public class MediaController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
 
         List<Media> all = mediaManager.getAllMediaByPropertyId(propertyId);
 
@@ -122,8 +122,8 @@ public class MediaController {
                     Integer sortOrder,
             HttpServletRequest req
     ) {
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
 
         if (file.isEmpty()) {
             throw new BadRequestException("File not provided.");
@@ -199,8 +199,8 @@ public class MediaController {
 
         Integer propertyId = mediaManager.getPropertyIdByMediaId(mediaId);
 
-        Property prop = propertyManager.getPropertyById(propertyId);
-        PropertyController.validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
     }
 
     @Operation(
