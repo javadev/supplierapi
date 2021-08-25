@@ -1,7 +1,6 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.Property;
-import com.cs.roomdbapi.dto.PropertySaveRequest;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.model.RoleName;
@@ -80,7 +79,7 @@ public class PropertyController {
     ) {
 
         Property property = propertyManager.getPropertyById(id);
-        validatePropertyAccess(req, property);
+        validatePropertyAccess(req, property.getSupplier(), id);
 
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
@@ -102,7 +101,7 @@ public class PropertyController {
     ) {
 
         Property property = propertyManager.getPropertyBySupplierPropertyId(id);
-        validatePropertyAccess(req, property);
+        validatePropertyAccess(req, property.getSupplier(), property.getId());
 
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
@@ -135,21 +134,78 @@ public class PropertyController {
             @Valid @RequestBody PropertySaveRequest property,
             HttpServletRequest req
     ) {
-        Property prop = propertyManager.getPropertyById(id);
-        validatePropertyAccess(req, prop);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(id);
+        validatePropertyAccess(req, supplier, id);
 
         Property updatedProperty = propertyManager.updateProperty(id, property, req.getRemoteUser());
 
         return ResponseEntity.ok(updatedProperty);
     }
 
-    protected static void validatePropertyAccess(HttpServletRequest req, Property property) {
+    @Operation(
+            summary = "Get property info by property id.",
+            description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/info/{id}"})
+    public ResponseEntity<PropertyInfo> getPropertyInfo(
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(id);
+        validatePropertyAccess(req, supplier, id);
 
-        String propertyName = property.getSupplier().getName();
+        PropertyInfo propertyInfo = propertyManager.getPropertyInfoByPropertyId(id);
+
+        return new ResponseEntity<>(propertyInfo, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add property info."
+    )
+    @PostMapping({"/info"})
+    public ResponseEntity<PropertyInfo> addPropertyInfo(
+            @Valid @RequestBody PropertyInfoSaveRequest info,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = info.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+
+        PropertyInfo propertyInfo = propertyManager.addPropertyInfo(info);
+
+        return new ResponseEntity<>(propertyInfo, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update property info. Request field PropertyId will be used to find Property Info that need to be updated."
+    )
+    @PutMapping("/info")
+    public ResponseEntity<PropertyInfo> updatePropertyInfo(
+            @Valid @RequestBody PropertyInfoSaveRequest info,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = info.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+
+        PropertyInfo updated = propertyManager.updatePropertyInfo(info);
+
+        return ResponseEntity.ok(updated);
+    }
+
+    protected static void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId) {
+
+        String propertyName = supplier.getName();
         String supplierName = req.getRemoteUser();
 
         if (!isHasAllPropertiesPermission() && !supplierName.equals(propertyName)) {
-            throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", property.getId()));
+            throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", propertyId));
         }
     }
 
