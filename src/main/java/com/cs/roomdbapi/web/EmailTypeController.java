@@ -1,7 +1,7 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.Brand;
-import com.cs.roomdbapi.manager.BrandManager;
+import com.cs.roomdbapi.dto.EmailType;
+import com.cs.roomdbapi.manager.EmailTypeManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,8 +17,8 @@ import javax.validation.constraints.Min;
 import java.util.List;
 
 @Tag(
-        name = "Brands",
-        description = "API endpoints to access Brands for the properties."
+        name = "Email Types",
+        description = "API endpoints to access Email Types."
 )
 @SecurityRequirement(name = "bearerAuth")
 @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
@@ -26,34 +26,34 @@ import java.util.List;
 @CrossOrigin
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/v1/brands", produces = MediaType.APPLICATION_JSON_VALUE)
-public class BrandController {
+@RequestMapping(value = "/api/v1/email-types", produces = MediaType.APPLICATION_JSON_VALUE)
+public class EmailTypeController {
 
-    private final BrandManager brandManager;
+    private final EmailTypeManager emailTypeManager;
 
     @Operation(
-            summary = "Get list of all brands.",
+            summary = "Get list of all email types.",
             description = "All fields of the Brand entity will be included in result."
     )
     @GetMapping
-    public ResponseEntity<List<Brand>> getAllBrands() {
-        List<Brand> brands = brandManager.getBrands();
+    public ResponseEntity<List<EmailType>> getAllBrands() {
+        List<EmailType> emailTypes = emailTypeManager.getEmailTypes();
 
-        return new ResponseEntity<>(brands, HttpStatus.OK);
+        return new ResponseEntity<>(emailTypes, HttpStatus.OK);
     }
 
     @Operation(
-            summary = "Get brand data by id."
+            summary = "Get email type data by id."
     )
     @GetMapping({"/{id}"})
-    public ResponseEntity<Brand> getBrand(
+    public ResponseEntity<EmailType> getBrandType(
             @PathVariable
-            @Parameter(description = "RoomDB internal brand Id. Required.")
+            @Parameter(description = "RoomDB internal email type Id. Required.")
             @Min(1)
                     Integer id
     ) {
 
-        return new ResponseEntity<>(brandManager.getBrandById(id), HttpStatus.OK);
+        return new ResponseEntity<>(emailTypeManager.getEmailTypeById(id), HttpStatus.OK);
     }
 
 }

@@ -41,6 +41,10 @@ public class AppUtils {
 
     public static final String BRAND = "Brand";
 
+    public static final String PHONE_TYPE = "Phone type";
+
+    public static final String EMAIL_TYPE = "Email type";
+
     public static final String STATE = "State";
 
     public static final String GEO_CODE = "Geo Code";
