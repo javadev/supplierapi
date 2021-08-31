@@ -217,7 +217,7 @@ public class MediaController {
             summary = "Get list of all media attribute types for provided media type."
     )
     @GetMapping({"/media-attribute-types-by-media-type/{mediaTypeId}"})
-    public ResponseEntity<List<MediaAttributeType>> getAllMediaAttributeTypes(
+    public ResponseEntity<List<MediaAttributeType>> getMediaAttributeTypesBeMediaTypeId(
             @PathVariable
             @Parameter(description = "RoomDB internal media type Id. Required.")
             @Min(1)
@@ -236,7 +236,7 @@ public class MediaController {
             summary = "Get list of media attributes for media."
     )
     @GetMapping({"/media-attribute-by-media/{mediaId}"})
-    public ResponseEntity<List<MediaAttribute>> mediaAttributeByMedia(
+    public ResponseEntity<List<MediaAttribute>> getMediaAttributeByMedia(
             @PathVariable
             @Parameter(description = "RoomDB internal media Id. Required.")
             @Min(1)
