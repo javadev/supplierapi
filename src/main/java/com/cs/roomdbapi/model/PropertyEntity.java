@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -42,6 +43,20 @@ public class PropertyEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "home_currency_id")
     private CurrencyEntity homeCurrency;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "property_x_phone",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "phone_id"))
+    List<PhoneEntity> phones;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "property_x_email",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "email_id"))
+    List<EmailEntity> emails;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

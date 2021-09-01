@@ -26,4 +26,8 @@ public interface PropertyManager {
 
     PropertyInfo updatePropertyInfo(PropertyInfoSaveRequest info);
 
+    List<Email> setPropertyEmails(PropertyEmailRequest propertyEmails);
+
+    List<Phone> setPropertyPhones(PropertyPhoneRequest propertyPhones);
+
 }

@@ -73,7 +73,7 @@ public class PropertyController {
     public ResponseEntity<Property> getProperty(
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(1)
+            @Min(100000)
                     Integer id,
             HttpServletRequest req
     ) {
@@ -130,7 +130,7 @@ public class PropertyController {
     public ResponseEntity<Property> updateProperty(
             @PathVariable("id")
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(1) Integer id,
+            @Min(100000) Integer id,
             @Valid @RequestBody PropertySaveRequest property,
             HttpServletRequest req
     ) {
@@ -153,7 +153,7 @@ public class PropertyController {
     public ResponseEntity<PropertyInfo> getPropertyInfo(
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(1)
+            @Min(100000)
                     Integer id,
             HttpServletRequest req
     ) {
@@ -175,7 +175,7 @@ public class PropertyController {
     ) {
         Integer propertyId = info.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
 
         PropertyInfo propertyInfo = propertyManager.addPropertyInfo(info);
 
@@ -192,7 +192,7 @@ public class PropertyController {
     ) {
         Integer propertyId = info.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
 
         PropertyInfo updated = propertyManager.updatePropertyInfo(info);
 
@@ -214,6 +214,48 @@ public class PropertyController {
         return auth != null && auth.getAuthorities().stream().anyMatch(
                 a -> a.getAuthority().equals(RoleName.ROLE_SUPPLIER_ALL_PROPERTIES.getAuthority())
         );
+    }
+
+    @Operation(
+            summary = "Set emails to property.",
+            description = "Previous emails will be removed and only new emails will be added to property. <br/>" +
+                    "If provided emails array empty all existing emails will be removed."
+    )
+    @PostMapping({"/set-emails"})
+    public ResponseEntity<List<Email>> setEmails(
+            @Valid
+            @RequestBody
+                    PropertyEmailRequest propertyEmailRequest,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = propertyEmailRequest.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
+
+        List<Email> emails = propertyManager.setPropertyEmails(propertyEmailRequest);
+
+        return new ResponseEntity<>(emails, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set phones to property.",
+            description = "Previous phones will be removed and only new phones will be added to property. <br/>" +
+                    "If provided phones array empty all existing phones will be removed."
+    )
+    @PostMapping({"/set-phones"})
+    public ResponseEntity<List<Phone>> setPhones(
+            @Valid
+            @RequestBody
+                    PropertyPhoneRequest propertyPhoneRequest,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = propertyPhoneRequest.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
+
+        List<Phone> phones = propertyManager.setPropertyPhones(propertyPhoneRequest);
+
+        return new ResponseEntity<>(phones, HttpStatus.CREATED);
     }
 
 }
