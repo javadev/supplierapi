@@ -1,7 +1,7 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.Brand;
-import com.cs.roomdbapi.manager.BrandManager;
+import com.cs.roomdbapi.dto.PhoneType;
+import com.cs.roomdbapi.manager.PhoneTypeManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,8 +17,8 @@ import javax.validation.constraints.Min;
 import java.util.List;
 
 @Tag(
-        name = "Brands",
-        description = "API endpoints to access Brands for the properties."
+        name = "Phone Types",
+        description = "API endpoints to access Phone Types."
 )
 @SecurityRequirement(name = "bearerAuth")
 @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
@@ -26,34 +26,34 @@ import java.util.List;
 @CrossOrigin
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/v1/brands", produces = MediaType.APPLICATION_JSON_VALUE)
-public class BrandController {
+@RequestMapping(value = "/api/v1/phone-types", produces = MediaType.APPLICATION_JSON_VALUE)
+public class PhoneTypeController {
 
-    private final BrandManager brandManager;
+    private final PhoneTypeManager phoneTypeManager;
 
     @Operation(
-            summary = "Get list of all brands.",
-            description = "All fields of the Brand entity will be included in result."
+            summary = "Get list of all phone types.",
+            description = "All fields of the Phone Type entity will be included in result."
     )
     @GetMapping
-    public ResponseEntity<List<Brand>> getAllBrands() {
-        List<Brand> brands = brandManager.getBrands();
+    public ResponseEntity<List<PhoneType>> getAllPhoneType() {
+        List<PhoneType> phoneTypes = phoneTypeManager.getPhoneType();
 
-        return new ResponseEntity<>(brands, HttpStatus.OK);
+        return new ResponseEntity<>(phoneTypes, HttpStatus.OK);
     }
 
     @Operation(
-            summary = "Get brand data by id."
+            summary = "Get phone type data by id."
     )
     @GetMapping({"/{id}"})
-    public ResponseEntity<Brand> getBrand(
+    public ResponseEntity<PhoneType> getPhoneType(
             @PathVariable
-            @Parameter(description = "RoomDB internal brand Id. Required.")
+            @Parameter(description = "RoomDB internal phone type Id. Required.")
             @Min(1)
                     Integer id
     ) {
 
-        return new ResponseEntity<>(brandManager.getBrandById(id), HttpStatus.OK);
+        return new ResponseEntity<>(phoneTypeManager.getPhoneTypeById(id), HttpStatus.OK);
     }
 
 }

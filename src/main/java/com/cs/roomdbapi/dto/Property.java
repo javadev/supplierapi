@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -53,7 +54,16 @@ public class Property {
     private Boolean forTesting;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Property home currency")
     private Currency homeCurrency;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Phones of the Property")
+    private List<Phone> phones;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Emails of the Property")
+    private List<Email> emails;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Supplier supplier;

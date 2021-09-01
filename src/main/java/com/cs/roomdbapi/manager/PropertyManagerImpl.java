@@ -40,6 +40,14 @@ public class PropertyManagerImpl implements PropertyManager {
 
     private final LanguageRepository languageRepository;
 
+    private final EmailRepository emailRepository;
+
+    private final EmailTypeRepository emailTypeRepository;
+
+    private final PhoneRepository phoneRepository;
+
+    private final PhoneTypeRepository phoneTypeRepository;
+
     @Override
     public List<Property> getProperties() {
         List<PropertyEntity> all = propertyRepository.findAll();
@@ -303,6 +311,94 @@ public class PropertyManagerImpl implements PropertyManager {
         log.info("Property Info with id '{}' updated to: '{}'", entity.getId(), entity.toString());
 
         return propertyInfo;
+    }
+
+    @Override
+    @Transactional
+    public List<Email> setPropertyEmails(PropertyEmailRequest propertyEmails) {
+        Integer propertyId = propertyEmails.getPropertyId();
+
+        List<EmailEntity> emails = new ArrayList<>();
+        if (propertyEmails.getEmails() != null) {
+            for (EmailSave eml : propertyEmails.getEmails()) {
+
+                if (eml.getEmail() == null || eml.getEmail().isBlank()) {
+                    throw new BadRequestException("Email should not be blank.");
+                }
+
+                EmailEntity entity = new EmailEntity();
+                entity.setEmail(eml.getEmail());
+
+                if (eml.getEmailTypeId() != null) {
+                    EmailTypeEntity emailTypeEntity = emailTypeRepository.findById(eml.getEmailTypeId())
+                            .orElseThrow(() -> new ResourceNotFoundException(EMAIL_TYPE, ID, eml.getEmailTypeId()));
+                    entity.setEmailType(emailTypeEntity);
+                }
+
+                emails.add(entity);
+            }
+        }
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        if (property.getEmails() != null && !property.getEmails().isEmpty()) {
+            emailRepository.deleteAll(property.getEmails());
+        }
+
+        if (emails.size() > 0) {
+            emailRepository.saveAll(emails);
+        }
+        property.setEmails(emails);
+        propertyRepository.save(property);
+
+        return EmailMapper.MAPPER.toListDTO(property.getEmails());
+    }
+
+    @Override
+    @Transactional
+    public List<Phone> setPropertyPhones(PropertyPhoneRequest propertyPhones) {
+        Integer propertyId = propertyPhones.getPropertyId();
+
+        List<PhoneEntity> phones = new ArrayList<>();
+        if (propertyPhones.getPhones() != null) {
+            for (PhoneSave phone : propertyPhones.getPhones()) {
+
+                if (phone.getPhoneNumber() == null || phone.getPhoneNumber().isBlank()) {
+                    throw new BadRequestException("Phone should not be blank.");
+                }
+
+                PhoneEntity entity = new PhoneEntity();
+                entity.setPhoneNumber(phone.getPhoneNumber());
+
+                if (phone.getPhoneTypeId() != null) {
+                    PhoneTypeEntity phoneTypeEntity = phoneTypeRepository.findById(phone.getPhoneTypeId())
+                            .orElseThrow(() -> new ResourceNotFoundException(PHONE_TYPE, ID, phone.getPhoneTypeId()));
+                    entity.setPhoneType(phoneTypeEntity);
+                }
+
+                if (phone.getExtension() != null) {
+                    entity.setExtension(phone.getExtension());
+                }
+
+                phones.add(entity);
+            }
+        }
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        if (property.getPhones() != null && !property.getPhones().isEmpty()) {
+            phoneRepository.deleteAll(property.getPhones());
+        }
+
+        if (phones.size() > 0) {
+            phoneRepository.saveAll(phones);
+        }
+        property.setPhones(phones);
+        propertyRepository.save(property);
+
+        return PhoneMapper.MAPPER.toListDTO(property.getPhones());
     }
 
 }

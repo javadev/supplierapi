@@ -40,7 +40,7 @@ public class PropertyInfoEntity {
     @Column(name = "taxpayer_id")
     private String taxpayerId;
 
-    @Column(name = "capacity")
+    @Column
     private Integer capacity;
 
     @Column(name = "capacity_type")
