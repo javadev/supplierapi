@@ -76,14 +76,17 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
-    public SuccessResponse<Object> resolveException(BadRequestException exception) {
-        return new SuccessResponse<>(exception.getObject(), exception.getMessage(), AppUtils.FAIL);
+    public ResponseEntity<SuccessResponse<Object>> resolveException(BadRequestException exception) {
+        SuccessResponse<Object> response = new SuccessResponse<>(exception.getObject(), exception.getMessage(), AppUtils.FAIL);
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseBody
-    public SuccessResponse<Object> resolveException(ResourceNotFoundException exception) {
-        return new SuccessResponse<>(null, exception.getMessage(), AppUtils.FAIL);
+    public ResponseEntity<SuccessResponse<Object>> resolveException(ResourceNotFoundException exception) {
+        SuccessResponse<Object> response = new SuccessResponse<>(null, exception.getMessage(), AppUtils.FAIL);
+
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @Bean
