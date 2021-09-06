@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -51,7 +52,21 @@ public class PropertySaveRequest {
     private Boolean forTesting;
 
     @JsonProperty
+    @Schema(description = "Emails for property.")
+    private List<EmailSave> emails;
+
+    @JsonProperty
+    @Schema(description = "Phones for property.")
+    private List<PhoneSave> phones;
+
+    @JsonProperty
     @Min(1)
+    @Schema(description = "Room DB internal currency id.", example = "12")
     private Integer homeCurrencyId;
+
+    @JsonProperty
+    @Size(min = 3, max = 3)
+    @Schema(description = "Currency 3 latter code (ISO 4217). Can be used instead homeCurrencyId.", example = "USD")
+    private String homeCurrencyCode;
 
 }

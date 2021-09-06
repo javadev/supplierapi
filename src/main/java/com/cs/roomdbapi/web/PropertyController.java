@@ -232,7 +232,7 @@ public class PropertyController {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validatePropertyAccess(req, supplier, propertyId);
 
-        List<Email> emails = propertyManager.setPropertyEmails(propertyEmailRequest);
+        List<Email> emails = propertyManager.setPropertyEmails(propertyEmailRequest.getPropertyId(), propertyEmailRequest.getEmails());
 
         return new ResponseEntity<>(emails, HttpStatus.CREATED);
     }
@@ -253,7 +253,7 @@ public class PropertyController {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validatePropertyAccess(req, supplier, propertyId);
 
-        List<Phone> phones = propertyManager.setPropertyPhones(propertyPhoneRequest);
+        List<Phone> phones = propertyManager.setPropertyPhones(propertyPhoneRequest.getPropertyId(), propertyPhoneRequest.getPhones());
 
         return new ResponseEntity<>(phones, HttpStatus.CREATED);
     }

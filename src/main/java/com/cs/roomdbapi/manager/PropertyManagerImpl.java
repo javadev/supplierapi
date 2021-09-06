@@ -90,6 +90,7 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    @Transactional
     public Property addProperty(PropertySaveRequest property, String supplierName) {
         if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
             throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
@@ -98,16 +99,17 @@ public class PropertyManagerImpl implements PropertyManager {
         SupplierEntity supplier = supplierRepository.findByName(supplierName)
                 .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
 
-        CurrencyEntity currencyEntity = null;
-        if (property.getHomeCurrencyId() != null) {
-            Integer currencyId = property.getHomeCurrencyId();
-            currencyEntity = currencyRepository.findById(currencyId)
-                    .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, ID, currencyId));
-        }
+        CurrencyEntity currencyEntity = getCurrencyEntity(property.getHomeCurrencyId(), property.getHomeCurrencyCode());
 
         PropertyEntity entity = PropertyMapper.MAPPER.saveRequestToEntity(property);
         entity.setHomeCurrency(currencyEntity);
         entity.setSupplier(supplier);
+
+        List<EmailEntity> emailEntities = prepareEmailEntities(property.getEmails());
+        entity.setEmails(emailEntities);
+
+        List<PhoneEntity> phoneEntities = preparePhoneEntities(property.getPhones());
+        entity.setPhones(phoneEntities);
 
         PropertyEntity save = propertyRepository.save(entity);
         log.info("Property added: '{}'", save.toString());
@@ -116,20 +118,18 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    @Transactional
     public Property updateProperty(Integer id, PropertySaveRequest property, String supplierName) {
         PropertyEntity entity = propertyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, id));
 
-        if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
-            throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
+        if (!entity.getSupplierPropertyId().equals(property.getSupplierPropertyId())) {
+            if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
+                throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
+            }
         }
 
-        CurrencyEntity currencyEntity = null;
-        if (property.getHomeCurrencyId() != null) {
-            Integer currencyId = property.getHomeCurrencyId();
-            currencyEntity = currencyRepository.findById(currencyId)
-                    .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, ID, currencyId));
-        }
+        CurrencyEntity currencyEntity = getCurrencyEntity(property.getHomeCurrencyId(), property.getHomeCurrencyCode());
 
         entity.setHomeCurrency(currencyEntity);
         entity.setSupplierPropertyId(property.getSupplierPropertyId());
@@ -138,6 +138,18 @@ public class PropertyManagerImpl implements PropertyManager {
         entity.setAlternativeName(property.getAlternativeName());
         entity.setStatus(property.getStatus());
         entity.setForTesting(property.getForTesting());
+
+        if (entity.getEmails() != null && !entity.getEmails().isEmpty()) {
+            emailRepository.deleteAll(entity.getEmails());
+        }
+        List<EmailEntity> emailEntities = prepareEmailEntities(property.getEmails());
+        entity.setEmails(emailEntities);
+
+        if (entity.getPhones() != null && !entity.getPhones().isEmpty()) {
+            phoneRepository.deleteAll(entity.getPhones());
+        }
+        List<PhoneEntity> phoneEntities = preparePhoneEntities(property.getPhones());
+        entity.setPhones(phoneEntities);
 
         PropertyEntity save = propertyRepository.save(entity);
         log.info("Property with id '{}' updated to: '{}'", entity.getId(), entity.toString());
@@ -315,12 +327,27 @@ public class PropertyManagerImpl implements PropertyManager {
 
     @Override
     @Transactional
-    public List<Email> setPropertyEmails(PropertyEmailRequest propertyEmails) {
-        Integer propertyId = propertyEmails.getPropertyId();
+    public List<Email> setPropertyEmails(Integer propertyId, List<EmailSave> emails) {
 
-        List<EmailEntity> emails = new ArrayList<>();
-        if (propertyEmails.getEmails() != null) {
-            for (EmailSave eml : propertyEmails.getEmails()) {
+        List<EmailEntity> emailEntities = prepareEmailEntities(emails);
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        if (property.getEmails() != null && !property.getEmails().isEmpty()) {
+            emailRepository.deleteAll(property.getEmails());
+        }
+
+        property.setEmails(emailEntities);
+        propertyRepository.save(property);
+
+        return EmailMapper.MAPPER.toListDTO(property.getEmails());
+    }
+
+    private List<EmailEntity> prepareEmailEntities(List<EmailSave> emails) {
+        List<EmailEntity> emailEntities = new ArrayList<>();
+        if (emails != null) {
+            for (EmailSave eml : emails) {
 
                 if (eml.getEmail() == null || eml.getEmail().isBlank()) {
                     throw new BadRequestException("Email should not be blank.");
@@ -335,34 +362,39 @@ public class PropertyManagerImpl implements PropertyManager {
                     entity.setEmailType(emailTypeEntity);
                 }
 
-                emails.add(entity);
+                emailEntities.add(entity);
             }
         }
 
-        PropertyEntity property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
-
-        if (property.getEmails() != null && !property.getEmails().isEmpty()) {
-            emailRepository.deleteAll(property.getEmails());
+        if (emailEntities.size() > 0) {
+            emailRepository.saveAll(emailEntities);
         }
-
-        if (emails.size() > 0) {
-            emailRepository.saveAll(emails);
-        }
-        property.setEmails(emails);
-        propertyRepository.save(property);
-
-        return EmailMapper.MAPPER.toListDTO(property.getEmails());
+        return emailEntities;
     }
 
     @Override
     @Transactional
-    public List<Phone> setPropertyPhones(PropertyPhoneRequest propertyPhones) {
-        Integer propertyId = propertyPhones.getPropertyId();
+    public List<Phone> setPropertyPhones(Integer propertyId, List<PhoneSave> phones) {
 
-        List<PhoneEntity> phones = new ArrayList<>();
-        if (propertyPhones.getPhones() != null) {
-            for (PhoneSave phone : propertyPhones.getPhones()) {
+        List<PhoneEntity> phoneEntities = preparePhoneEntities(phones);
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        if (property.getPhones() != null && !property.getPhones().isEmpty()) {
+            phoneRepository.deleteAll(property.getPhones());
+        }
+
+        property.setPhones(phoneEntities);
+        propertyRepository.save(property);
+
+        return PhoneMapper.MAPPER.toListDTO(property.getPhones());
+    }
+
+    private List<PhoneEntity> preparePhoneEntities(List<PhoneSave> phones) {
+        List<PhoneEntity> phoneEntities = new ArrayList<>();
+        if (phones != null) {
+            for (PhoneSave phone : phones) {
 
                 if (phone.getPhoneNumber() == null || phone.getPhoneNumber().isBlank()) {
                     throw new BadRequestException("Phone should not be blank.");
@@ -381,24 +413,25 @@ public class PropertyManagerImpl implements PropertyManager {
                     entity.setExtension(phone.getExtension());
                 }
 
-                phones.add(entity);
+                phoneEntities.add(entity);
             }
         }
-
-        PropertyEntity property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
-
-        if (property.getPhones() != null && !property.getPhones().isEmpty()) {
-            phoneRepository.deleteAll(property.getPhones());
+        if (phoneEntities.size() > 0) {
+            phoneRepository.saveAll(phoneEntities);
         }
+        return phoneEntities;
+    }
 
-        if (phones.size() > 0) {
-            phoneRepository.saveAll(phones);
+    private CurrencyEntity getCurrencyEntity(Integer currencyId, String currencyCode) {
+        CurrencyEntity currencyEntity = null;
+        if (currencyId != null) {
+            currencyEntity = currencyRepository.findById(currencyId)
+                    .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, ID, currencyId));
+        } else if (currencyCode != null) {
+            currencyEntity = currencyRepository.findByCode(currencyCode.toUpperCase())
+                    .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, CODE, currencyCode));
         }
-        property.setPhones(phones);
-        propertyRepository.save(property);
-
-        return PhoneMapper.MAPPER.toListDTO(property.getPhones());
+        return currencyEntity;
     }
 
 }
