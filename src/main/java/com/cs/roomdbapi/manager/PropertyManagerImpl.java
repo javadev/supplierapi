@@ -123,9 +123,11 @@ public class PropertyManagerImpl implements PropertyManager {
         PropertyEntity entity = propertyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, id));
 
-        if (!entity.getSupplierPropertyId().equals(property.getSupplierPropertyId())) {
-            if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
-                throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
+        if (property.getSupplierPropertyId() != null) {
+            if (!property.getSupplierPropertyId().equals(entity.getSupplierPropertyId())) {
+                if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
+                    throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
+                }
             }
         }
 
