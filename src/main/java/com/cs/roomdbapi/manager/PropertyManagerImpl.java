@@ -274,6 +274,9 @@ public class PropertyManagerImpl implements PropertyManager {
             if (geoCode.getLatitude() == null || geoCode.getLongitude() == null) {
                 throw new BadRequestException("Geo Code latitude and longitude should not be empty.");
             }
+            if (entityGeoCode == null) {
+                entityGeoCode = new GeoCodeEntity();
+            }
             if (!geoCode.getLatitude().equals(entityGeoCode.getLatitude())
                     || !geoCode.getLongitude().equals(entityGeoCode.getLongitude())) {
 
