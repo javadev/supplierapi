@@ -1,6 +1,5 @@
 package com.cs.roomdbapi.dto;
 
-import com.cs.roomdbapi.model.DescriptionEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -12,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 @Data
