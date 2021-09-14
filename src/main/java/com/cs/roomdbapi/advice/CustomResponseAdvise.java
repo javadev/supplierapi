@@ -7,6 +7,7 @@ import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.response.ErrorResponse;
 import com.cs.roomdbapi.response.SuccessResponse;
 import com.cs.roomdbapi.utilities.AppUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
 
     @Value("${springdoc.packagesToScan}")
@@ -119,7 +121,8 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
     }
 
     @ExceptionHandler(Exception.class)
-    public void handleException(HttpServletResponse res) throws IOException {
+    public void handleException(HttpServletResponse res, Exception ex) throws IOException {
+        log.error("ExceptionHandled: ", ex);
         res.sendError(HttpStatus.BAD_REQUEST.value(), "Something went wrong");
     }
 
