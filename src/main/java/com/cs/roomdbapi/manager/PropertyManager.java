@@ -26,6 +26,8 @@ public interface PropertyManager {
 
     PropertyInfo updatePropertyInfo(PropertyInfoSaveRequest info);
 
+    void deletePropertyInfoByPropertyId(Integer propertyId);
+
     List<Email> setPropertyEmails(Integer propertyId, List<EmailSave> emails);
 
     List<Phone> setPropertyPhones(Integer propertyId, List<PhoneSave> phones);

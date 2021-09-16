@@ -51,6 +51,8 @@ public class AppUtils {
 
     public static final String STATE = "State";
 
+    public static final String COUNTRY = "Country";
+
     public static final String GEO_CODE = "Geo Code";
 
     public static final String POINT_OF_INTEREST = "Point Of Interest";

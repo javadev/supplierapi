@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -52,6 +53,13 @@ public class PropertyInfoEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_type_id")
     private PropertyTypeEntity propertyType;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "property_info_x_address",
+            joinColumns = @JoinColumn(name = "property_info_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id"))
+    List<AddressEntity> addresses;
 
     @Column
     @UpdateTimestamp

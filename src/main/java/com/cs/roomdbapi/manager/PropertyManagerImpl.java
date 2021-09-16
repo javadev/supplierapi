@@ -48,6 +48,12 @@ public class PropertyManagerImpl implements PropertyManager {
 
     private final PhoneTypeRepository phoneTypeRepository;
 
+    private final AddressRepository addressRepository;
+
+    private final StateRepository stateRepository;
+
+    private final CountryRepository countryRepository;
+
     @Override
     public List<Property> getProperties() {
         List<PropertyEntity> all = propertyRepository.findAll();
@@ -202,7 +208,7 @@ public class PropertyManagerImpl implements PropertyManager {
         }
 
         GeoCode geoCode = info.getGeoCode();
-        if (geoCode != null) {                                                              
+        if (geoCode != null) {
             if (geoCode.getLatitude() == null || geoCode.getLongitude() == null) {
                 throw new BadRequestException("Geo Code latitude and longitude should not be empty.");
             }
@@ -212,6 +218,8 @@ public class PropertyManagerImpl implements PropertyManager {
 
             entity.setGeoCode(save);
         }
+
+        addAddresses(info, entity);
 
         PropertyInfoEntity propertyInfoSave = propertyInfoRepository.save(entity);
 
@@ -224,6 +232,25 @@ public class PropertyManagerImpl implements PropertyManager {
         addLanguages(propertyInfo);
 
         return propertyInfo;
+    }
+
+    private AddressEntity prepareAddressEntity(AddressSave addressSave) {
+        AddressEntity addressEntity = AddressMapper.MAPPER.toEntity(addressSave);
+
+        LanguageEntity language = languageRepository.findById(addressSave.getLanguageId())
+                .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, addressSave.getLanguageId()));
+
+        StateEntity state = stateRepository.findById(addressSave.getStateId())
+                .orElseThrow(() -> new ResourceNotFoundException(STATE, ID, addressSave.getStateId()));
+
+        CountryEntity country = countryRepository.findById(addressSave.getCountryId())
+                .orElseThrow(() -> new ResourceNotFoundException(COUNTRY, ID, addressSave.getCountryId()));
+
+        addressEntity.setLanguage(language);
+        addressEntity.setState(state);
+        addressEntity.setCountry(country);
+
+        return addressEntity;
     }
 
     private List<PropertyInfoLanguageEntity> prepareLanguagesForPropertyInfo(PropertyInfoSaveRequest info, Integer infoId) {
@@ -288,7 +315,7 @@ public class PropertyManagerImpl implements PropertyManager {
             }
         }
 
-        if(info.getBrandId() == null) {
+        if (info.getBrandId() == null) {
             entity.setBrand(null);
         } else {
             BrandEntity brandEntity = brandRepository.findById(info.getBrandId())
@@ -307,7 +334,7 @@ public class PropertyManagerImpl implements PropertyManager {
             entity.setCapacityType(Enum.valueOf(CapacityType.class, info.getCapacityType()));
         }
 
-        if(info.getPropertyTypeId() == null) {
+        if (info.getPropertyTypeId() == null) {
             entity.setPropertyType(null);
         } else {
             PropertyTypeEntity propertyTypeEntity = propertyTypeRepository.findById(info.getPropertyTypeId())
@@ -322,12 +349,54 @@ public class PropertyManagerImpl implements PropertyManager {
             propertyInfoLanguageRepository.saveAll(propertyInfoLanguages);
         }
 
+        if (entity.getAddresses() != null && entity.getAddresses().size() > 0) {
+            addressRepository.deleteAll(entity.getAddresses());
+        }
+        addAddresses(info, entity);
+
+        propertyInfoRepository.save(entity);
+
         PropertyInfo propertyInfo = PropertyInfoMapper.MAPPER.toDTO(entity);
         addLanguages(propertyInfo);
 
         log.info("Property Info with id '{}' updated to: '{}'", entity.getId(), entity.toString());
 
         return propertyInfo;
+    }
+
+    private void addAddresses(PropertyInfoSaveRequest info, PropertyInfoEntity entity) {
+        List<AddressSave> addresses = info.getAddresses();
+        if (addresses != null && addresses.size() > 0) {
+            List<AddressEntity> addressEntities = new ArrayList<>();
+
+            for (AddressSave addressSave : addresses) {
+                AddressEntity addressEntity = prepareAddressEntity(addressSave);
+
+                addressEntities.add(addressEntity);
+            }
+
+            addressRepository.saveAll(addressEntities);
+            entity.setAddresses(addressEntities);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deletePropertyInfoByPropertyId(Integer propertyId) {
+        PropertyInfoEntity entity = propertyInfoRepository.findByPropertyId(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_INFO, PROPERTY_ID, propertyId));
+
+        propertyInfoLanguageRepository.deleteByPropertyInfoId(entity.getId());
+
+        if (entity.getGeoCode() != null) {
+            geoCodeRepository.delete(entity.getGeoCode());
+        }
+
+        if (entity.getAddresses() != null && entity.getAddresses().size() > 0) {
+            addressRepository.deleteAll(entity.getAddresses());
+        }
+
+        propertyInfoRepository.delete(entity);
     }
 
     @Override

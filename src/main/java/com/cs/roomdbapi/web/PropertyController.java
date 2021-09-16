@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+@Slf4j
 @Tag(
         name = "Properties",
         description = "API endpoints to access Property basic information."
@@ -197,6 +199,27 @@ public class PropertyController {
         PropertyInfo updated = propertyManager.updatePropertyInfo(info);
 
         return ResponseEntity.ok(updated);
+    }
+
+    @Operation(
+            summary = "Delete property info by property id."
+    )
+    @DeleteMapping("/info/{id}")
+    public ResponseEntity<Void> deletePropertyInfo(
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(100000)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("API delete Property Info called with propertyId: {}.", id);
+
+        Supplier supplier = propertyManager.getSupplierByPropertyId(id);
+        validatePropertyAccess(req, supplier, id);
+
+        propertyManager.deletePropertyInfoByPropertyId(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     protected static void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId) {

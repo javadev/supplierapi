@@ -63,4 +63,7 @@ public class PropertyInfo {
     @JsonProperty
     private List<PropertyInfoLanguage> languages;
 
+    @JsonProperty
+    private List<Address> addresses;
+
 }

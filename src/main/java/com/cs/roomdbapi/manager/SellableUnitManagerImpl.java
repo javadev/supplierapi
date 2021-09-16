@@ -55,8 +55,9 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
         entity.setProperty(propertyEntity);
 
         List<NameSave> names = request.getNames();
-        List<NameEntity> nameEntities = new ArrayList<>();
         if (names != null && names.size() > 0) {
+            List<NameEntity> nameEntities = new ArrayList<>();
+
             NameTypeEntity nameTypeEntity = nameTypeRepository.findByCode(DEFAULT_SELLABLE_UNIT_NAME_TYPE_CODE)
                     .orElseThrow(() -> new ResourceNotFoundException(NAME_TYPE, CODE, DEFAULT_SELLABLE_UNIT_NAME_TYPE_CODE));
 
@@ -81,8 +82,8 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
 
             nameRepository.saveAll(nameEntities);
+            entity.setNames(nameEntities);
         }
-        entity.setNames(nameEntities);
 
         if (request.getSellableUnitTypeId() != null) {
             SellableUnitTypeEntity sellableUnitTypeEntity = sellableUnitTypeRepository.findById(request.getSellableUnitTypeId())
