@@ -346,7 +346,7 @@ public class MediaManagerImpl implements MediaManager {
         String url = mediaEntity.getUrl();
 
         mediaAttributeRepository.deleteByMediaId(id);
-        mediaRepository.delete(mediaEntity);
+        mediaRepository.delete(mediaEntity); // TODO check that descriptions are removed
 
         if (url != null && !url.isBlank()) {
             String filename = url.replace(accessUrl, "");

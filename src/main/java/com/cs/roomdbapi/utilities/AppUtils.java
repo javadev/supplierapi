@@ -39,7 +39,11 @@ public class AppUtils {
 
     public static final String MEDIA = "Media";
 
+    public static final String SELLABLE_UNIT = "Sellable Unit";
+
     public static final String BRAND = "Brand";
+
+    public static final String SELLABLE_UNIT_TYPE = "Sellable Unit Type";
 
     public static final String PHONE_TYPE = "Phone type";
 
@@ -60,6 +64,8 @@ public class AppUtils {
     public static final String MEDIA_ATTRIBUTE_TYPE = "Media Attribute Type";
 
     public static final String DESCRIPTION_TYPE = "Description Type";
+
+    public static final String NAME_TYPE = "Name Type";
 
     public static final String LICENSE_TYPE = "License Type";
 
@@ -92,4 +98,6 @@ public class AppUtils {
     public static final String DEFAULT_MEDIA_DESCRIPTION_TYPE_CODE = "med";
 
     public static final String DEFAULT_POI_DESCRIPTION_TYPE_CODE = "poi";
+
+    public static final String DEFAULT_SELLABLE_UNIT_NAME_TYPE_CODE = "su";
 }
