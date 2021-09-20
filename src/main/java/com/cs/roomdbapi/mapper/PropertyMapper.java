@@ -34,6 +34,7 @@ public interface PropertyMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "last_update", ignore = true)
     @Mapping(target = "homeCurrency", ignore = true)
+    @Mapping(target = "descriptions", ignore = true)
     @Mapping(target = "supplier", ignore = true)
     PropertyEntity saveRequestToEntity(PropertySaveRequest dto);
 

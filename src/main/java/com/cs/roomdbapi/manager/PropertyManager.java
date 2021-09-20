@@ -32,4 +32,8 @@ public interface PropertyManager {
 
     List<Phone> setPropertyPhones(Integer propertyId, List<PhoneSave> phones);
 
+    Description addPropertyDescription(Integer propertyId, DescriptionSave descriptionToSave);
+
+    Integer getPropertyIdByDescriptionId(Integer descriptionId);
+
 }

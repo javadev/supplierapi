@@ -155,7 +155,7 @@ public class PointOfInterestController {
     }
 
     @Operation(
-            summary = "Add descriptions to point of interest."
+            summary = "Add description to point of interest."
     )
     @PostMapping({"/description/{poiId}"})
     public ResponseEntity<Description> addDescription(

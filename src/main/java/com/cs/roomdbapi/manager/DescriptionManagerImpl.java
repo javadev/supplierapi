@@ -33,6 +33,8 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
     private final PointOfInterestRepository pointOfInterestRepository;
 
+    private final PropertyRepository propertyRepository;
+
     @Override
     public List<DescriptionType> getAllDescriptionTypes() {
         List<DescriptionTypeEntity> all = descriptionTypeRepository.findAll();
@@ -49,8 +51,14 @@ public class DescriptionManagerImpl implements DescriptionManager {
             throw new BadRequestException(String.format("Description text should not be blank for language '%s'.", language.getName()));
         }
 
-        DescriptionTypeEntity descriptionType = descriptionTypeRepository.findByCode(descriptionTypeCode)
-                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, CODE, descriptionTypeCode));
+        DescriptionTypeEntity descriptionType;
+        if (descriptionToSave.getDescriptionTypeId() != null) {
+            descriptionType = descriptionTypeRepository.findById(descriptionToSave.getDescriptionTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, ID, descriptionToSave.getDescriptionTypeId()));
+        } else {
+            descriptionType = descriptionTypeRepository.findByCode(descriptionTypeCode)
+                    .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, CODE, descriptionTypeCode));
+        }
 
         DescriptionEntity descriptionEntity = new DescriptionEntity();
         descriptionEntity.setLanguage(language);
@@ -60,7 +68,6 @@ public class DescriptionManagerImpl implements DescriptionManager {
         return descriptionRepository.save(descriptionEntity);
     }
 
-
     @Override
     public Description updateDescription(Integer descriptionId, DescriptionSave descriptionToSave) {
         DescriptionEntity descriptionEntity = descriptionRepository.findById(descriptionId)
@@ -68,6 +75,12 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
         LanguageEntity language = languageRepository.findById(descriptionToSave.getLanguageId())
                 .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, descriptionToSave.getLanguageId()));
+
+        if (descriptionToSave.getDescriptionTypeId() != null) {
+            DescriptionTypeEntity descriptionType = descriptionTypeRepository.findById(descriptionToSave.getDescriptionTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, ID, descriptionToSave.getDescriptionTypeId()));
+            descriptionEntity.setDescriptionType(descriptionType);
+        }
 
         if (descriptionToSave.getText().isBlank()) {
             throw new BadRequestException(String.format("Description text should not be blank for language '%s'.", language.getName()));
@@ -107,6 +120,21 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
         poiEntity.getDescriptions().remove(entity);
         pointOfInterestRepository.save(poiEntity);
+
+        descriptionRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deletePropertyDescription(Integer propertyId, Integer id) {
+        PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        DescriptionEntity entity = descriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, id));
+
+        propertyEntity.getDescriptions().remove(entity);
+        propertyRepository.save(propertyEntity);
 
         descriptionRepository.delete(entity);
     }

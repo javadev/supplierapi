@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -64,6 +65,10 @@ public class Property {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Emails of the Property")
     private List<Email> emails;
+
+    @JsonProperty
+    @Schema(description = "Descriptions of the Property")
+    private List<Description> descriptions;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Supplier supplier;

@@ -54,6 +54,8 @@ public class PropertyManagerImpl implements PropertyManager {
 
     private final CountryRepository countryRepository;
 
+    private final DescriptionManager descriptionManager;
+
     @Override
     public List<Property> getProperties() {
         List<PropertyEntity> all = propertyRepository.findAll();
@@ -506,6 +508,25 @@ public class PropertyManagerImpl implements PropertyManager {
                     .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, CODE, currencyCode));
         }
         return currencyEntity;
+    }
+
+    @Override
+    @Transactional
+    public Description addPropertyDescription(Integer propertyId, DescriptionSave descriptionToSave) {
+        DescriptionEntity savedDescription = descriptionManager.createDescription(descriptionToSave, null);
+
+        PropertyEntity entity = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        entity.getDescriptions().add(savedDescription);
+        propertyRepository.save(entity);
+
+        return DescriptionMapper.MAPPER.toDTO(savedDescription);
+    }
+
+    @Override
+    public Integer getPropertyIdByDescriptionId(Integer descriptionId) {
+        return propertyRepository.getPropertyIdByDescriptionId(descriptionId);
     }
 
 }

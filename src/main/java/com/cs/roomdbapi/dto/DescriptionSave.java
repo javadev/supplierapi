@@ -31,4 +31,8 @@ public class DescriptionSave {
     @Schema(description = "Language id of the description text language")
     private Integer languageId;
 
+    @JsonProperty
+    @Schema(description = "Description type id of the description")
+    private Integer descriptionTypeId;
+
 }

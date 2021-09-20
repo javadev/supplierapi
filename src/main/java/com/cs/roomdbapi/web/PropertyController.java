@@ -2,6 +2,7 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
+import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.model.RoleName;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +40,8 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyManager propertyManager;
+
+    private final DescriptionManager descriptionManager;
 
     @Operation(
             summary = "Get list of all properties.",
@@ -279,6 +282,73 @@ public class PropertyController {
         List<Phone> phones = propertyManager.setPropertyPhones(propertyPhoneRequest.getPropertyId(), propertyPhoneRequest.getPhones());
 
         return new ResponseEntity<>(phones, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Add description to property."
+    )
+    @PostMapping({"/description/{propertyId}"})
+    public ResponseEntity<Description> addDescription(
+            @PathVariable("propertyId")
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(1)
+                    Integer propertyId,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
+
+        Description description = propertyManager.addPropertyDescription(propertyId, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update description for property."
+    )
+    @PatchMapping("/description/{id}")
+    public ResponseEntity<Description> updateDescription(
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
+
+        Description description = descriptionManager.updateDescription(id, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Delete description for property."
+    )
+    @DeleteMapping("/description/{id}")
+    public ResponseEntity<Void> deleteDescription(
+            @PathVariable
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("API delete property description called with id: {}.", id);
+
+        Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
+
+        descriptionManager.deletePropertyDescription(propertyId, id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

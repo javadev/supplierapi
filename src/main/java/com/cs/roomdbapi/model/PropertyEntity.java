@@ -58,6 +58,13 @@ public class PropertyEntity {
             inverseJoinColumns = @JoinColumn(name = "email_id"))
     List<EmailEntity> emails;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "property_x_description",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "description_id"))
+    List<DescriptionEntity> descriptions;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id")
