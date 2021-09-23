@@ -1,11 +1,9 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.NameSave;
-import com.cs.roomdbapi.dto.SellableUnit;
-import com.cs.roomdbapi.dto.SellableUnitSaveRequest;
-import com.cs.roomdbapi.dto.SellableUnitType;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
+import com.cs.roomdbapi.mapper.AvailabilityMapper;
 import com.cs.roomdbapi.mapper.SellableUnitMapper;
 import com.cs.roomdbapi.mapper.SellableUnitTypeMapper;
 import com.cs.roomdbapi.model.*;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.cs.roomdbapi.utilities.AppUtils.*;
 
@@ -36,6 +35,8 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     private final NameTypeRepository nameTypeRepository;
 
     private final NameRepository nameRepository;
+
+    private final AvailabilityRepository availabilityRepository;
 
     @Override
     public List<SellableUnitType> getAllSellableUnitTypes() {
@@ -128,10 +129,58 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
+    public List<Availability> getAvailabilitiesBySellableUnitId(Integer sellableUnitId) {
+        List<AvailabilityEntity> all = availabilityRepository.findAllBySellableUnitId(sellableUnitId);
+
+        return AvailabilityMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
     public List<SellableUnit> getAllSellableUnitsByPropertyId(Integer propertyId) {
         List<SellableUnitEntity> all = sellableUnitRepository.findAllByProperty_Id(propertyId);
 
         return SellableUnitMapper.MAPPER.toListDTO(all);
     }
+
+    @Override
+    @Transactional
+    public List<Availability> setSellableUnitAvailabilities(Integer sellableUnitId, List<AvailabilitySave> availabilities) {
+
+        List<AvailabilityEntity> availabilityEntities = new ArrayList<>();
+        if (availabilities != null) {
+            for (AvailabilitySave availability : availabilities) {
+
+                if (availability.getCountAvailable() == null || availability.getDate() == null) {
+                    throw new BadRequestException("Availability count and date are required and should be provided.");
+                }
+
+                AvailabilityEntity entity;
+
+                // If availability exists for specified date we will updete count for this record
+                Optional<AvailabilityEntity> optional = availabilityRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
+                        availability.getDate(), availability.getTimeSegment());
+                entity = optional.orElseGet(AvailabilityEntity::new);
+
+                entity.setCountAvailable(availability.getCountAvailable());
+                if (entity.getDate() == null) {
+                    entity.setDate(availability.getDate());
+                }
+                if (entity.getTimeSegment() == null) {
+                    entity.setTimeSegment(availability.getTimeSegment());
+                }
+                entity.setSellableUnitId(sellableUnitId);
+
+                availabilityEntities.add(entity);
+            }
+        }
+
+        List<AvailabilityEntity> saveAll = new ArrayList<>();
+        if (availabilityEntities.size() > 0) {
+            saveAll = availabilityRepository.saveAll(availabilityEntities);
+        }
+
+        return AvailabilityMapper.MAPPER.toListDTO(saveAll);
+    }
+
 }
                                                                 

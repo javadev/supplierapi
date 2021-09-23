@@ -1,8 +1,6 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.SellableUnit;
-import com.cs.roomdbapi.dto.SellableUnitSaveRequest;
-import com.cs.roomdbapi.dto.SellableUnitType;
+import com.cs.roomdbapi.dto.*;
 
 import java.util.List;
 
@@ -21,4 +19,9 @@ public interface SellableUnitManager {
     SellableUnit getSellableUnitById(Integer id);
 
     List<SellableUnit> getAllSellableUnitsByPropertyId(Integer propertyId);
+
+    List<Availability> getAvailabilitiesBySellableUnitId(Integer sellableUnitId);
+
+    List<Availability> setSellableUnitAvailabilities(Integer sellableUnitId, List<AvailabilitySave> availabilities);
+
 }

@@ -133,4 +133,42 @@ public class SellableUnitController {
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Get sellable unit availabilities."
+    )
+    @GetMapping({"/availabilities/{sellableUnitId}"})
+    public ResponseEntity<List<Availability>> getSellableUnitAvailabilities(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validateSellableUnitAccess(sellableUnitId, req);
+
+        List<Availability> all = sellableUnitManager.getAvailabilitiesBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add availabilities to sellable unit.",
+            description = "If availability for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/set-availabilities"})
+    public ResponseEntity<List<Availability>> setAvailabilities(
+            @Valid
+            @RequestBody
+                    SellableUnitAvailabilityRequest request,
+            HttpServletRequest req
+    ) {
+        validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        List<Availability> availabilities = sellableUnitManager.setSellableUnitAvailabilities(request.getSellableUnitId(), request.getAvailabilities());
+
+        return new ResponseEntity<>(availabilities, HttpStatus.CREATED);
+    }
+
 }

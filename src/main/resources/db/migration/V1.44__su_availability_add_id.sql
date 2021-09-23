@@ -1,0 +1,3 @@
+ALTER TABLE sellable_unit_capacity ADD COLUMN "id" SERIAL PRIMARY KEY;
+
+ALTER TABLE availability ADD COLUMN "id" SERIAL PRIMARY KEY;
