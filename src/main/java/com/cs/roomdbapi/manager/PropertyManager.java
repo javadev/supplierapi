@@ -16,6 +16,8 @@ public interface PropertyManager {
 
     Property getPropertyBySupplierPropertyId(String id);
 
+    Property getOrCreatePropertyBySupplierPropertyId(String id, String supplierName);
+
     Property addProperty(PropertySaveRequest property, String supplierName);
 
     Property updateProperty(Integer id, PropertySaveRequest property, String supplierName);

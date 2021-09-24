@@ -32,7 +32,6 @@ public class PropertySaveRequest {
     private String code;
 
     @JsonProperty
-    @NotBlank(message = "Name should be provided.")
     @Size(min = 1, max = 255)
     @Schema(description = "Name of the property", example = "Golden Tulip")
     private String name;

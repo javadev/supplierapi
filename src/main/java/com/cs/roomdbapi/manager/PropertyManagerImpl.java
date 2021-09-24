@@ -98,6 +98,28 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public Property getOrCreatePropertyBySupplierPropertyId(String id, String supplierName) {
+        Optional<PropertyEntity> optional = propertyRepository.findBySupplierPropertyId(id);
+
+        PropertyEntity entity;
+        if (optional.isPresent()) {
+            entity = optional.get();
+        } else {
+            SupplierEntity supplier = supplierRepository.findByName(supplierName)
+                    .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
+
+            entity = new PropertyEntity();
+            entity.setSupplierPropertyId(id);
+            entity.setSupplier(supplier);
+
+            PropertyEntity save = propertyRepository.save(entity);
+            log.info("Property added: '{}'", save.toString());
+        }
+
+        return PropertyMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
     @Transactional
     public Property addProperty(PropertySaveRequest property, String supplierName) {
         if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {

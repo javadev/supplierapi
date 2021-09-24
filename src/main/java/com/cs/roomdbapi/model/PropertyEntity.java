@@ -27,7 +27,6 @@ public class PropertyEntity {
     @Column
     private String code;
 
-    @NotNull
     @Column
     private String name;
 

@@ -156,7 +156,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
 
                 AvailabilityEntity entity;
 
-                // If availability exists for specified date we will updete count for this record
+                // If availability exists for specified date we will update count for this record
                 Optional<AvailabilityEntity> optional = availabilityRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
                         availability.getDate(), availability.getTimeSegment());
                 entity = optional.orElseGet(AvailabilityEntity::new);

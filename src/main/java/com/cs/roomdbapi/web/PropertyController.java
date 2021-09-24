@@ -111,6 +111,27 @@ public class PropertyController {
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Get or create property by supplier property id.",
+            description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/supplier-property-id/get-or-create/{id}"})
+    public ResponseEntity<Property> getOrCreatePropertyBySupplierPropertyId(
+            @PathVariable
+            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Size(min = 1, max = 255)
+                    String id,
+            HttpServletRequest req
+    ) {
+        Property property = propertyManager.getOrCreatePropertyBySupplierPropertyId(id, req.getRemoteUser());
+        validatePropertyAccess(req, property.getSupplier(), property.getId());
+
+        return new ResponseEntity<>(property, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @Operation(
