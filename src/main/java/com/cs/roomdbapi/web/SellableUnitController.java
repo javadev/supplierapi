@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Slf4j
@@ -169,6 +170,55 @@ public class SellableUnitController {
         List<Availability> availabilities = sellableUnitManager.setSellableUnitAvailabilities(request.getSellableUnitId(), request.getAvailabilities());
 
         return new ResponseEntity<>(availabilities, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit by supplier unit id."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/supplier-unit-id/{id}"})
+    public ResponseEntity<SellableUnit> getSellableUnitBySupplierUnitId(
+            @PathVariable
+            @Parameter(description = "Supplier unit id - unit (room, meal, etc.) id that is used on supplier side. Required.")
+            @Size(min = 1, max = 255)
+                    String id,
+            HttpServletRequest req
+    ) {
+
+        SellableUnit sellableUnit = sellableUnitManager.getSellableUnitBySupplierUnitId(id);
+
+        Integer propertyId = sellableUnit.getPropertyId();
+
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+
+        return new ResponseEntity<>(sellableUnit, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get or create sellable unit by supplier unit id."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/supplier-unit-id/get-or-create/{propertyId}/{sellableUnitId}"})
+    public ResponseEntity<SellableUnit> getOrCreateSellableUnitBySupplierUnitId(
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required. Will be used to create sellable unit in case it doesn't exists.")
+            @Min(100000)
+                    Integer propertyId,
+            @PathVariable
+            @Parameter(description = "Supplier unit id - unit (room, meal, etc.) id that is used on supplier side. Required.")
+            @Size(min = 1, max = 255)
+                    String sellableUnitId,
+            HttpServletRequest req
+    ) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+
+        SellableUnit supplierUnit = sellableUnitManager.getOrCreateSellableUnitBySupplierUnitId(sellableUnitId, propertyId);
+
+        return new ResponseEntity<>(supplierUnit, HttpStatus.OK);
     }
 
 }

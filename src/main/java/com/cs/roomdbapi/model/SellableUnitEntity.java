@@ -27,8 +27,11 @@ public class SellableUnitEntity {
     @JoinColumn(name = "property_id")
     private PropertyEntity property;
 
+    @Column(name = "supplier_unit_id")
+    private String supplierUnitId;
+
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
+    @JoinTable(                                                                                                           
             name = "sellable_unit_x_name",
             joinColumns = @JoinColumn(name = "sellable_unit_id"),
             inverseJoinColumns = @JoinColumn(name = "name_id"))

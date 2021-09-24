@@ -18,6 +18,10 @@ public interface SellableUnitManager {
 
     SellableUnit getSellableUnitById(Integer id);
 
+    SellableUnit getSellableUnitBySupplierUnitId(String id);
+
+    SellableUnit getOrCreateSellableUnitBySupplierUnitId(String sellableUnitId, Integer propertyId);
+
     List<SellableUnit> getAllSellableUnitsByPropertyId(Integer propertyId);
 
     List<Availability> getAvailabilitiesBySellableUnitId(Integer sellableUnitId);

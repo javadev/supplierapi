@@ -26,6 +26,10 @@ public class SellableUnitSaveRequest {
     private Integer propertyId;
 
     @JsonProperty
+    @Schema(description = "Unit (room, meal, etc.) id that is used in supplier system.", example = "room-12321")
+    private String supplierUnitId;
+
+    @JsonProperty
     @Schema(description = "Names for property.")
     private List<NameSave> names;
 

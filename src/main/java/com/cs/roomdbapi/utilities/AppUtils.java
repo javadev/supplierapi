@@ -86,6 +86,8 @@ public class AppUtils {
 
     public static final String SUPPLIER_PROPERTY_ID = "SupplierPropertyId";
 
+    public static final String SUPPLIER_UNIT_ID = "SupplierUnitId";
+
     public static final String CODE = "code";
 
     public static final String NAME = "name";

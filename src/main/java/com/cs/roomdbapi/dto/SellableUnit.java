@@ -29,6 +29,10 @@ public class SellableUnit {
     private Integer propertyId;
 
     @JsonProperty
+    @Schema(description = "Unit (room, meal, etc.) id that is used in supplier system.")
+    private String supplierUnitId;
+
+    @JsonProperty
     @Schema(description = "Names for property.")
     private List<Name> names;
 

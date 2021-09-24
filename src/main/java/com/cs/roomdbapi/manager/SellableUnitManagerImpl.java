@@ -129,6 +129,36 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
+    public SellableUnit getSellableUnitBySupplierUnitId(String id) {
+        SellableUnitEntity entity = sellableUnitRepository.findBySupplierUnitId(id)
+                .orElseThrow(() -> new ResourceNotFoundException(SELLABLE_UNIT, SUPPLIER_UNIT_ID, id));
+
+        return SellableUnitMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
+    public SellableUnit getOrCreateSellableUnitBySupplierUnitId(String sellableUnitId, Integer propertyId) {
+        Optional<SellableUnitEntity> optional = sellableUnitRepository.findBySupplierUnitId(sellableUnitId);
+
+        SellableUnitEntity entity;
+        if (optional.isPresent()) {
+            entity = optional.get();
+        } else {
+            PropertyEntity property = propertyRepository.findById(propertyId)
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+            entity = new SellableUnitEntity();
+            entity.setProperty(property);
+            entity.setSupplierUnitId(sellableUnitId);
+
+            SellableUnitEntity save = sellableUnitRepository.save(entity);
+            log.info("Sellable unit added: '{}'", save.toString());
+        }
+
+        return SellableUnitMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
     public List<Availability> getAvailabilitiesBySellableUnitId(Integer sellableUnitId) {
         List<AvailabilityEntity> all = availabilityRepository.findAllBySellableUnitId(sellableUnitId);
 
