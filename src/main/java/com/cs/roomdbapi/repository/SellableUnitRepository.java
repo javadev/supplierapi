@@ -1,6 +1,5 @@
 package com.cs.roomdbapi.repository;
 
-import com.cs.roomdbapi.model.PropertyEntity;
 import com.cs.roomdbapi.model.SellableUnitEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,5 +22,9 @@ public interface SellableUnitRepository extends JpaRepository<SellableUnitEntity
 
     @Transactional(readOnly = true)
     Optional<SellableUnitEntity> findBySupplierUnitId(@NotBlank String id);
+
+    @Transactional(readOnly = true)
+    @Query(value = "select suxd.sellable_unit_id from sellable_unit_x_description suxd where suxd.description_id = ?1", nativeQuery = true)
+    Integer getSellableUnitIdByDescriptionId(Integer descriptionId);
 
 }

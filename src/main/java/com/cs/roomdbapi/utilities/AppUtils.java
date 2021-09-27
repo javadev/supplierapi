@@ -103,5 +103,7 @@ public class AppUtils {
 
     public static final String DEFAULT_POI_DESCRIPTION_TYPE_CODE = "poi";
 
+    public static final String DEFAULT_SELLABLE_UNIT_DESCRIPTION_TYPE_CODE = "su";
+
     public static final String DEFAULT_SELLABLE_UNIT_NAME_TYPE_CODE = "su";
 }

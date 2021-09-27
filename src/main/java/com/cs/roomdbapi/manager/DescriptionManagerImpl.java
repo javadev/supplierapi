@@ -35,6 +35,8 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
     private final PropertyRepository propertyRepository;
 
+    private final SellableUnitRepository sellableUnitRepository;
+
     @Override
     public List<DescriptionType> getAllDescriptionTypes() {
         List<DescriptionTypeEntity> all = descriptionTypeRepository.findAll();
@@ -73,20 +75,22 @@ public class DescriptionManagerImpl implements DescriptionManager {
         DescriptionEntity descriptionEntity = descriptionRepository.findById(descriptionId)
                 .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, descriptionId));
 
-        LanguageEntity language = languageRepository.findById(descriptionToSave.getLanguageId())
-                .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, descriptionToSave.getLanguageId()));
-
         if (descriptionToSave.getDescriptionTypeId() != null) {
             DescriptionTypeEntity descriptionType = descriptionTypeRepository.findById(descriptionToSave.getDescriptionTypeId())
                     .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, ID, descriptionToSave.getDescriptionTypeId()));
             descriptionEntity.setDescriptionType(descriptionType);
         }
 
-        if (descriptionToSave.getText().isBlank()) {
-            throw new BadRequestException(String.format("Description text should not be blank for language '%s'.", language.getName()));
+        if (descriptionToSave.getLanguageId() != null) {
+            LanguageEntity language = languageRepository.findById(descriptionToSave.getLanguageId())
+                    .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, descriptionToSave.getLanguageId()));
+            descriptionEntity.setLanguage(language);
         }
 
-        descriptionEntity.setLanguage(language);
+        if (descriptionToSave.getText().isBlank()) {
+            throw new BadRequestException("Description text should not be blank.");
+        }
+
         descriptionEntity.setText(descriptionToSave.getText());
 
         DescriptionEntity save = descriptionRepository.save(descriptionEntity);
@@ -135,6 +139,21 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
         propertyEntity.getDescriptions().remove(entity);
         propertyRepository.save(propertyEntity);
+
+        descriptionRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSellableUnitDescription(Integer sellableUnitId, Integer id) {
+        SellableUnitEntity sellableUnitEntity = sellableUnitRepository.findById(sellableUnitId)
+                .orElseThrow(() -> new ResourceNotFoundException(SELLABLE_UNIT, ID, sellableUnitId));
+
+        DescriptionEntity entity = descriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, id));
+
+        sellableUnitEntity.getDescriptions().remove(entity);
+        sellableUnitRepository.save(sellableUnitEntity);
 
         descriptionRepository.delete(entity);
     }

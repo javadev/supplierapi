@@ -54,6 +54,10 @@ public class SellableUnit {
     private SellableUnitType sellableUnitType;
 
     @JsonProperty
+    @Schema(description = "Descriptions of the sellable unit")
+    private List<Description> descriptions;
+
+    @JsonProperty
     @Schema(description = "Time type that describes time period applicable for sellable unit", example = "day")
     private String timeType;
 

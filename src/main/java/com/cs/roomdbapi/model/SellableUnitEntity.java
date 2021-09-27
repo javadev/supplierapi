@@ -58,7 +58,7 @@ public class SellableUnitEntity {
             name = "sellable_unit_x_description",
             joinColumns = @JoinColumn(name = "sellable_unit_id"),
             inverseJoinColumns = @JoinColumn(name = "description_id"))
-    List<DescriptionEntity> descriptions;   // TODO implement API to add/remove/update descriptions
+    List<DescriptionEntity> descriptions;
 
     @Column
     @UpdateTimestamp

@@ -4,6 +4,7 @@ import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.AvailabilityMapper;
+import com.cs.roomdbapi.mapper.DescriptionMapper;
 import com.cs.roomdbapi.mapper.SellableUnitMapper;
 import com.cs.roomdbapi.mapper.SellableUnitTypeMapper;
 import com.cs.roomdbapi.model.*;
@@ -37,6 +38,8 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     private final NameRepository nameRepository;
 
     private final AvailabilityRepository availabilityRepository;
+
+    private final DescriptionManager descriptionManager;
 
     @Override
     public List<SellableUnitType> getAllSellableUnitTypes() {
@@ -210,6 +213,25 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
         }
 
         return AvailabilityMapper.MAPPER.toListDTO(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public Description addSellableUnitDescription(Integer sellableUnitId, DescriptionSave descriptionToSave) {
+        DescriptionEntity savedDescription = descriptionManager.createDescription(descriptionToSave, DEFAULT_SELLABLE_UNIT_DESCRIPTION_TYPE_CODE);
+
+        SellableUnitEntity entity = sellableUnitRepository.findById(sellableUnitId)
+                .orElseThrow(() -> new ResourceNotFoundException(SELLABLE_UNIT, ID, sellableUnitId));
+
+        entity.getDescriptions().add(savedDescription);
+        sellableUnitRepository.save(entity);
+
+        return DescriptionMapper.MAPPER.toDTO(savedDescription);
+    }
+
+    @Override
+    public Integer getSellableUnitIdByDescriptionId(Integer descriptionId) {
+        return sellableUnitRepository.getSellableUnitIdByDescriptionId(descriptionId);
     }
 
 }

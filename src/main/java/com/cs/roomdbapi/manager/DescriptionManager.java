@@ -21,5 +21,7 @@ public interface DescriptionManager {
 
     void deletePropertyDescription(Integer propertyId, Integer id);
 
+    void deleteSellableUnitDescription(Integer sellableUnitId, Integer id);
+
 }
                                                                                

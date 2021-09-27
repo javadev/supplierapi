@@ -2,6 +2,7 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
+import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.SellableUnitManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +40,8 @@ public class SellableUnitController {
     private final SellableUnitManager sellableUnitManager;
 
     private final PropertyManager propertyManager;
+
+    private final DescriptionManager descriptionManager;
 
     @Operation(
             summary = "Get list of all sellable unit types."
@@ -219,6 +222,70 @@ public class SellableUnitController {
         SellableUnit supplierUnit = sellableUnitManager.getOrCreateSellableUnitBySupplierUnitId(sellableUnitId, propertyId);
 
         return new ResponseEntity<>(supplierUnit, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add description to sellable unit."
+    )
+    @PostMapping({"/description/{sellableUnitId}"})
+    public ResponseEntity<Description> addDescription(
+            @PathVariable("sellableUnitId")
+            @Parameter(description = "RoomDB internal sellable unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        validateSellableUnitAccess(sellableUnitId, req);
+
+        Description description = sellableUnitManager.addSellableUnitDescription(sellableUnitId, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update description for sellable unit."
+    )
+    @PatchMapping("/description/{id}")
+    public ResponseEntity<Description> updateDescription(
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
+        validateSellableUnitAccess(sellableUnitId, req);
+
+        Description description = descriptionManager.updateDescription(id, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Delete description for sellable unit."
+    )
+    @DeleteMapping("/description/{id}")
+    public ResponseEntity<Void> deleteDescription(
+            @PathVariable
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("API delete sellable unit description called with id: {}.", id);
+
+        Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
+        validateSellableUnitAccess(sellableUnitId, req);
+
+        descriptionManager.deleteSellableUnitDescription(sellableUnitId, id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

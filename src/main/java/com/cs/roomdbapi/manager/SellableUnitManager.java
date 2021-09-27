@@ -28,4 +28,8 @@ public interface SellableUnitManager {
 
     List<Availability> setSellableUnitAvailabilities(Integer sellableUnitId, List<AvailabilitySave> availabilities);
 
+    Description addSellableUnitDescription(Integer sellableUnitId, DescriptionSave descriptionToSave); // TODO
+
+    Integer getSellableUnitIdByDescriptionId(Integer descriptionId);
+
 }
