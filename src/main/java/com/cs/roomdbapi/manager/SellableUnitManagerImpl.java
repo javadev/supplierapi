@@ -3,10 +3,7 @@ package com.cs.roomdbapi.manager;
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
-import com.cs.roomdbapi.mapper.AvailabilityMapper;
-import com.cs.roomdbapi.mapper.DescriptionMapper;
-import com.cs.roomdbapi.mapper.SellableUnitMapper;
-import com.cs.roomdbapi.mapper.SellableUnitTypeMapper;
+import com.cs.roomdbapi.mapper.*;
 import com.cs.roomdbapi.model.*;
 import com.cs.roomdbapi.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +35,10 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     private final NameRepository nameRepository;
 
     private final AvailabilityRepository availabilityRepository;
+
+    private final SUCapacityRepository suCapacityRepository;
+
+    private final TimeRangeRepository timeRangeRepository;
 
     private final DescriptionManager descriptionManager;
 
@@ -232,6 +233,68 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     @Override
     public Integer getSellableUnitIdByDescriptionId(Integer descriptionId) {
         return sellableUnitRepository.getSellableUnitIdByDescriptionId(descriptionId);
+    }
+
+    @Override
+    public List<SUCapacity> getSUCapacityBySellableUnitId(Integer sellableUnitId) {
+        List<SUCapacityEntity> all = suCapacityRepository.findAllBySellableUnitId(sellableUnitId);
+
+        return SUCapacityMapper.MAPPER.toListDTO(all);
+    }
+
+    @Transactional
+    public List<SUCapacity> setOrAddSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities, boolean removeExisting) {
+
+        if (removeExisting) {
+            suCapacityRepository.removeBySellableUnitId(sellableUnitId);
+        }
+
+        List<SUCapacityEntity> suCapacityEntities = new ArrayList<>();
+        if (capacities != null) {
+            for (SUCapacity capacity : capacities) {
+                suCapacityEntities.add(prepareCapacityEntity(sellableUnitId, capacity));
+            }
+        }
+
+        List<SUCapacityEntity> saveAll = new ArrayList<>();
+        if (suCapacityEntities.size() > 0) {
+            saveAll = suCapacityRepository.saveAll(suCapacityEntities);
+        }
+
+        return SUCapacityMapper.MAPPER.toListDTO(saveAll);
+    }
+
+    @Override
+    public List<SUCapacity> setSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities) {
+
+        return setOrAddSellableUnitCapacities(sellableUnitId, capacities, true);
+    }
+
+    @Override
+    public List<SUCapacity> addSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities) {
+
+        return setOrAddSellableUnitCapacities(sellableUnitId, capacities, false);
+    }
+
+    private SUCapacityEntity prepareCapacityEntity(Integer sellableUnitId, SUCapacity capacity) {
+        if (capacity.getCapacity() == null || capacity.getCapacity() < 0) {
+            throw new BadRequestException("Capacity should be provided and should be zero or positive number.");
+        }
+
+        SUCapacityEntity entity = new SUCapacityEntity();
+        
+        TimeRangeEntity timeRange = null;
+        if (capacity.getTimeRange() != null) {
+            timeRange = TimeRangeMapper.MAPPER.toEntity(capacity.getTimeRange());
+            timeRangeRepository.save(timeRange);
+        }
+
+        entity.setSellableUnitId(sellableUnitId);
+        entity.setCapacity(capacity.getCapacity());
+        entity.setIsBlockout(capacity.getIsBlockout());
+        entity.setTimeRange(timeRange);
+
+        return entity;
     }
 
 }

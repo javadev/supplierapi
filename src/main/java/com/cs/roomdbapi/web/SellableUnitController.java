@@ -288,4 +288,61 @@ public class SellableUnitController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Get sellable unit capacity data."
+    )
+    @GetMapping({"/capacity/{sellableUnitId}"})
+    public ResponseEntity<List<SUCapacity>> getSellableUnitSUCapacity(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUCapacity> all = sellableUnitManager.getSUCapacityBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set capacity data to sellable unit.",
+            description = "All capacity entries will be **overridden** with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided."
+    )
+    @PostMapping({"/set-capacities"})
+    public ResponseEntity<List<SUCapacity>> setCapacity(
+            @Valid
+            @RequestBody
+                    SellableUnitCapacityRequest request,
+            HttpServletRequest req
+    ) {
+        validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        List<SUCapacity> capacities = sellableUnitManager.setSellableUnitCapacities(request.getSellableUnitId(), request.getCapacities());
+
+        return new ResponseEntity<>(capacities, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Add capacity data to sellable unit.",
+            description = "New capacity entries will be **created** no effect for existing entries. <br/>" +
+            "Time segment is not required and will be empty if not provided. <br/>" +
+            "Only created records will be returned as result."
+    )
+    @PostMapping({"/add-capacities"})
+    public ResponseEntity<List<SUCapacity>> addCapacity(
+            @Valid
+            @RequestBody
+                    SellableUnitCapacityRequest request,
+            HttpServletRequest req
+    ) {
+        validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        List<SUCapacity> capacities = sellableUnitManager.addSellableUnitCapacities(request.getSellableUnitId(), request.getCapacities());
+
+        return new ResponseEntity<>(capacities, HttpStatus.CREATED);
+    }
+
 }

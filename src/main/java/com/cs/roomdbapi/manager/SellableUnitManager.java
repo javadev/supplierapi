@@ -32,4 +32,10 @@ public interface SellableUnitManager {
 
     Integer getSellableUnitIdByDescriptionId(Integer descriptionId);
 
+    List<SUCapacity> getSUCapacityBySellableUnitId(Integer sellableUnitId);
+
+    List<SUCapacity> setSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities);
+
+    List<SUCapacity> addSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities);
+
 }
