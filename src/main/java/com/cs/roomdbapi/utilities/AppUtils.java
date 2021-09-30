@@ -39,6 +39,8 @@ public class AppUtils {
 
     public static final String MEDIA = "Media";
 
+    public static final String PRODUCT = "Product";
+
     public static final String SELLABLE_UNIT = "Sellable Unit";
 
     public static final String BRAND = "Brand";
