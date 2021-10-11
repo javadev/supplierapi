@@ -24,9 +24,9 @@ public interface SellableUnitManager {
 
     List<SellableUnit> getAllSellableUnitsByPropertyId(Integer propertyId);
 
-    List<Availability> getAvailabilitiesBySellableUnitId(Integer sellableUnitId);
+    List<AvailabilityResult> getAvailabilitiesBySellableUnitId(Integer sellableUnitId);
 
-    List<Availability> setSellableUnitAvailabilities(Integer sellableUnitId, List<AvailabilitySave> availabilities);
+    List<AvailabilityResult> setAvailabilitiesToSellableUnit(Integer sellableUnitId, List<AvailabilitySave> availabilities);
 
     Description addSellableUnitDescription(Integer sellableUnitId, DescriptionSave descriptionToSave); // TODO
 
@@ -37,5 +37,9 @@ public interface SellableUnitManager {
     List<SUCapacity> setSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities);
 
     List<SUCapacity> addSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities);
+
+    List<Calendar> getCalendarRowsBySellableUnitId(Integer sellableUnitId);
+
+    List<Calendar> setCalendarRowsToSellableUnit(Integer sellableUnitId, List<Calendar> availabilities);
 
 }

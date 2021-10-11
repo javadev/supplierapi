@@ -34,7 +34,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
 
     private final NameRepository nameRepository;
 
-    private final AvailabilityRepository availabilityRepository;
+    private final CalendarRepository calendarRepository;
 
     private final SUCapacityRepository suCapacityRepository;
 
@@ -163,10 +163,10 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
-    public List<Availability> getAvailabilitiesBySellableUnitId(Integer sellableUnitId) {
-        List<AvailabilityEntity> all = availabilityRepository.findAllBySellableUnitId(sellableUnitId);
+    public List<AvailabilityResult> getAvailabilitiesBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitId(sellableUnitId);
 
-        return AvailabilityMapper.MAPPER.toListDTO(all);
+        return CalendarMapper.MAPPER.toListAvailability(all);
     }
 
     @Override
@@ -178,9 +178,9 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
 
     @Override
     @Transactional
-    public List<Availability> setSellableUnitAvailabilities(Integer sellableUnitId, List<AvailabilitySave> availabilities) {
+    public List<AvailabilityResult> setAvailabilitiesToSellableUnit(Integer sellableUnitId, List<AvailabilitySave> availabilities) {
 
-        List<AvailabilityEntity> availabilityEntities = new ArrayList<>();
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
         if (availabilities != null) {
             for (AvailabilitySave availability : availabilities) {
 
@@ -188,12 +188,12 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
                     throw new BadRequestException("Availability count and date are required and should be provided.");
                 }
 
-                AvailabilityEntity entity;
+                CalendarEntity entity;
 
                 // If availability exists for specified date we will update count for this record
-                Optional<AvailabilityEntity> optional = availabilityRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
+                Optional<CalendarEntity> optional = calendarRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
                         availability.getDate(), availability.getTimeSegment());
-                entity = optional.orElseGet(AvailabilityEntity::new);
+                entity = optional.orElseGet(CalendarEntity::new);
 
                 entity.setCountAvailable(availability.getCountAvailable());
                 if (entity.getDate() == null) {
@@ -202,18 +202,20 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
                 if (entity.getTimeSegment() == null) {
                     entity.setTimeSegment(availability.getTimeSegment());
                 }
-                entity.setSellableUnitId(sellableUnitId);
+                if (entity.getSellableUnitId() == null) {
+                    entity.setSellableUnitId(sellableUnitId);
+                }
 
-                availabilityEntities.add(entity);
+                calendarEntities.add(entity);
             }
         }
 
-        List<AvailabilityEntity> saveAll = new ArrayList<>();
-        if (availabilityEntities.size() > 0) {
-            saveAll = availabilityRepository.saveAll(availabilityEntities);
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
         }
 
-        return AvailabilityMapper.MAPPER.toListDTO(saveAll);
+        return CalendarMapper.MAPPER.toListAvailability(saveAll);
     }
 
     @Override
@@ -295,6 +297,87 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
         entity.setTimeRange(timeRange);
 
         return entity;
+    }
+
+    @Override
+    public List<Calendar> getCalendarRowsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitId(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    @Transactional
+    public List<Calendar> setCalendarRowsToSellableUnit(Integer sellableUnitId, List<Calendar> calendars) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (calendars != null) {
+            for (Calendar calendar : calendars) {
+
+                if (calendar.getDate() == null) {
+                    throw new BadRequestException("Calendar date is required and should be provided.");
+                }
+                if (calendar.getCountAvailable() == null && calendar.getPrice() == null
+                        && calendar.getMinLOS() == null && calendar.getMaxLOS() == null
+                        && calendar.getClosedForSale() == null && calendar.getClosedForArrival() == null
+                        && calendar.getClosedForDeparture() == null){
+                    throw new BadRequestException(String.format(
+                            "All data fields for calendar entry are empty for date: %s. At least one field should be provided.",
+                            calendar.getDate()
+                    ));
+                }
+
+                CalendarEntity entity;
+
+                // If availability exists for specified date we will update count for this record
+                Optional<CalendarEntity> optional = calendarRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
+                        calendar.getDate(), calendar.getTimeSegment());
+                entity = optional.orElseGet(CalendarEntity::new);
+
+                // set(for new) or rewrite(for existing) calendar data fields
+                if (calendar.getCountAvailable() != null) {
+                    entity.setCountAvailable(calendar.getCountAvailable());
+                }
+                if (calendar.getPrice() != null) {
+                    entity.setPrice(calendar.getPrice());
+                }
+                if (calendar.getMinLOS() != null) {
+                    entity.setMinLOS(calendar.getMinLOS());
+                }
+                if (calendar.getMaxLOS() != null) {
+                    entity.setMaxLOS(calendar.getMaxLOS());
+                }
+                if (calendar.getClosedForSale() != null) {
+                    entity.setClosedForSale(calendar.getClosedForSale());
+                }
+                if (calendar.getClosedForArrival() != null) {
+                    entity.setClosedForArrival(calendar.getClosedForArrival());
+                }
+                if (calendar.getClosedForDeparture() != null) {
+                    entity.setClosedForDeparture(calendar.getClosedForDeparture());
+                }
+
+                // set fields if calendar entry is new
+                if (entity.getDate() == null) {
+                    entity.setDate(calendar.getDate());
+                }
+                if (entity.getTimeSegment() == null) {
+                    entity.setTimeSegment(calendar.getTimeSegment());
+                }
+                if (entity.getSellableUnitId() == null) {
+                    entity.setSellableUnitId(sellableUnitId);
+                }
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListDTO(saveAll);
     }
 
 }

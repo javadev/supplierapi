@@ -28,6 +28,8 @@ public class SellableUnit {
     @Schema(description = "Room DB Property Id of the property", example = "1000040")
     private Integer propertyId;
 
+    // TODO review logic that this id could be duplicated if provided from different systems
+    // make check that it's unique within supplier or within property? discuss.
     @JsonProperty
     @Schema(description = "Unit (room, meal, etc.) id that is used in supplier system.")
     private String supplierUnitId;
@@ -45,6 +47,7 @@ public class SellableUnit {
     private Boolean soldOverTime;
 
     @JsonProperty
+    @Min(0)
     @Schema(description = "Base price of the sellable unit", example = "55.90")
     private BigDecimal basePrice;
 

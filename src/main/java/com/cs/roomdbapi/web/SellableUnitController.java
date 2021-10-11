@@ -1,10 +1,10 @@
 package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
-import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.SellableUnitManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -43,6 +43,8 @@ public class SellableUnitController {
 
     private final DescriptionManager descriptionManager;
 
+    private final ValidationManager validationManager;
+
     @Operation(
             summary = "Get list of all sellable unit types."
     )
@@ -63,7 +65,7 @@ public class SellableUnitController {
     ) {
         Integer propertyId = request.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         SellableUnit sellableUnit = sellableUnitManager.addSellableUnit(request);
 
@@ -83,22 +85,11 @@ public class SellableUnitController {
     ) {
         log.info("API delete sellable unit called with id: {}.", id);
 
-        validateSellableUnitAccess(id, req);
+        validationManager.validateSellableUnitAccess(id, req);
 
         sellableUnitManager.deleteSellableUnit(id);
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    private void validateSellableUnitAccess(Integer sellableUnitId, HttpServletRequest req) {
-        if (sellableUnitManager.sellableUnitNotExistsById(sellableUnitId)) {
-            throw new BadRequestException("Sellable Unit with provided id does not exists in a system.");
-        }
-
-        Integer propertyId = sellableUnitManager.getPropertyIdBySellableUnitId(sellableUnitId);
-
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
     }
 
     @Operation(
@@ -112,7 +103,7 @@ public class SellableUnitController {
                     Integer id,
             HttpServletRequest req
     ) {
-        validateSellableUnitAccess(id, req);
+        validationManager.validateSellableUnitAccess(id, req);
 
         return new ResponseEntity<>(sellableUnitManager.getSellableUnitById(id), HttpStatus.OK);
     }
@@ -130,49 +121,11 @@ public class SellableUnitController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         List<SellableUnit> all = sellableUnitManager.getAllSellableUnitsByPropertyId(propertyId);
 
         return new ResponseEntity<>(all, HttpStatus.OK);
-    }
-
-    @Operation(
-            summary = "Get sellable unit availabilities."
-    )
-    @GetMapping({"/availabilities/{sellableUnitId}"})
-    public ResponseEntity<List<Availability>> getSellableUnitAvailabilities(
-            @PathVariable
-            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
-            @Min(1)
-                    Integer sellableUnitId,
-            HttpServletRequest req
-    ) {
-        validateSellableUnitAccess(sellableUnitId, req);
-
-        List<Availability> all = sellableUnitManager.getAvailabilitiesBySellableUnitId(sellableUnitId);
-
-        return new ResponseEntity<>(all, HttpStatus.OK);
-    }
-
-    @Operation(
-            summary = "Set/add availabilities to sellable unit.",
-            description = "If availability for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
-                    "Time segment is not required and will be empty if not provided. <br/>" +
-                    "If time segment provided existing data will be overridden with provided data."
-    )
-    @PostMapping({"/set-availabilities"})
-    public ResponseEntity<List<Availability>> setAvailabilities(
-            @Valid
-            @RequestBody
-                    SellableUnitAvailabilityRequest request,
-            HttpServletRequest req
-    ) {
-        validateSellableUnitAccess(request.getSellableUnitId(), req);
-
-        List<Availability> availabilities = sellableUnitManager.setSellableUnitAvailabilities(request.getSellableUnitId(), request.getAvailabilities());
-
-        return new ResponseEntity<>(availabilities, HttpStatus.CREATED);
     }
 
     @Operation(
@@ -194,7 +147,7 @@ public class SellableUnitController {
         Integer propertyId = sellableUnit.getPropertyId();
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         return new ResponseEntity<>(sellableUnit, HttpStatus.OK);
     }
@@ -217,7 +170,7 @@ public class SellableUnitController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         SellableUnit supplierUnit = sellableUnitManager.getOrCreateSellableUnitBySupplierUnitId(sellableUnitId, propertyId);
 
@@ -238,7 +191,7 @@ public class SellableUnitController {
                     DescriptionSave descriptionSave,
             HttpServletRequest req
     ) {
-        validateSellableUnitAccess(sellableUnitId, req);
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
         Description description = sellableUnitManager.addSellableUnitDescription(sellableUnitId, descriptionSave);
 
@@ -260,7 +213,7 @@ public class SellableUnitController {
             HttpServletRequest req
     ) {
         Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
-        validateSellableUnitAccess(sellableUnitId, req);
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
 
@@ -281,7 +234,7 @@ public class SellableUnitController {
         log.info("API delete sellable unit description called with id: {}.", id);
 
         Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
-        validateSellableUnitAccess(sellableUnitId, req);
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
         descriptionManager.deleteSellableUnitDescription(sellableUnitId, id);
 
@@ -299,7 +252,7 @@ public class SellableUnitController {
                     Integer sellableUnitId,
             HttpServletRequest req
     ) {
-        validateSellableUnitAccess(sellableUnitId, req);
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
         List<SUCapacity> all = sellableUnitManager.getSUCapacityBySellableUnitId(sellableUnitId);
 
@@ -318,7 +271,7 @@ public class SellableUnitController {
                     SellableUnitCapacityRequest request,
             HttpServletRequest req
     ) {
-        validateSellableUnitAccess(request.getSellableUnitId(), req);
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
         List<SUCapacity> capacities = sellableUnitManager.setSellableUnitCapacities(request.getSellableUnitId(), request.getCapacities());
 
@@ -338,7 +291,7 @@ public class SellableUnitController {
                     SellableUnitCapacityRequest request,
             HttpServletRequest req
     ) {
-        validateSellableUnitAccess(request.getSellableUnitId(), req);
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
         List<SUCapacity> capacities = sellableUnitManager.addSellableUnitCapacities(request.getSellableUnitId(), request.getCapacities());
 

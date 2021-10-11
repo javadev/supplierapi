@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,8 +16,8 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "availability")
-public class AvailabilityEntity {
+@Table(name = "calendar")
+public class CalendarEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,12 +27,29 @@ public class AvailabilityEntity {
     @Column(name = "sellable_unit_id")
     private Integer sellableUnitId;
 
-    @NotNull
+    @Column
+    private LocalDate date;
+
     @Column(name = "count_available")
     private Integer countAvailable;
 
     @Column
-    private LocalDate date;
+    private BigDecimal price;
+
+    @Column(name = "min_los")
+    private Integer minLOS;
+    
+    @Column(name = "max_los")
+    private Integer maxLOS;
+
+    @Column(name = "closed_for_sale")
+    private Boolean closedForSale;
+
+    @Column(name = "closed_for_arrival")
+    private Boolean closedForArrival;
+
+    @Column(name = "closed_for_departure")
+    private Boolean closedForDeparture;
 
     @Column(name = "time_segment")
     private LocalTime timeSegment;

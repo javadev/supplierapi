@@ -7,6 +7,7 @@ import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.MediaManager;
 import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,6 +49,8 @@ public class LogoController {
 
     private final PropertyManager propertyManager;
 
+    private final ValidationManager validationManager;
+
     @Operation(
             summary = "Get list of all logo(s), by property id.",
             description = "All fields of the logo entity will be included in result."
@@ -88,7 +91,7 @@ public class LogoController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         if (file.isEmpty()) {
             throw new BadRequestException("File not provided.");
@@ -125,7 +128,7 @@ public class LogoController {
         Integer propertyId = mediaManager.getPropertyIdByMediaId(logoId);
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
     }
 
     @Operation(

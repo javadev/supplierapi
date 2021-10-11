@@ -5,6 +5,7 @@ import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.ProductManager;
 import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -41,6 +42,8 @@ public class ProductController {
 
     private final PropertyManager propertyManager;
 
+    private final ValidationManager validationManager;
+
     @Operation(
             summary = "Get list of all products, by property id.",
             description = "All fields of the product entity will be included in result."
@@ -54,7 +57,7 @@ public class ProductController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         List<Product> all = productManager.getAllProductsByPropertyId(propertyId);
 
@@ -85,7 +88,7 @@ public class ProductController {
         Integer propertyId = productManager.getPropertyIdByProductId(productId);
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
     }
 
     // TODO add API methods for descriptions

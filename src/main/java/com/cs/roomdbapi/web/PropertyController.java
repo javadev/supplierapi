@@ -1,10 +1,9 @@
 package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
-import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
-import com.cs.roomdbapi.model.RoleName;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +40,8 @@ public class PropertyController {
 
     private final DescriptionManager descriptionManager;
 
+    private final ValidationManager validationManager;
+
     @Operation(
             summary = "Get list of all properties.",
             description = "All fields of the Property entity will be included in result. <br/>" +
@@ -56,7 +55,7 @@ public class PropertyController {
 
         List<Property> properties;
 
-        if (isHasAllPropertiesPermission()) {
+        if (validationManager.isHasAllPropertiesPermission()) {
             // all properties
             properties = propertyManager.getProperties();
         } else {
@@ -84,7 +83,7 @@ public class PropertyController {
     ) {
 
         Property property = propertyManager.getPropertyById(id);
-        validatePropertyAccess(req, property.getSupplier(), id);
+        validationManager.validatePropertyAccess(req, property.getSupplier(), id);
 
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
@@ -106,7 +105,7 @@ public class PropertyController {
     ) {
 
         Property property = propertyManager.getPropertyBySupplierPropertyId(id);
-        validatePropertyAccess(req, property.getSupplier(), property.getId());
+        validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
@@ -127,7 +126,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Property property = propertyManager.getOrCreatePropertyBySupplierPropertyId(id, req.getRemoteUser());
-        validatePropertyAccess(req, property.getSupplier(), property.getId());
+        validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
@@ -161,7 +160,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(id);
-        validatePropertyAccess(req, supplier, id);
+        validationManager.validatePropertyAccess(req, supplier, id);
 
         Property updatedProperty = propertyManager.updateProperty(id, property, req.getRemoteUser());
 
@@ -184,7 +183,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(id);
-        validatePropertyAccess(req, supplier, id);
+        validationManager.validatePropertyAccess(req, supplier, id);
 
         PropertyInfo propertyInfo = propertyManager.getPropertyInfoByPropertyId(id);
 
@@ -201,7 +200,7 @@ public class PropertyController {
     ) {
         Integer propertyId = info.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         PropertyInfo propertyInfo = propertyManager.addPropertyInfo(info);
 
@@ -218,7 +217,7 @@ public class PropertyController {
     ) {
         Integer propertyId = info.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         PropertyInfo updated = propertyManager.updatePropertyInfo(info);
 
@@ -239,28 +238,11 @@ public class PropertyController {
         log.info("API delete Property Info called with propertyId: {}.", id);
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(id);
-        validatePropertyAccess(req, supplier, id);
+        validationManager.validatePropertyAccess(req, supplier, id);
 
         propertyManager.deletePropertyInfoByPropertyId(id);
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    protected static void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId) {
-
-        String propertyName = supplier.getName();
-        String supplierName = req.getRemoteUser();
-
-        if (!isHasAllPropertiesPermission() && !supplierName.equals(propertyName)) {
-            throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", propertyId));
-        }
-    }
-
-    private static boolean isHasAllPropertiesPermission() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth != null && auth.getAuthorities().stream().anyMatch(
-                a -> a.getAuthority().equals(RoleName.ROLE_SUPPLIER_ALL_PROPERTIES.getAuthority())
-        );
     }
 
     @Operation(
@@ -277,7 +259,7 @@ public class PropertyController {
     ) {
         Integer propertyId = propertyEmailRequest.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         List<Email> emails = propertyManager.setPropertyEmails(propertyEmailRequest.getPropertyId(), propertyEmailRequest.getEmails());
 
@@ -298,7 +280,7 @@ public class PropertyController {
     ) {
         Integer propertyId = propertyPhoneRequest.getPropertyId();
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         List<Phone> phones = propertyManager.setPropertyPhones(propertyPhoneRequest.getPropertyId(), propertyPhoneRequest.getPhones());
 
@@ -320,7 +302,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         Description description = propertyManager.addPropertyDescription(propertyId, descriptionSave);
 
@@ -343,7 +325,7 @@ public class PropertyController {
     ) {
         Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
 
@@ -365,7 +347,7 @@ public class PropertyController {
 
         Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         descriptionManager.deletePropertyDescription(propertyId, id);
 

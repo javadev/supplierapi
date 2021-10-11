@@ -18,15 +18,15 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Availability {
+public class AvailabilityResult {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer id;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Min(1)
     @Schema(description = "Room DB internal sellable unit id.", example = "12")
     private Integer sellableUnitId;
+
+    @JsonProperty
+    @Schema(description = "Data for the calendar data.", example = "2021-09-16")
+    private LocalDate date;
 
     @JsonProperty
     @Min(0)
@@ -34,11 +34,7 @@ public class Availability {
     private Integer countAvailable;
 
     @JsonProperty
-    @Schema(description = "Data of the availability data.", example = "2021-09-16")
-    private LocalDate date;
-
-    @JsonProperty
-    @Schema(description = "Time segment of the availability data.", example = "07:00")
+    @Schema(description = "Time segment of the calendar data.", example = "07:00")
     private LocalTime timeSegment;
 
 }

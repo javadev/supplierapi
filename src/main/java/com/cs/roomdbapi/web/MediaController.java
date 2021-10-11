@@ -2,10 +2,7 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
-import com.cs.roomdbapi.manager.DescriptionManager;
-import com.cs.roomdbapi.manager.MediaManager;
-import com.cs.roomdbapi.manager.PredefinedTagManager;
-import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,6 +46,8 @@ public class MediaController {
 
     private final DescriptionManager descriptionManager;
 
+    private final ValidationManager validationManager;
+
     @Operation(
             summary = "Get list of all media, by property id.",
             description = "All fields of the media entity will be included in result."
@@ -62,7 +61,7 @@ public class MediaController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         List<Media> all = mediaManager.getAllMediaByPropertyId(propertyId);
 
@@ -123,7 +122,7 @@ public class MediaController {
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
 
         if (file.isEmpty()) {
             throw new BadRequestException("File not provided.");
@@ -200,7 +199,7 @@ public class MediaController {
         Integer propertyId = mediaManager.getPropertyIdByMediaId(mediaId);
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
     }
 
     @Operation(

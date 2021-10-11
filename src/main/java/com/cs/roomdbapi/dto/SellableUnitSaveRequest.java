@@ -42,6 +42,7 @@ public class SellableUnitSaveRequest {
     private Boolean soldOverTime;
 
     @JsonProperty
+    @Min(0)
     @Schema(description = "Base price of the sellable unit", example = "55.90")
     private BigDecimal basePrice;
 
