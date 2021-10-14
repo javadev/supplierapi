@@ -1,6 +1,7 @@
 package com.cs.roomdbapi.security;
 
 import com.cs.roomdbapi.exception.CustomException;
+import com.cs.roomdbapi.exception.InvalidTokenException;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,10 +30,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Authentication auth = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
-        } catch (CustomException ex) {
-            //this is very important, since it guarantees the user is not authenticated at all
-            SecurityContextHolder.clearContext();
-            response.sendError(ex.getHttpStatus().value(), ex.getMessage());
+        } catch (CustomException | InvalidTokenException ex) {
+            throw ex;
         }
 
         filterChain.doFilter(request, response);

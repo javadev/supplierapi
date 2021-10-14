@@ -3,6 +3,7 @@ package com.cs.roomdbapi.advice;
 import com.cs.roomdbapi.annotation.IgnoreResponseBinding;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.exception.CustomException;
+import com.cs.roomdbapi.exception.InvalidTokenException;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.response.ErrorResponse;
 import com.cs.roomdbapi.response.SuccessResponse;
@@ -78,15 +79,15 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
-    public ResponseEntity<SuccessResponse<Object>> resolveException(BadRequestException exception) {
-        SuccessResponse<Object> response = new SuccessResponse<>(exception.getObject(), exception.getMessage(), AppUtils.FAIL);
+    public ResponseEntity<SuccessResponse<Object>> resolveException(BadRequestException ex) {
+        SuccessResponse<Object> response = new SuccessResponse<>(ex.getObject(), ex.getMessage(), AppUtils.FAIL);
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseBody
-    public ResponseEntity<SuccessResponse<Object>> resolveException(ResourceNotFoundException exception) {
-        SuccessResponse<Object> response = new SuccessResponse<>(null, exception.getMessage(), AppUtils.FAIL);
+    public ResponseEntity<SuccessResponse<Object>> resolveException(ResourceNotFoundException ex) {
+        SuccessResponse<Object> response = new SuccessResponse<>(null, ex.getMessage(), AppUtils.FAIL);
 
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -106,18 +107,31 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
     }
 
     @ExceptionHandler(CustomException.class)
-    public void handleCustomException(HttpServletResponse res, CustomException ex) throws IOException {
-        res.sendError(ex.getHttpStatus().value(), ex.getMessage());
+    public ResponseEntity<SuccessResponse<Object>> handleCustomException(HttpServletResponse res, CustomException ex) throws IOException {
+        SuccessResponse<Object> response = new SuccessResponse<>(null, ex.getMessage(), AppUtils.FAIL);
+
+        return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
     @ExceptionHandler(ConversionFailedException.class)
-    public ResponseEntity<String> handleConflict(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<SuccessResponse<Object>> handleConflict(RuntimeException ex) {
+        SuccessResponse<Object> response = new SuccessResponse<>(null, ex.getMessage(), AppUtils.FAIL);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public void handleAccessDeniedException(HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
+    public ResponseEntity<SuccessResponse<Object>> handleAccessDeniedException(HttpServletResponse res) {
+        SuccessResponse<Object> response = new SuccessResponse<>(null, "Access denied", AppUtils.FAIL);
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<SuccessResponse<Object>> handleInvalidTokenException(HttpServletResponse res, InvalidTokenException ex) {
+        SuccessResponse<Object> response = new SuccessResponse<>(null, ex.getMessage(), AppUtils.FAIL);
+
+        return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,6 +1,7 @@
 package com.cs.roomdbapi.security;
 
 import com.cs.roomdbapi.exception.CustomException;
+import com.cs.roomdbapi.exception.InvalidTokenException;
 import com.cs.roomdbapi.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -84,7 +85,7 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("JwtTokenProvider::validateToken Expired or invalid JWT token: '{}'", token);
 
-            throw new CustomException("Expired or invalid JWT token", HttpStatus.NOT_ACCEPTABLE);
+            throw new InvalidTokenException("Expired or invalid JWT token", HttpStatus.UNAUTHORIZED);
         }
     }
 

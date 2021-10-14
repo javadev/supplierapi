@@ -21,6 +21,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final JwtAuthenticationEntryPoint jwtEntryPoint;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -39,8 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Disallow everything else..
                 .anyRequest().authenticated();
 
-        // If a user try to access a resource without having enough permissions
-        http.exceptionHandling().accessDeniedPage("/login");
+        http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
 
         // Apply JWT
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
