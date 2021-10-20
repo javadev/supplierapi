@@ -11,29 +11,23 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AvailabilitySave {
+public class SUPriceRequest {
 
     @JsonProperty
-    @Min(0)
+    @Min(1)
     @NotNull
-    @Schema(description = "Count of the available sellable units.", example = "30")
-    private Integer countAvailable;
+    @Schema(description = "Room DB internal sellable unit id.", example = "12")
+    private Integer sellableUnitId;
 
     @JsonProperty
-    @NotNull
-    @Schema(description = "Data of the availability data.", example = "2021-09-16")
-    private LocalDate date;
-
-    @JsonProperty
-    @Schema(description = "Time segment of the availability data.", example = "07:00")
-    private LocalTime timeSegment;
+    @Schema(description = "Prices for sellable unit.")
+    private List<SUPriceSave> prices;
 
 }

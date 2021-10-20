@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,7 +20,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Calendar {
+public class SUCalendar {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer id;
@@ -30,6 +31,7 @@ public class Calendar {
     private Integer sellableUnitId;
 
     @JsonProperty
+    @NotNull
     @Schema(description = "Data for the calendar data.", example = "2021-09-16")
     private LocalDate date;
 

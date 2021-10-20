@@ -5,29 +5,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SellableUnitCapacityRequest {
+public class SUPriceSave extends SUBaseCalendarSave {
 
     @JsonProperty
-    @Min(1)
+    @Min(0)
     @NotNull
-    @Schema(description = "Room DB internal sellable unit id.", example = "12")
-    private Integer sellableUnitId;
-
-    @JsonProperty
-    @Schema(description = "Capacities for sellable unit.")
-    private List<SUCapacity> capacities;
+    @Schema(description = "Price of the sellable unit for this date", example = "22.50")
+    private BigDecimal price;
 
 }

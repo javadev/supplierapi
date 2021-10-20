@@ -7,27 +7,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import java.util.List;
-
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SellableUnitCalendarRequest {
+public class SUClosedForDepartureResult extends SUBaseResult {
 
     @JsonProperty
-    @Min(1)
-    @NotNull
-    @Schema(description = "Room DB internal sellable unit id.", example = "12")
-    private Integer sellableUnitId;
-
-    @JsonProperty
-    @Schema(description = "Calendar entries for sellable unit.")
-    private List<Calendar> calendars;
+    @Schema(description = "Is sellable units closed for departure for this date", example = "true")
+    private Boolean closedForDeparture;
 
 }

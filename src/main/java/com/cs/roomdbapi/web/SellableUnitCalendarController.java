@@ -1,9 +1,6 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.AvailabilityResult;
-import com.cs.roomdbapi.dto.Calendar;
-import com.cs.roomdbapi.dto.SellableUnitAvailabilityRequest;
-import com.cs.roomdbapi.dto.SellableUnitCalendarRequest;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.manager.SellableUnitManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +42,7 @@ public class SellableUnitCalendarController {
             summary = "Get sellable unit availabilities."
     )
     @GetMapping({"/availabilities/{sellableUnitId}"})
-    public ResponseEntity<List<AvailabilityResult>> getSellableUnitAvailabilities(
+    public ResponseEntity<List<SUAvailabilityResult>> getSellableUnitAvailabilities(
             @PathVariable
             @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
             @Min(1)
@@ -54,7 +51,7 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
-        List<AvailabilityResult> all = sellableUnitManager.getAvailabilitiesBySellableUnitId(sellableUnitId);
+        List<SUAvailabilityResult> all = sellableUnitManager.getAvailabilitiesBySellableUnitId(sellableUnitId);
 
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
@@ -66,15 +63,250 @@ public class SellableUnitCalendarController {
                     "If time segment provided existing data will be overridden with provided data."
     )
     @PostMapping({"/availabilities/set"})
-    public ResponseEntity<List<AvailabilityResult>> setAvailabilities(
+    public ResponseEntity<List<SUAvailabilityResult>> setAvailabilities(
             @Valid
             @RequestBody
-                    SellableUnitAvailabilityRequest request,
+                    SUAvailabilityRequest request,
             HttpServletRequest req
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        List<AvailabilityResult> all = sellableUnitManager.setAvailabilitiesToSellableUnit(request.getSellableUnitId(), request.getAvailabilities());
+        log.info(request.toString());
+        List<SUAvailabilityResult> all = sellableUnitManager.setAvailabilitiesToSellableUnit(request.getSellableUnitId(), request.getAvailabilities());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit prices."
+    )
+    @GetMapping({"/price/{sellableUnitId}"})
+    public ResponseEntity<List<SUPriceResult>> getSellableUnitPrices(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUPriceResult> all = sellableUnitManager.getPricesBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add prices to sellable unit.",
+            description = "If price for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/price/set"})
+    public ResponseEntity<List<SUPriceResult>> setPrices(
+            @Valid
+            @RequestBody
+                    SUPriceRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUPriceResult> all = sellableUnitManager.setPricesToSellableUnit(request.getSellableUnitId(), request.getPrices());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit minimum length of stay records."
+    )
+    @GetMapping({"/minLOS/{sellableUnitId}"})
+    public ResponseEntity<List<SUMinLOSResult>> getSellableUnitMinLOSRecords(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUMinLOSResult> all = sellableUnitManager.getMinLOSRecordsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add minimum length of stay records to sellable unit.",
+            description = "If minimum length of stay record for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/minLOS/set"})
+    public ResponseEntity<List<SUMinLOSResult>> setMinLOSRecords(
+            @Valid
+            @RequestBody
+                    SUMinLOSRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUMinLOSResult> all = sellableUnitManager.setMinLOSRecordsToSellableUnit(request.getSellableUnitId(), request.getMinLOSRecords());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit maximum length of stay records."
+    )
+    @GetMapping({"/maxLOS/{sellableUnitId}"})
+    public ResponseEntity<List<SUMaxLOSResult>> getSellableUnitMaxLOSRecords(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUMaxLOSResult> all = sellableUnitManager.getMaxLOSRecordsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add maximum length of stay records to sellable unit.",
+            description = "If maximum length of stay record for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/maxLOS/set"})
+    public ResponseEntity<List<SUMaxLOSResult>> setMaxLOSRecords(
+            @Valid
+            @RequestBody
+                    SUMaxLOSRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUMaxLOSResult> all = sellableUnitManager.setMaxLOSRecordsToSellableUnit(request.getSellableUnitId(), request.getMaxLOSRecords());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit closed for sale records."
+    )
+    @GetMapping({"/closedForSale/{sellableUnitId}"})
+    public ResponseEntity<List<SUClosedForSaleResult>> getSellableUnitClosedForSaleRecords(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUClosedForSaleResult> all = sellableUnitManager.getClosedForSaleRecordsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add closed for sale records to sellable unit.",
+            description = "If closed for sale record for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/closedForSale/set"})
+    public ResponseEntity<List<SUClosedForSaleResult>> setClosedForSaleRecords(
+            @Valid
+            @RequestBody
+                    SUClosedForSaleRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUClosedForSaleResult> all = sellableUnitManager.setClosedForSaleRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForSaleRecords());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit closed for arrival records."
+    )
+    @GetMapping({"/closedForArrival/{sellableUnitId}"})
+    public ResponseEntity<List<SUClosedForArrivalResult>> getSellableUnitClosedForArrivalRecords(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUClosedForArrivalResult> all = sellableUnitManager.getClosedForArrivalRecordsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add closed for arrival records to sellable unit.",
+            description = "If closed for arrival record for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/closedForArrival/set"})
+    public ResponseEntity<List<SUClosedForArrivalResult>> setClosedForArrivalRecords(
+            @Valid
+            @RequestBody
+                    SUClosedForArrivalRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUClosedForArrivalResult> all = sellableUnitManager.setClosedForArrivalRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForArrivalRecords());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get sellable unit closed for departure records."
+    )
+    @GetMapping({"/closedForDeparture/{sellableUnitId}"})
+    public ResponseEntity<List<SUClosedForDepartureResult>> getSellableUnitClosedForDepartureRecords(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUClosedForDepartureResult> all = sellableUnitManager.getClosedForDepartureRecordsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add closed for departure records to sellable unit.",
+            description = "If closed for departure record for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/closedForDeparture/set"})
+    public ResponseEntity<List<SUClosedForDepartureResult>> setClosedForDepartureRecords(
+            @Valid
+            @RequestBody
+                    SUClosedForDepartureRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUClosedForDepartureResult> all = sellableUnitManager.setClosedForDepartureRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForDepartureRecords());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
     }
@@ -84,7 +316,7 @@ public class SellableUnitCalendarController {
             description = "Result will include all date based fields ro the sellable unit."
     )
     @GetMapping({"/{sellableUnitId}"})
-    public ResponseEntity<List<Calendar>> getSellableUnitCalendarEntries(
+    public ResponseEntity<List<SUCalendar>> getSellableUnitCalendarEntries(
             @PathVariable
             @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
             @Min(1)
@@ -93,7 +325,7 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
-        List<Calendar> all = sellableUnitManager.getCalendarRowsBySellableUnitId(sellableUnitId);
+        List<SUCalendar> all = sellableUnitManager.getCalendarRowsBySellableUnitId(sellableUnitId);
 
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
@@ -105,15 +337,16 @@ public class SellableUnitCalendarController {
                     "If time segment provided existing data will be overridden with provided data."
     )
     @PostMapping({"/"})
-    public ResponseEntity<List<Calendar>> setSellableUnitCalendarEntries(
+    public ResponseEntity<List<SUCalendar>> setSellableUnitCalendarEntries(
             @Valid
             @RequestBody
-                    SellableUnitCalendarRequest request,
+                    SUCalendarRequest request,
             HttpServletRequest req
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        List<Calendar> all = sellableUnitManager.setCalendarRowsToSellableUnit(request.getSellableUnitId(), request.getCalendars());
+        log.info(request.toString());
+        List<SUCalendar> all = sellableUnitManager.setCalendarRowsToSellableUnit(request.getSellableUnitId(), request.getCalendars());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
     }

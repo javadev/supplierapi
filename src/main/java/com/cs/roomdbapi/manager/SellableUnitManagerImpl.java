@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -163,8 +165,8 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
-    public List<AvailabilityResult> getAvailabilitiesBySellableUnitId(Integer sellableUnitId) {
-        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitId(sellableUnitId);
+    public List<SUAvailabilityResult> getAvailabilitiesBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndCountAvailableIsNotNull(sellableUnitId);
 
         return CalendarMapper.MAPPER.toListAvailability(all);
     }
@@ -178,33 +180,18 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
 
     @Override
     @Transactional
-    public List<AvailabilityResult> setAvailabilitiesToSellableUnit(Integer sellableUnitId, List<AvailabilitySave> availabilities) {
+    public List<SUAvailabilityResult> setAvailabilitiesToSellableUnit(Integer sellableUnitId, List<SUAvailabilitySave> availabilities) {
 
         List<CalendarEntity> calendarEntities = new ArrayList<>();
         if (availabilities != null) {
-            for (AvailabilitySave availability : availabilities) {
+            for (SUAvailabilitySave availability : availabilities) {
 
                 if (availability.getCountAvailable() == null || availability.getDate() == null) {
                     throw new BadRequestException("Availability count and date are required and should be provided.");
                 }
 
-                CalendarEntity entity;
-
-                // If availability exists for specified date we will update count for this record
-                Optional<CalendarEntity> optional = calendarRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
-                        availability.getDate(), availability.getTimeSegment());
-                entity = optional.orElseGet(CalendarEntity::new);
-
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, availability.getDate(), availability.getTimeSegment());
                 entity.setCountAvailable(availability.getCountAvailable());
-                if (entity.getDate() == null) {
-                    entity.setDate(availability.getDate());
-                }
-                if (entity.getTimeSegment() == null) {
-                    entity.setTimeSegment(availability.getTimeSegment());
-                }
-                if (entity.getSellableUnitId() == null) {
-                    entity.setSellableUnitId(sellableUnitId);
-                }
 
                 calendarEntities.add(entity);
             }
@@ -300,7 +287,225 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
-    public List<Calendar> getCalendarRowsBySellableUnitId(Integer sellableUnitId) {
+    public List<SUPriceResult> getPricesBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndPriceIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListPrice(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUPriceResult> setPricesToSellableUnit(Integer sellableUnitId, List<SUPriceSave> prices) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (prices != null) {
+            for (SUPriceSave price : prices) {
+                if (price.getPrice() == null || price.getDate() == null) {
+                    throw new BadRequestException("Price and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, price.getDate(), price.getTimeSegment());
+                entity.setPrice(price.getPrice());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListPrice(saveAll);
+    }
+
+    @Override
+    public List<SUMinLOSResult> getMinLOSRecordsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndMinLOSIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListMinLOS(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUMinLOSResult> setMinLOSRecordsToSellableUnit(Integer sellableUnitId, List<SUMinLOSSave> minLOSRecords) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (minLOSRecords != null) {
+            for (SUMinLOSSave minLOSRecord : minLOSRecords) {
+                if (minLOSRecord.getMinLOS() == null || minLOSRecord.getDate() == null) {
+                    throw new BadRequestException("Minimum length of stay and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, minLOSRecord.getDate(), minLOSRecord.getTimeSegment());
+                entity.setMinLOS(minLOSRecord.getMinLOS());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListMinLOS(saveAll);
+    }
+
+    @Override
+    public List<SUMaxLOSResult> getMaxLOSRecordsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndMaxLOSIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListMaxLOS(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUMaxLOSResult> setMaxLOSRecordsToSellableUnit(Integer sellableUnitId, List<SUMaxLOSSave> maxLOSRecords) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (maxLOSRecords != null) {
+            for (SUMaxLOSSave maxLOSRecord : maxLOSRecords) {
+                if (maxLOSRecord.getMaxLOS() == null || maxLOSRecord.getDate() == null) {
+                    throw new BadRequestException("Maximum length of stay and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, maxLOSRecord.getDate(), maxLOSRecord.getTimeSegment());
+                entity.setMaxLOS(maxLOSRecord.getMaxLOS());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListMaxLOS(saveAll);
+    }
+
+    @Override
+    public List<SUClosedForSaleResult> getClosedForSaleRecordsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndClosedForSaleIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListClosedForSale(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUClosedForSaleResult> setClosedForSaleRecordsToSellableUnit(Integer sellableUnitId, List<SUClosedForSaleSave> closedForSaleRecords) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (closedForSaleRecords != null) {
+            for (SUClosedForSaleSave closedForSaleRecord : closedForSaleRecords) {
+                if (closedForSaleRecord.getClosedForSale() == null || closedForSaleRecord.getDate() == null) {
+                    throw new BadRequestException("Closed for sale and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, closedForSaleRecord.getDate(), closedForSaleRecord.getTimeSegment());
+                entity.setClosedForSale(closedForSaleRecord.getClosedForSale());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListClosedForSale(saveAll);
+    }
+
+    @Override
+    public List<SUClosedForArrivalResult> getClosedForArrivalRecordsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndClosedForArrivalIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListClosedForArrival(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUClosedForArrivalResult> setClosedForArrivalRecordsToSellableUnit(Integer sellableUnitId, List<SUClosedForArrivalSave> closedForArrivalRecords) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (closedForArrivalRecords != null) {
+            for (SUClosedForArrivalSave closedForArrivalRecord : closedForArrivalRecords) {
+                if (closedForArrivalRecord.getClosedForArrival() == null || closedForArrivalRecord.getDate() == null) {
+                    throw new BadRequestException("Closed for arrival and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, closedForArrivalRecord.getDate(), closedForArrivalRecord.getTimeSegment());
+                entity.setClosedForArrival(closedForArrivalRecord.getClosedForArrival());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListClosedForArrival(saveAll);
+    }
+
+    @Override
+    public List<SUClosedForDepartureResult> getClosedForDepartureRecordsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndClosedForDepartureIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListClosedForDeparture(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUClosedForDepartureResult> setClosedForDepartureRecordsToSellableUnit(Integer sellableUnitId, List<SUClosedForDepartureSave> closedForDepartureRecords) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (closedForDepartureRecords != null) {
+            for (SUClosedForDepartureSave closedForDepartureRecord : closedForDepartureRecords) {
+                if (closedForDepartureRecord.getClosedForDeparture() == null || closedForDepartureRecord.getDate() == null) {
+                    throw new BadRequestException("Closed for departure and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, closedForDepartureRecord.getDate(), closedForDepartureRecord.getTimeSegment());
+                entity.setClosedForDeparture(closedForDepartureRecord.getClosedForDeparture());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = new ArrayList<>();
+        if (calendarEntities.size() > 0) {
+            saveAll = calendarRepository.saveAll(calendarEntities);
+        }
+
+        return CalendarMapper.MAPPER.toListClosedForDeparture(saveAll);
+    }
+
+    private CalendarEntity getCalendarEntity(Integer sellableUnitId, LocalDate date, LocalTime timeSegment) {
+        CalendarEntity entity;
+
+        // If calendar record exists for specified date we will update data for this record
+        Optional<CalendarEntity> optional = calendarRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId, date, timeSegment);
+
+        entity = optional.orElseGet(CalendarEntity::new);
+        if (entity.getDate() == null) {
+            entity.setDate(date);
+        }
+        if (entity.getTimeSegment() == null) {
+            entity.setTimeSegment(timeSegment);
+        }
+        if (entity.getSellableUnitId() == null) {
+            entity.setSellableUnitId(sellableUnitId);
+        }
+
+        return entity;
+    }
+
+    @Override
+    public List<SUCalendar> getCalendarRowsBySellableUnitId(Integer sellableUnitId) {
         List<CalendarEntity> all = calendarRepository.findAllBySellableUnitId(sellableUnitId);
 
         return CalendarMapper.MAPPER.toListDTO(all);
@@ -308,11 +513,11 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
 
     @Override
     @Transactional
-    public List<Calendar> setCalendarRowsToSellableUnit(Integer sellableUnitId, List<Calendar> calendars) {
+    public List<SUCalendar> setCalendarRowsToSellableUnit(Integer sellableUnitId, List<SUCalendar> calendars) {
 
         List<CalendarEntity> calendarEntities = new ArrayList<>();
         if (calendars != null) {
-            for (Calendar calendar : calendars) {
+            for (SUCalendar calendar : calendars) {
 
                 if (calendar.getDate() == null) {
                     throw new BadRequestException("Calendar date is required and should be provided.");

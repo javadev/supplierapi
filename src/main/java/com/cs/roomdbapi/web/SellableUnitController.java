@@ -268,7 +268,7 @@ public class SellableUnitController {
     public ResponseEntity<List<SUCapacity>> setCapacity(
             @Valid
             @RequestBody
-                    SellableUnitCapacityRequest request,
+                    SUCapacityRequest request,
             HttpServletRequest req
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
@@ -288,7 +288,7 @@ public class SellableUnitController {
     public ResponseEntity<List<SUCapacity>> addCapacity(
             @Valid
             @RequestBody
-                    SellableUnitCapacityRequest request,
+                    SUCapacityRequest request,
             HttpServletRequest req
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);

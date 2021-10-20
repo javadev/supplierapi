@@ -1,0 +1,2 @@
+ALTER TABLE calendar ALTER COLUMN sellable_unit_id SET NOT NULL;
+ALTER TABLE calendar ALTER COLUMN date SET NOT NULL;

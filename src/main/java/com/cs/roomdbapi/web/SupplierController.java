@@ -72,7 +72,7 @@ public class SupplierController {
     @Operation(
             summary = "Refresh token.",
             description = "This API can be used by authorized users to get new token. <br/>" +
-                    "Potentially could be used to avoid token expire, just need to refresh before experation time."
+                    "Potentially could be used to avoid token expire, just need to refresh before expiration time."
     )
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +

@@ -24,9 +24,33 @@ public interface SellableUnitManager {
 
     List<SellableUnit> getAllSellableUnitsByPropertyId(Integer propertyId);
 
-    List<AvailabilityResult> getAvailabilitiesBySellableUnitId(Integer sellableUnitId);
+    List<SUAvailabilityResult> getAvailabilitiesBySellableUnitId(Integer sellableUnitId);
 
-    List<AvailabilityResult> setAvailabilitiesToSellableUnit(Integer sellableUnitId, List<AvailabilitySave> availabilities);
+    List<SUAvailabilityResult> setAvailabilitiesToSellableUnit(Integer sellableUnitId, List<SUAvailabilitySave> availabilities);
+
+    List<SUPriceResult> getPricesBySellableUnitId(Integer sellableUnitId);
+
+    List<SUPriceResult> setPricesToSellableUnit(Integer sellableUnitId, List<SUPriceSave> prices);
+
+    List<SUMinLOSResult> getMinLOSRecordsBySellableUnitId(Integer sellableUnitId);
+
+    List<SUMinLOSResult> setMinLOSRecordsToSellableUnit(Integer sellableUnitId, List<SUMinLOSSave> minLOSRecords);
+
+    List<SUMaxLOSResult> getMaxLOSRecordsBySellableUnitId(Integer sellableUnitId);
+
+    List<SUMaxLOSResult> setMaxLOSRecordsToSellableUnit(Integer sellableUnitId, List<SUMaxLOSSave> maxLOSRecords);
+
+    List<SUClosedForSaleResult> getClosedForSaleRecordsBySellableUnitId(Integer sellableUnitId);
+
+    List<SUClosedForSaleResult> setClosedForSaleRecordsToSellableUnit(Integer sellableUnitId, List<SUClosedForSaleSave> closedForSaleRecords);
+
+    List<SUClosedForArrivalResult> getClosedForArrivalRecordsBySellableUnitId(Integer sellableUnitId);
+
+    List<SUClosedForArrivalResult> setClosedForArrivalRecordsToSellableUnit(Integer sellableUnitId, List<SUClosedForArrivalSave> closedForArrivalRecords);
+
+    List<SUClosedForDepartureResult> getClosedForDepartureRecordsBySellableUnitId(Integer sellableUnitId);
+
+    List<SUClosedForDepartureResult> setClosedForDepartureRecordsToSellableUnit(Integer sellableUnitId, List<SUClosedForDepartureSave> closedForDepartureRecords);
 
     Description addSellableUnitDescription(Integer sellableUnitId, DescriptionSave descriptionToSave); // TODO
 
@@ -38,8 +62,8 @@ public interface SellableUnitManager {
 
     List<SUCapacity> addSellableUnitCapacities(Integer sellableUnitId, List<SUCapacity> capacities);
 
-    List<Calendar> getCalendarRowsBySellableUnitId(Integer sellableUnitId);
+    List<SUCalendar> getCalendarRowsBySellableUnitId(Integer sellableUnitId);
 
-    List<Calendar> setCalendarRowsToSellableUnit(Integer sellableUnitId, List<Calendar> availabilities);
+    List<SUCalendar> setCalendarRowsToSellableUnit(Integer sellableUnitId, List<SUCalendar> calendars);
 
 }
