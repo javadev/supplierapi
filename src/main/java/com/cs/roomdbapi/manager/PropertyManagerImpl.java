@@ -177,6 +177,7 @@ public class PropertyManagerImpl implements PropertyManager {
         entity.setAlternativeName(property.getAlternativeName());
         entity.setStatus(property.getStatus());
         entity.setForTesting(property.getForTesting());
+        entity.setIsMaster(property.getIsMaster());
 
         if (entity.getEmails() != null && !entity.getEmails().isEmpty()) {
             emailRepository.deleteAll(entity.getEmails());

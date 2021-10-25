@@ -51,6 +51,10 @@ public class PropertySaveRequest {
     private Boolean forTesting;
 
     @JsonProperty
+    @Schema(description = "Is data from Room DB should be used as master for this property.", example = "false")
+    private Boolean isMaster;
+
+    @JsonProperty
     @Schema(description = "Emails for property.")
     private List<EmailSave> emails;
 

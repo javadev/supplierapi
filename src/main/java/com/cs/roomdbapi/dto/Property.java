@@ -53,6 +53,10 @@ public class Property {
     @Schema(description = "Is this property for testing purpose", example = "false")
     private Boolean forTesting;
 
+    @JsonProperty
+    @Schema(description = "Is data from Room DB should be used as master for this property.", example = "false")
+    private Boolean isMaster;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Property home currency")
     private Currency homeCurrency;

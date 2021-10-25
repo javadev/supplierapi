@@ -39,6 +39,9 @@ public class PropertyEntity {
     @Column(name = "for_testing")
     private Boolean forTesting = false;
 
+    @Column(name = "is_master")
+    private Boolean isMaster = false;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "home_currency_id")
     private CurrencyEntity homeCurrency;
