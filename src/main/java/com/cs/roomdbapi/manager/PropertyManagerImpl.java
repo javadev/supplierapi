@@ -98,6 +98,13 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public List<Property> getPropertiesByCode(String code) {
+        List<PropertyEntity> all = propertyRepository.findAllByCode(code);
+
+        return PropertyMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
     public Property getOrCreatePropertyBySupplierPropertyId(String id, String supplierName) {
         Optional<PropertyEntity> optional = propertyRepository.findBySupplierPropertyId(id);
 

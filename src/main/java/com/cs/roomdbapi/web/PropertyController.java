@@ -111,6 +111,28 @@ public class PropertyController {
     }
 
     @Operation(
+            summary = "Get properties data by code.",
+            description = "This endpoint could return more than one entry because code is not validate to be unique accross all properties. <br/>" +
+                    "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/code/{code}"})
+    public ResponseEntity<List<Property>> getPropertyByCode(
+            @PathVariable
+            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Size(min = 1, max = 255)
+                    String code,
+            HttpServletRequest req
+    ) {
+        List<Property> properties = propertyManager.getPropertiesByCode(code);
+        properties.removeIf(property -> !validationManager.hasAccessToProperty(req, property.getSupplier(), property.getId()));
+
+        return new ResponseEntity<>(properties, HttpStatus.OK);
+    }
+
+    @Operation(
             summary = "Get or create property by supplier property id.",
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."

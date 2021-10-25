@@ -35,12 +35,21 @@ public class ValidationManagerImpl implements ValidationManager {
     @Override
     public void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId) {
 
-        String propertyName = supplier.getName();
+        String propertySupplierName = supplier.getName();
         String supplierName = req.getRemoteUser();
 
-        if (!isHasAllPropertiesPermission() && !supplierName.equals(propertyName)) {
+        if (!isHasAllPropertiesPermission() && !supplierName.equals(propertySupplierName)) {
             throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", propertyId));
         }
+    }
+
+    @Override
+    public boolean hasAccessToProperty(HttpServletRequest req, Supplier supplier, Integer propertyId) {
+
+        String propertySupplierName = supplier.getName();
+        String supplierName = req.getRemoteUser();
+
+        return isHasAllPropertiesPermission() || supplierName.equals(propertySupplierName);
     }
 
     public boolean isHasAllPropertiesPermission() {

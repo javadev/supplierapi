@@ -10,6 +10,8 @@ public interface ValidationManager {
 
     void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId);
 
+    boolean hasAccessToProperty(HttpServletRequest req, Supplier supplier, Integer propertyId);
+
     boolean isHasAllPropertiesPermission();
 
 }
