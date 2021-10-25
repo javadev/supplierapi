@@ -78,6 +78,30 @@ public class SellableUnitCalendarController {
     }
 
     @Operation(
+            summary = "Set/add availabilities to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If availability for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/availabilities/set/date-range"})
+    public ResponseEntity<List<SUAvailabilityResult>> setAvailabilitiesDateRange(
+            @Valid
+            @RequestBody
+                    SUAvailabilityDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUAvailabilityResult> all = sellableUnitManager.setAvailabilitiesToSellableUnitForDateRange(request);
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
             summary = "Get sellable unit prices."
     )
     @GetMapping({"/price/{sellableUnitId}"})
@@ -112,6 +136,30 @@ public class SellableUnitCalendarController {
 
         log.info(request.toString());
         List<SUPriceResult> all = sellableUnitManager.setPricesToSellableUnit(request.getSellableUnitId(), request.getPrices());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set/add prices to sellable unit. For date range.",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If price for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/price/set/date-range"})
+    public ResponseEntity<List<SUPriceResult>> setPricesDateRange(
+            @Valid
+            @RequestBody
+                    SUPriceDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUPriceResult> all = sellableUnitManager.setPricesToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
     }
@@ -156,6 +204,30 @@ public class SellableUnitCalendarController {
     }
 
     @Operation(
+            summary = "Set/add minimum length of stay records to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If minimum length of stay records for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/minLOS/set/date-range"})
+    public ResponseEntity<List<SUMinLOSResult>> setMinLOSRecordsDateRange(
+            @Valid
+            @RequestBody
+                    SUMinLOSDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUMinLOSResult> all = sellableUnitManager.setMinLOSRecordsToSellableUnitForDateRange(request);
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
             summary = "Get sellable unit maximum length of stay records."
     )
     @GetMapping({"/maxLOS/{sellableUnitId}"})
@@ -190,6 +262,30 @@ public class SellableUnitCalendarController {
 
         log.info(request.toString());
         List<SUMaxLOSResult> all = sellableUnitManager.setMaxLOSRecordsToSellableUnit(request.getSellableUnitId(), request.getMaxLOSRecords());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set/add maximum length of stay records to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If maximum length of stay records for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/maxLOS/set/date-range"})
+    public ResponseEntity<List<SUMaxLOSResult>> setMaxLOSRecordsDateRange(
+            @Valid
+            @RequestBody
+                    SUMaxLOSDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUMaxLOSResult> all = sellableUnitManager.setMaxLOSRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
     }
@@ -234,6 +330,30 @@ public class SellableUnitCalendarController {
     }
 
     @Operation(
+            summary = "Set/add closed for sale records to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If closed for sale records for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/closedForSale/set/date-range"})
+    public ResponseEntity<List<SUClosedForSaleResult>> setClosedForSaleRecordsDateRange(
+            @Valid
+            @RequestBody
+                    SUClosedForSaleDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUClosedForSaleResult> all = sellableUnitManager.setClosedForSaleRecordsToSellableUnitForDateRange(request);
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
             summary = "Get sellable unit closed for arrival records."
     )
     @GetMapping({"/closedForArrival/{sellableUnitId}"})
@@ -268,6 +388,30 @@ public class SellableUnitCalendarController {
 
         log.info(request.toString());
         List<SUClosedForArrivalResult> all = sellableUnitManager.setClosedForArrivalRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForArrivalRecords());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set/add closed for arrival records to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If closed for arrival records for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/closedForArrival/set/date-range"})
+    public ResponseEntity<List<SUClosedForArrivalResult>> setClosedForArrivalRecordsDateRange(
+            @Valid
+            @RequestBody
+                    SUClosedForArrivalDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUClosedForArrivalResult> all = sellableUnitManager.setClosedForArrivalRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
     }
@@ -312,6 +456,30 @@ public class SellableUnitCalendarController {
     }
 
     @Operation(
+            summary = "Set/add closed for departure records to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If closed for departure records for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/closedForDeparture/set/date-range"})
+    public ResponseEntity<List<SUClosedForDepartureResult>> setClosedForDepartureRecordsDateRange(
+            @Valid
+            @RequestBody
+                    SUClosedForDepartureDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUClosedForDepartureResult> all = sellableUnitManager.setClosedForDepartureRecordsToSellableUnitForDateRange(request);
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
             summary = "Get sellable unit calendar entries.",
             description = "Result will include all date based fields ro the sellable unit."
     )
@@ -347,6 +515,30 @@ public class SellableUnitCalendarController {
 
         log.info(request.toString());
         List<SUCalendar> all = sellableUnitManager.setCalendarRowsToSellableUnit(request.getSellableUnitId(), request.getCalendars());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set/add calendar entries to sellable unit. For date range",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If calendar entries for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/date-range"})
+    public ResponseEntity<List<SUCalendar>> setSellableUnitCalendarEntriesDateRange(
+            @Valid
+            @RequestBody
+                    SUCalendarDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        log.info(request.toString());
+        List<SUCalendar> all = sellableUnitManager.setCalendarRowsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
     }

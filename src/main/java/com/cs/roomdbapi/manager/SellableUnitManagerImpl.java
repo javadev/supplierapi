@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -143,8 +144,8 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
-    public SellableUnit getOrCreateSellableUnitBySupplierUnitId(String sellableUnitId, Integer propertyId) {
-        Optional<SellableUnitEntity> optional = sellableUnitRepository.findBySupplierUnitId(sellableUnitId);
+    public SellableUnit getOrCreateSellableUnitBySupplierUnitId(String supplierUnitId, Integer propertyId) {
+        Optional<SellableUnitEntity> optional = sellableUnitRepository.findBySupplierUnitId(supplierUnitId);
 
         SellableUnitEntity entity;
         if (optional.isPresent()) {
@@ -155,7 +156,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
 
             entity = new SellableUnitEntity();
             entity.setProperty(property);
-            entity.setSupplierUnitId(sellableUnitId);
+            entity.setSupplierUnitId(supplierUnitId);
 
             SellableUnitEntity save = sellableUnitRepository.save(entity);
             log.info("Sellable unit added: '{}'", save.toString());
@@ -197,10 +198,33 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListAvailability(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUAvailabilityResult> setAvailabilitiesToSellableUnitForDateRange(SUAvailabilityDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getCountAvailable() == null) {
+            throw new BadRequestException("Availability count is required and should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setCountAvailable(request.getCountAvailable());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListAvailability(saveAll);
     }
@@ -311,12 +335,77 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListPrice(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUPriceResult> setPricesToSellableUnitForDateRange(SUPriceDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getPrice() == null) {
+            throw new BadRequestException("Price is required and should be provided.");
+        }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setPrice(request.getPrice());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListPrice(saveAll);
+    }
+
+    private List<CalendarEntity> saveCalendarAll(List<CalendarEntity> calendarEntities) {
         List<CalendarEntity> saveAll = new ArrayList<>();
         if (calendarEntities.size() > 0) {
             saveAll = calendarRepository.saveAll(calendarEntities);
         }
+        return saveAll;
+    }
 
-        return CalendarMapper.MAPPER.toListPrice(saveAll);
+    private boolean checkDayOfWeek(SUDateRangeRequest request, DayOfWeek dayOfWeek) {
+        if (dayOfWeek.equals(DayOfWeek.MONDAY) && (request.getMonday() == null || !request.getMonday())) {
+            return true;
+        }
+        if (dayOfWeek.equals(DayOfWeek.TUESDAY) && (request.getTuesday() == null || !request.getTuesday())) {
+            return true;
+        }
+        if (dayOfWeek.equals(DayOfWeek.WEDNESDAY) && (request.getWednesday() == null || !request.getWednesday())) {
+            return true;
+        }
+        if (dayOfWeek.equals(DayOfWeek.THURSDAY) && (request.getThursday() == null || !request.getThursday())) {
+            return true;
+        }
+        if (dayOfWeek.equals(DayOfWeek.FRIDAY) && (request.getFriday() == null || !request.getFriday())) {
+            return true;
+        }
+        if (dayOfWeek.equals(DayOfWeek.SATURDAY) && (request.getSaturday() == null || !request.getSaturday())) {
+            return true;
+        }
+        if (dayOfWeek.equals(DayOfWeek.SUNDAY) && (request.getSunday() == null || !request.getSunday())) {
+            return true;
+        }
+        return false;
+    }
+
+    private void validateDates(SUDateRangeRequest request) {
+        if (request.getStartDate() == null || request.getEndDate() == null ) {
+            throw new BadRequestException("Start date and End date are required and should be provided.");
+        }
+        if (request.getStartDate().isAfter(request.getEndDate())) {
+            throw new BadRequestException("Provided Start date is after End date. Start date should be before or equals to End date.");
+        }
     }
 
     @Override
@@ -344,10 +433,33 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListMinLOS(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUMinLOSResult> setMinLOSRecordsToSellableUnitForDateRange(SUMinLOSDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getMinLOS() == null) {
+            throw new BadRequestException("Minimum length of stay is required and should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setMinLOS(request.getMinLOS());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListMinLOS(saveAll);
     }
@@ -377,10 +489,33 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListMaxLOS(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUMaxLOSResult> setMaxLOSRecordsToSellableUnitForDateRange(SUMaxLOSDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getMaxLOS() == null) {
+            throw new BadRequestException("Maximum length of stay is required and should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setMaxLOS(request.getMaxLOS());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListMaxLOS(saveAll);
     }
@@ -410,10 +545,33 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListClosedForSale(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUClosedForSaleResult> setClosedForSaleRecordsToSellableUnitForDateRange(SUClosedForSaleDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getClosedForSale() == null) {
+            throw new BadRequestException("Closed for sale is required and should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setClosedForSale(request.getClosedForSale());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListClosedForSale(saveAll);
     }
@@ -443,10 +601,33 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListClosedForArrival(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUClosedForArrivalResult> setClosedForArrivalRecordsToSellableUnitForDateRange(SUClosedForArrivalDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getClosedForArrival() == null) {
+            throw new BadRequestException("Closed for arrival is required and should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setClosedForArrival(request.getClosedForArrival());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListClosedForArrival(saveAll);
     }
@@ -476,10 +657,33 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListClosedForDeparture(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUClosedForDepartureResult> setClosedForDepartureRecordsToSellableUnitForDateRange(SUClosedForDepartureDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getClosedForDeparture() == null) {
+            throw new BadRequestException("Closed for departure is required and should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setClosedForDeparture(request.getClosedForDeparture());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListClosedForDeparture(saveAll);
     }
@@ -532,12 +736,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
                     ));
                 }
 
-                CalendarEntity entity;
-
-                // If availability exists for specified date we will update count for this record
-                Optional<CalendarEntity> optional = calendarRepository.findBySellableUnitIdAndDateAndTimeSegment(sellableUnitId,
-                        calendar.getDate(), calendar.getTimeSegment());
-                entity = optional.orElseGet(CalendarEntity::new);
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, calendar.getDate(), calendar.getTimeSegment());
 
                 // set(for new) or rewrite(for existing) calendar data fields
                 if (calendar.getCountAvailable() != null) {
@@ -562,25 +761,62 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
                     entity.setClosedForDeparture(calendar.getClosedForDeparture());
                 }
 
-                // set fields if calendar entry is new
-                if (entity.getDate() == null) {
-                    entity.setDate(calendar.getDate());
-                }
-                if (entity.getTimeSegment() == null) {
-                    entity.setTimeSegment(calendar.getTimeSegment());
-                }
-                if (entity.getSellableUnitId() == null) {
-                    entity.setSellableUnitId(sellableUnitId);
-                }
-
                 calendarEntities.add(entity);
             }
         }
 
-        List<CalendarEntity> saveAll = new ArrayList<>();
-        if (calendarEntities.size() > 0) {
-            saveAll = calendarRepository.saveAll(calendarEntities);
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListDTO(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUCalendar> setCalendarRowsToSellableUnitForDateRange(SUCalendarDateRangeRequest request) {
+
+        validateDates(request);
+        if (request.getCountAvailable() == null && request.getPrice() == null
+                && request.getMinLOS() == null && request.getMaxLOS() == null
+                && request.getClosedForSale() == null && request.getClosedForArrival() == null
+                && request.getClosedForDeparture() == null){
+            throw new BadRequestException("All data fields for calendar entry are empty. At least one field should be provided.");
         }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+
+            // set(for new) or rewrite(for existing) calendar data fields
+            if (request.getCountAvailable() != null) {
+                entity.setCountAvailable(request.getCountAvailable());
+            }
+            if (request.getPrice() != null) {
+                entity.setPrice(request.getPrice());
+            }
+            if (request.getMinLOS() != null) {
+                entity.setMinLOS(request.getMinLOS());
+            }
+            if (request.getMaxLOS() != null) {
+                entity.setMaxLOS(request.getMaxLOS());
+            }
+            if (request.getClosedForSale() != null) {
+                entity.setClosedForSale(request.getClosedForSale());
+            }
+            if (request.getClosedForArrival() != null) {
+                entity.setClosedForArrival(request.getClosedForArrival());
+            }
+            if (request.getClosedForDeparture() != null) {
+                entity.setClosedForDeparture(request.getClosedForDeparture());
+            }
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
 
         return CalendarMapper.MAPPER.toListDTO(saveAll);
     }

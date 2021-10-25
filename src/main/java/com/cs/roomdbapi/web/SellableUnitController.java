@@ -166,13 +166,13 @@ public class SellableUnitController {
             @PathVariable
             @Parameter(description = "Supplier unit id - unit (room, meal, etc.) id that is used on supplier side. Required.")
             @Size(min = 1, max = 255)
-                    String sellableUnitId,
+                    String supplierUnitId,
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validationManager.validatePropertyAccess(req, supplier, propertyId);
 
-        SellableUnit supplierUnit = sellableUnitManager.getOrCreateSellableUnitBySupplierUnitId(sellableUnitId, propertyId);
+        SellableUnit supplierUnit = sellableUnitManager.getOrCreateSellableUnitBySupplierUnitId(supplierUnitId, propertyId);
 
         return new ResponseEntity<>(supplierUnit, HttpStatus.OK);
     }
