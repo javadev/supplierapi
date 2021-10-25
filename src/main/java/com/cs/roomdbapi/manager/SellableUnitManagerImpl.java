@@ -208,6 +208,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUAvailabilityResult> setAvailabilitiesToSellableUnitForDateRange(SUAvailabilityDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getCountAvailable() == null) {
             throw new BadRequestException("Availability count is required and should be provided.");
         }
@@ -345,6 +346,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUPriceResult> setPricesToSellableUnitForDateRange(SUPriceDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getPrice() == null) {
             throw new BadRequestException("Price is required and should be provided.");
         }
@@ -372,6 +374,22 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             saveAll = calendarRepository.saveAll(calendarEntities);
         }
         return saveAll;
+    }
+
+    /*
+    * Check that at least one week day is set and it's true. Otherwise throw exception.
+    */
+    private void validateWeekDays(SUDateRangeRequest request) {
+        if ((request.getMonday() == null || !request.getMonday())
+                && (request.getTuesday() == null || !request.getTuesday())
+                && (request.getWednesday() == null || !request.getWednesday())
+                && (request.getThursday() == null || !request.getThursday())
+                && (request.getFriday() == null || !request.getFriday())
+                && (request.getSaturday() == null || !request.getSaturday())
+                && (request.getSunday() == null || !request.getSunday())
+        ) {
+            throw new BadRequestException("Week days validation fail. At least one week day should be provided and should be set to true.");
+        }
     }
 
     private boolean checkDayOfWeek(SUDateRangeRequest request, DayOfWeek dayOfWeek) {
@@ -443,6 +461,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUMinLOSResult> setMinLOSRecordsToSellableUnitForDateRange(SUMinLOSDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getMinLOS() == null) {
             throw new BadRequestException("Minimum length of stay is required and should be provided.");
         }
@@ -499,6 +518,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUMaxLOSResult> setMaxLOSRecordsToSellableUnitForDateRange(SUMaxLOSDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getMaxLOS() == null) {
             throw new BadRequestException("Maximum length of stay is required and should be provided.");
         }
@@ -555,6 +575,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUClosedForSaleResult> setClosedForSaleRecordsToSellableUnitForDateRange(SUClosedForSaleDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getClosedForSale() == null) {
             throw new BadRequestException("Closed for sale is required and should be provided.");
         }
@@ -611,6 +632,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUClosedForArrivalResult> setClosedForArrivalRecordsToSellableUnitForDateRange(SUClosedForArrivalDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getClosedForArrival() == null) {
             throw new BadRequestException("Closed for arrival is required and should be provided.");
         }
@@ -667,6 +689,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUClosedForDepartureResult> setClosedForDepartureRecordsToSellableUnitForDateRange(SUClosedForDepartureDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getClosedForDeparture() == null) {
             throw new BadRequestException("Closed for departure is required and should be provided.");
         }
@@ -775,6 +798,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     public List<SUCalendar> setCalendarRowsToSellableUnitForDateRange(SUCalendarDateRangeRequest request) {
 
         validateDates(request);
+        validateWeekDays(request);
         if (request.getCountAvailable() == null && request.getPrice() == null
                 && request.getMinLOS() == null && request.getMaxLOS() == null
                 && request.getClosedForSale() == null && request.getClosedForArrival() == null
