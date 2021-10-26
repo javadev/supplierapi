@@ -157,7 +157,7 @@ public class SellableUnitController {
     )
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
-    @GetMapping({"/supplier-unit-id/get-or-create/{propertyId}/{sellableUnitId}"})
+    @GetMapping({"/supplier-unit-id/get-or-create/{propertyId}/{supplierUnitId}"})
     public ResponseEntity<SellableUnit> getOrCreateSellableUnitBySupplierUnitId(
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required. Will be used to create sellable unit in case it doesn't exists.")
