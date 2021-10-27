@@ -8,13 +8,21 @@ public interface PropertyManager {
 
     List<Property> getProperties();
 
+    List<Property> getIsMasterProperties();
+
     List<Property> getPropertiesBySupplier(String supplierName);
 
+    List<Property> getIsMasterPropertiesBySupplier(String supplierName);
+
     Property getPropertyById(Integer id);
+
+    Property getPropertyIsMasterById(Integer id);
 
     Supplier getSupplierByPropertyId(Integer propertyId);
 
     Property getPropertyBySupplierPropertyId(String id);
+
+    Property getPropertyIsMasterBySupplierPropertyId(String id);
 
     List<Property> getPropertiesByCode(String code);
 

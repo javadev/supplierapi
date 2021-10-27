@@ -53,6 +53,7 @@ public class PropertyController {
     @GetMapping
     public ResponseEntity<List<Property>> getAllProperties(HttpServletRequest req) {
 
+        log.info("Splr: '{}'. API: '/'", req.getRemoteUser());
         List<Property> properties;
 
         if (validationManager.isHasAllPropertiesPermission()) {
@@ -61,6 +62,31 @@ public class PropertyController {
         } else {
             // only properties that are belong to supplier
             properties = propertyManager.getPropertiesBySupplier(req.getRemoteUser());
+        }
+
+        return new ResponseEntity<>(properties, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get list of properties that are isMaster.",
+            description = "All fields of the Property entity will be included in result. <br/>" +
+                    "If supplier has role to **read all properties** than this endpoint will return **all** properties in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will include **only** properties which **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/is-master"})
+    public ResponseEntity<List<Property>> getAllIsMasterProperties(HttpServletRequest req) {
+
+        log.info("Splr: '{}'. API: '/is-master'", req.getRemoteUser());
+        List<Property> properties;
+
+        if (validationManager.isHasAllPropertiesPermission()) {
+            // all properties
+            properties = propertyManager.getIsMasterProperties();
+        } else {
+            // only properties that are belong to supplier
+            properties = propertyManager.getIsMasterPropertiesBySupplier(req.getRemoteUser());
         }
 
         return new ResponseEntity<>(properties, HttpStatus.OK);
@@ -81,6 +107,7 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
+        log.info("Splr: '{}'. API: '/{id}' with id: {}", req.getRemoteUser(), id);
 
         Property property = propertyManager.getPropertyById(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), id);
@@ -103,9 +130,60 @@ public class PropertyController {
                     String id,
             HttpServletRequest req
     ) {
+        log.info("Splr: '{}'. API: '/supplier-property-id/{id}' with id: {}", req.getRemoteUser(), id);
 
         Property property = propertyManager.getPropertyBySupplierPropertyId(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
+
+        return new ResponseEntity<>(property, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get property isMaster data by id.",
+            description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/is-master/{id}"})
+    public ResponseEntity<Property> isMasterProperty(
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(100000)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        log.info("Splr: '{}'. API: '/is-master/{id}' with id: {}", req.getRemoteUser(), id);
+
+        Property property = propertyManager.getPropertyIsMasterById(id);
+        validationManager.validatePropertyAccess(req, property.getSupplier(), id);
+
+        property.setSupplier(null); // unset, is was needed only for validation
+
+        return new ResponseEntity<>(property, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get property isMaster data by supplier property id.",
+            description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/is-master/supplier-property-id/{id}"})
+    public ResponseEntity<Property> isMasterPropertyBySupplierPropertyId(
+            @PathVariable
+            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Size(min = 1, max = 255)
+                    String id,
+            HttpServletRequest req
+    ) {
+        log.info("Splr: '{}'. API: '/is-master/supplier-property-id/{id}' with id: {}", req.getRemoteUser(), id);
+
+        Property property = propertyManager.getPropertyIsMasterBySupplierPropertyId(id);
+        validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
+
+        property.setSupplier(null); // unset, is was needed only for validation
 
         return new ResponseEntity<>(property, HttpStatus.OK);
     }

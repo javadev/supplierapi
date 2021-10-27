@@ -64,6 +64,13 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public List<Property> getIsMasterProperties() {
+        List<PropertyEntity> all = propertyRepository.findAllByIsMaster(true);
+
+        return PropertyMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
     public List<Property> getPropertiesBySupplier(String supplierName) {
         SupplierEntity supplier = supplierRepository.findByName(supplierName)
                 .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
@@ -74,11 +81,29 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public List<Property> getIsMasterPropertiesBySupplier(String supplierName) {
+        SupplierEntity supplier = supplierRepository.findByName(supplierName)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
+
+        List<PropertyEntity> all = propertyRepository.findAllBySupplierIsAndIsMaster(supplier, true);
+
+        return PropertyMapper.MAPPER.toListDTOWithoutSupplier(all);
+    }
+
+    @Override
     public Property getPropertyById(Integer id) {
         PropertyEntity entity = propertyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, id));
 
         return PropertyMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
+    public Property getPropertyIsMasterById(Integer id) {
+        PropertyEntity entity = propertyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, id));
+
+        return PropertyMapper.MAPPER.toDTOIsMaster(entity);
     }
 
     @Override
@@ -98,6 +123,14 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public Property getPropertyIsMasterBySupplierPropertyId(String id) {
+        PropertyEntity entity = propertyRepository.findBySupplierPropertyId(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, SUPPLIER_PROPERTY_ID, id));
+
+        return PropertyMapper.MAPPER.toDTOIsMaster(entity);
+    }
+
+    @Override
     public List<Property> getPropertiesByCode(String code) {
         List<PropertyEntity> all = propertyRepository.findAllByCode(code);
 
@@ -105,6 +138,7 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    @Transactional
     public Property getOrCreatePropertyBySupplierPropertyId(String id, String supplierName) {
         Optional<PropertyEntity> optional = propertyRepository.findBySupplierPropertyId(id);
 

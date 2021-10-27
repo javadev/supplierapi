@@ -144,6 +144,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
     }
 
     @Override
+    @Transactional
     public SellableUnit getOrCreateSellableUnitBySupplierUnitId(String supplierUnitId, Integer propertyId) {
         Optional<SellableUnitEntity> optional = sellableUnitRepository.findBySupplierUnitId(supplierUnitId);
 
