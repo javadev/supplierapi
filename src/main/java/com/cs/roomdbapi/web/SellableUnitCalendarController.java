@@ -71,7 +71,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUAvailabilityResult> all = sellableUnitManager.setAvailabilitiesToSellableUnit(request.getSellableUnitId(), request.getAvailabilities());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -95,7 +94,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUAvailabilityResult> all = sellableUnitManager.setAvailabilitiesToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -134,7 +132,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUPriceResult> all = sellableUnitManager.setPricesToSellableUnit(request.getSellableUnitId(), request.getPrices());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -158,7 +155,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUPriceResult> all = sellableUnitManager.setPricesToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -197,7 +193,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUMinLOSResult> all = sellableUnitManager.setMinLOSRecordsToSellableUnit(request.getSellableUnitId(), request.getMinLOSRecords());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -221,7 +216,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUMinLOSResult> all = sellableUnitManager.setMinLOSRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -260,7 +254,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUMaxLOSResult> all = sellableUnitManager.setMaxLOSRecordsToSellableUnit(request.getSellableUnitId(), request.getMaxLOSRecords());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -284,7 +277,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUMaxLOSResult> all = sellableUnitManager.setMaxLOSRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -323,7 +315,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUClosedForSaleResult> all = sellableUnitManager.setClosedForSaleRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForSaleRecords());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -347,7 +338,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUClosedForSaleResult> all = sellableUnitManager.setClosedForSaleRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -386,7 +376,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUClosedForArrivalResult> all = sellableUnitManager.setClosedForArrivalRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForArrivalRecords());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -410,7 +399,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUClosedForArrivalResult> all = sellableUnitManager.setClosedForArrivalRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -449,7 +437,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUClosedForDepartureResult> all = sellableUnitManager.setClosedForDepartureRecordsToSellableUnit(request.getSellableUnitId(), request.getClosedForDepartureRecords());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -473,7 +460,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUClosedForDepartureResult> all = sellableUnitManager.setClosedForDepartureRecordsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -513,7 +499,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUCalendar> all = sellableUnitManager.setCalendarRowsToSellableUnit(request.getSellableUnitId(), request.getCalendars());
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
@@ -537,7 +522,6 @@ public class SellableUnitCalendarController {
     ) {
         validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
 
-        log.info(request.toString());
         List<SUCalendar> all = sellableUnitManager.setCalendarRowsToSellableUnitForDateRange(request);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);

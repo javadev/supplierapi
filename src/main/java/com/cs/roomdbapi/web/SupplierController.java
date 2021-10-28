@@ -172,8 +172,6 @@ public class SupplierController {
     public SuccessResponse<String> encodePassword(String password) {
         String encodedPassword = passwordEncoder.encode(password);
 
-        log.info("Encode password called.");
-
         return new SuccessResponse<>(encodedPassword, "Success password encode.", AppUtils.SUCCESS);
     }
 

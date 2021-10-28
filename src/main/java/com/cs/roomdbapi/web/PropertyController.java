@@ -52,8 +52,6 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping
     public ResponseEntity<List<Property>> getAllProperties(HttpServletRequest req) {
-
-        log.info("Splr: '{}'. API: '/'", req.getRemoteUser());
         List<Property> properties;
 
         if (validationManager.isHasAllPropertiesPermission()) {
@@ -77,8 +75,6 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master"})
     public ResponseEntity<List<Property>> getAllIsMasterProperties(HttpServletRequest req) {
-
-        log.info("Splr: '{}'. API: '/is-master'", req.getRemoteUser());
         List<Property> properties;
 
         if (validationManager.isHasAllPropertiesPermission()) {
@@ -107,8 +103,6 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("Splr: '{}'. API: '/{id}' with id: {}", req.getRemoteUser(), id);
-
         Property property = propertyManager.getPropertyById(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), id);
 
@@ -130,8 +124,6 @@ public class PropertyController {
                     String id,
             HttpServletRequest req
     ) {
-        log.info("Splr: '{}'. API: '/supplier-property-id/{id}' with id: {}", req.getRemoteUser(), id);
-
         Property property = propertyManager.getPropertyBySupplierPropertyId(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
@@ -153,8 +145,6 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("Splr: '{}'. API: '/is-master/{id}' with id: {}", req.getRemoteUser(), id);
-
         Property property = propertyManager.getPropertyIsMasterById(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), id);
 
@@ -178,8 +168,6 @@ public class PropertyController {
                     String id,
             HttpServletRequest req
     ) {
-        log.info("Splr: '{}'. API: '/is-master/supplier-property-id/{id}' with id: {}", req.getRemoteUser(), id);
-
         Property property = propertyManager.getPropertyIsMasterBySupplierPropertyId(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
@@ -335,8 +323,6 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete Property Info called with propertyId: {}.", id);
-
         Supplier supplier = propertyManager.getSupplierByPropertyId(id);
         validationManager.validatePropertyAccess(req, supplier, id);
 
@@ -443,8 +429,6 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete property description called with id: {}.", id);
-
         Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validationManager.validatePropertyAccess(req, supplier, propertyId);

@@ -113,8 +113,6 @@ public class PointOfInterestController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete POI called with id: {}.", id);
-
         validatePOIAccess(id, req);
 
         poiManager.deletePOI(id);
@@ -212,8 +210,6 @@ public class PointOfInterestController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete point of interests description called with id: {}.", id);
-
         Integer poiId = poiManager.getPOIIdByDescriptionId(id);
         validatePOIAccess(poiId, req);
 

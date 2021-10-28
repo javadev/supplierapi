@@ -83,8 +83,6 @@ public class SellableUnitController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete sellable unit called with id: {}.", id);
-
         validationManager.validateSellableUnitAccess(id, req);
 
         sellableUnitManager.deleteSellableUnit(id);
@@ -231,8 +229,6 @@ public class SellableUnitController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete sellable unit description called with id: {}.", id);
-
         Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
         validationManager.validateSellableUnitAccess(sellableUnitId, req);
 

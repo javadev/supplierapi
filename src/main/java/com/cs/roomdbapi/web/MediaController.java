@@ -308,8 +308,6 @@ public class MediaController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete media called with id: {}.", id);
-
         validateMediaAccess(id, req);
 
         mediaManager.deleteMedia(id);
@@ -372,8 +370,6 @@ public class MediaController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete media description called with id: {}.", id);
-
         Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
         validateMediaAccess(mediaId, req);
 

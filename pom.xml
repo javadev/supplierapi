@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cs</groupId>
     <artifactId>roomdbapi</artifactId>
-    <version>0.0.22-SNAPSHOT</version>
+    <version>0.0.23-SNAPSHOT</version>
     <name>roomdbapi</name>
 
     <description>API application for Room DB</description>
@@ -95,6 +95,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
         </dependency>
 
     </dependencies>

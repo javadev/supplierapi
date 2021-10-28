@@ -142,8 +142,6 @@ public class LogoController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete logo called with id: {}.", id);
-
         validateLogoAccess(id, req);
 
         mediaManager.deleteMedia(id);
