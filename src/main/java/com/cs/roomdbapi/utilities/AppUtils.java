@@ -39,6 +39,8 @@ public class AppUtils {
 
     public static final String IDENTIFIER_SOURCE = "Identifier source";
 
+    public static final String PROPERTY_IDENTIFIER = "Property Identifier";
+
     public static final String MEDIA = "Media";
 
     public static final String PRODUCT = "Product";
@@ -97,6 +99,8 @@ public class AppUtils {
     public static final String ABBREVIATION = "abbreviation";
 
     public static final String NAME = "name";
+
+    public static final String SOURCE_ID = "sourceId";
 
     /*
      * Defaults

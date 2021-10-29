@@ -48,4 +48,10 @@ public interface PropertyManager {
 
     Integer getPropertyIdByDescriptionId(Integer descriptionId);
 
+    List<PropertyIdentifier> getPropertyIdentifiersByPropertyId(Integer propertyId);
+
+    List<PropertyIdentifier> addPropertyIdentifiers(Integer propertyId, List<PropertyIdentifierSave> propertyIdentifierSave);
+
+    void deletePropertyIdentifier(Integer propertyId, Integer sourceId);
+
 }

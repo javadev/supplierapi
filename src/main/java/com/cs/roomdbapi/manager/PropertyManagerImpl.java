@@ -8,6 +8,7 @@ import com.cs.roomdbapi.model.*;
 import com.cs.roomdbapi.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,10 @@ import static com.cs.roomdbapi.utilities.AppUtils.*;
 public class PropertyManagerImpl implements PropertyManager {
 
     private final PropertyRepository propertyRepository;
+
+    private final PropertyIdentifierRepository propertyIdentifierRepository;
+
+    private final IdentifierSourceRepository identifierSourceRepository;
 
     private final PropertyInfoRepository propertyInfoRepository;
 
@@ -591,6 +596,62 @@ public class PropertyManagerImpl implements PropertyManager {
     @Override
     public Integer getPropertyIdByDescriptionId(Integer descriptionId) {
         return propertyRepository.getPropertyIdByDescriptionId(descriptionId);
+    }
+
+    @Override
+    public List<PropertyIdentifier> getPropertyIdentifiersByPropertyId(Integer propertyId) {
+        List<PropertyIdentifierEntity> all = propertyIdentifierRepository.findAllByPropertyId(propertyId);
+
+        return PropertyIdentifierMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    @Transactional
+    public List<PropertyIdentifier> addPropertyIdentifiers(Integer propertyId, List<PropertyIdentifierSave> identifiers) {
+        List<PropertyIdentifierEntity> entities = new ArrayList<>();
+
+        for (PropertyIdentifierSave identifier : identifiers) {
+            IdentifierSourceEntity sourceEntity = identifierSourceRepository.findById(identifier.getSourceId())
+                    .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ID, identifier.getSourceId()));
+
+            if (identifier.getIdentifier() == null || identifier.getIdentifier().isBlank()) {
+                throw new BadRequestException("Identifier should not be blank.");
+            }
+
+            PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)
+                    .orElseGet(PropertyIdentifierEntity::new);
+
+            if (entity.getPropertyId() == null) {
+                entity.setPropertyId(propertyId);
+                entity.setSource(sourceEntity);
+
+                log.info("REQUEST_ID: {}. New property identifier created for source: '{}'", MDC.get("REQUEST_ID"), sourceEntity.getAbbreviation());
+            } else {
+                log.info("REQUEST_ID: {}. Existing property identifier will be updated for source: '{}'", MDC.get("REQUEST_ID"), sourceEntity.getAbbreviation());
+            }
+
+            entity.setIdentifier(identifier.getIdentifier());
+            entities.add(entity);
+        }
+
+        List<PropertyIdentifierEntity> saveAll = new ArrayList<>();
+        if (entities.size() > 0) {
+            saveAll = propertyIdentifierRepository.saveAll(entities);
+        }
+
+        return PropertyIdentifierMapper.MAPPER.toListDTO(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public void deletePropertyIdentifier(Integer propertyId, Integer sourceId) {
+        IdentifierSourceEntity sourceEntity = identifierSourceRepository.findById(sourceId)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ID, sourceId));
+
+        PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_IDENTIFIER, SOURCE_ID, sourceId));
+
+        propertyIdentifierRepository.delete(entity);
     }
 
 }

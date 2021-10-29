@@ -438,4 +438,71 @@ public class PropertyController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Get property identifiers by property id.",
+            description = "It will return array of the identifiers if supplier has access to the property"
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/identifier/{propertyId}"})
+    public ResponseEntity<List<PropertyIdentifier>> getPropertyIdentifiers(
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(100000)
+                    Integer propertyId,
+            HttpServletRequest req
+    ) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        List<PropertyIdentifier> all = propertyManager.getPropertyIdentifiersByPropertyId(propertyId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add/Update property identifiers for specific source to property.",
+            description = "If identifier for source already exists, it will be overridden. <br/>" +
+                    "If identifier for source is new it will be created. <br/>" +
+                    "If identifier is not provided in request for source it will remain as is."
+    )
+    @PostMapping({"/identifier"})
+    public ResponseEntity<List<PropertyIdentifier>> addPropertyIdentifier(
+            @Valid
+            @RequestBody
+                    PropertyIdentifierRequest propertyIdentifierRequest,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = propertyIdentifierRequest.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        List<PropertyIdentifier> list = propertyManager.addPropertyIdentifiers(propertyId, propertyIdentifierRequest.getIdentifiers());
+
+        return new ResponseEntity<>(list, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Delete property identifier for specific source for property."
+    )
+    @DeleteMapping("/identifier/{propertyId}/{sourceId}")
+    public ResponseEntity<Void> deleteIdentifier(
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(1)
+                    Integer propertyId,
+            @PathVariable
+            @Parameter(description = "RoomDB internal identifier source Id. Required.")
+            @Min(1)
+                    Integer sourceId,
+            HttpServletRequest req
+    ) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        propertyManager.deletePropertyIdentifier(propertyId, sourceId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
