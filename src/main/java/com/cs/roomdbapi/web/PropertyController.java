@@ -505,4 +505,44 @@ public class PropertyController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Set/Update home currency by currency id.",
+            description = "Existing value will be updated."
+    )
+    @PostMapping({"/home-currency/by-id"})
+    public ResponseEntity<Currency> setHomeCurrencyById(
+            @Valid
+            @RequestBody
+                    HomeCurrencyById request,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = request.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        Currency currency = propertyManager.setPropertyHomeCurrencyById(propertyId, request.getHomeCurrencyId());
+
+        return new ResponseEntity<>(currency, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set/Update home currency by currency 3 latter code (ISO 4217).",
+            description = "Existing value will be updated."
+    )
+    @PostMapping({"/home-currency/by-code"})
+    public ResponseEntity<Currency> setHomeCurrencyByCode(
+            @Valid
+            @RequestBody
+                    HomeCurrencyByCode request,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = request.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        Currency currency = propertyManager.setPropertyHomeCurrencyByCode(propertyId, request.getHomeCurrencyCode());
+
+        return new ResponseEntity<>(currency, HttpStatus.CREATED);
+    }
+
 }

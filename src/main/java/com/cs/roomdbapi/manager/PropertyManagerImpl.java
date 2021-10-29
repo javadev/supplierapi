@@ -536,6 +536,34 @@ public class PropertyManagerImpl implements PropertyManager {
         return PhoneMapper.MAPPER.toListDTO(property.getPhones());
     }
 
+    @Override
+    @Transactional
+    public Currency setPropertyHomeCurrencyById(Integer propertyId, Integer currencyId) {
+        PropertyEntity entity = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        CurrencyEntity currencyEntity = currencyRepository.findById(currencyId)
+                    .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, ID, currencyId));
+
+        entity.setHomeCurrency(currencyEntity);
+
+        return CurrencyMapper.MAPPER.toDTO(currencyEntity);
+    }
+
+    @Override
+    @Transactional
+    public Currency setPropertyHomeCurrencyByCode(Integer propertyId, String currencyCode) {
+        PropertyEntity entity = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        CurrencyEntity currencyEntity = currencyRepository.findByCode(currencyCode)
+                    .orElseThrow(() -> new ResourceNotFoundException(CURRENCY, CODE, currencyCode));
+
+        entity.setHomeCurrency(currencyEntity);
+
+        return CurrencyMapper.MAPPER.toDTO(currencyEntity);
+    }
+
     private List<PhoneEntity> preparePhoneEntities(List<PhoneSave> phones) {
         List<PhoneEntity> phoneEntities = new ArrayList<>();
         if (phones != null) {

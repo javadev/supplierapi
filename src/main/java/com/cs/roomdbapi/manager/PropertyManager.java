@@ -44,6 +44,10 @@ public interface PropertyManager {
 
     List<Phone> setPropertyPhones(Integer propertyId, List<PhoneSave> phones);
 
+    Currency setPropertyHomeCurrencyById(Integer propertyId, Integer currencyId);
+
+    Currency setPropertyHomeCurrencyByCode(Integer propertyId, String currencyCode);
+
     Description addPropertyDescription(Integer propertyId, DescriptionSave descriptionToSave);
 
     Integer getPropertyIdByDescriptionId(Integer descriptionId);
