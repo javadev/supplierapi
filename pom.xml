@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cs</groupId>
     <artifactId>roomdbapi</artifactId>
-    <version>0.0.23-SNAPSHOT</version>
+    <version>0.0.24-SNAPSHOT</version>
     <name>roomdbapi</name>
 
     <description>API application for Room DB</description>
