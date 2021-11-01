@@ -369,6 +369,63 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
         return CalendarMapper.MAPPER.toListPrice(saveAll);
     }
 
+    @Override
+    public List<SUCommissionResult> getCommissionsBySellableUnitId(Integer sellableUnitId) {
+        List<CalendarEntity> all = calendarRepository.findAllBySellableUnitIdAndCommissionIsNotNull(sellableUnitId);
+
+        return CalendarMapper.MAPPER.toListCommission(all);
+    }
+
+    @Override
+    @Transactional
+    public List<SUCommissionResult> setCommissionsToSellableUnit(Integer sellableUnitId, List<SUCommissionSave> commissions) {
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        if (commissions != null) {
+            for (SUCommissionSave commission : commissions) {
+                if (commission.getCommission() == null || commission.getDate() == null) {
+                    throw new BadRequestException("Commission and date are required and should be provided.");
+                }
+
+                CalendarEntity entity = getCalendarEntity(sellableUnitId, commission.getDate(), commission.getTimeSegment());
+                entity.setCommission(commission.getCommission());
+
+                calendarEntities.add(entity);
+            }
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListCommission(saveAll);
+    }
+
+    @Override
+    @Transactional
+    public List<SUCommissionResult> setCommissionsToSellableUnitForDateRange(SUCommissionDateRangeRequest request) {
+
+        validateDates(request);
+        validateWeekDays(request);
+        if (request.getCommission() == null) {
+            throw new BadRequestException("Commission is required and should be provided.");
+        }
+
+        List<CalendarEntity> calendarEntities = new ArrayList<>();
+        for (LocalDate date = request.getStartDate(); (date.isBefore(request.getEndDate()) || date.equals(request.getEndDate())); date = date.plusDays(1)) {
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+            if (checkDayOfWeek(request, dayOfWeek)) continue;
+
+            CalendarEntity entity = getCalendarEntity(request.getSellableUnitId(), date, request.getTimeSegment());
+            entity.setCommission(request.getCommission());
+
+            calendarEntities.add(entity);
+        }
+
+        List<CalendarEntity> saveAll = saveCalendarAll(calendarEntities);
+
+        return CalendarMapper.MAPPER.toListCommission(saveAll);
+    }
+
     private List<CalendarEntity> saveCalendarAll(List<CalendarEntity> calendarEntities) {
         List<CalendarEntity> saveAll = new ArrayList<>();
         if (calendarEntities.size() > 0) {
@@ -753,7 +810,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
                 if (calendar.getCountAvailable() == null && calendar.getPrice() == null
                         && calendar.getMinLOS() == null && calendar.getMaxLOS() == null
                         && calendar.getClosedForSale() == null && calendar.getClosedForArrival() == null
-                        && calendar.getClosedForDeparture() == null){
+                        && calendar.getClosedForDeparture() == null && calendar.getCommission() == null){
                     throw new BadRequestException(String.format(
                             "All data fields for calendar entry are empty for date: %s. At least one field should be provided.",
                             calendar.getDate()
@@ -768,6 +825,9 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
                 }
                 if (calendar.getPrice() != null) {
                     entity.setPrice(calendar.getPrice());
+                }
+                if (calendar.getCommission() != null) {
+                    entity.setCommission(calendar.getCommission());
                 }
                 if (calendar.getMinLOS() != null) {
                     entity.setMinLOS(calendar.getMinLOS());
@@ -803,7 +863,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
         if (request.getCountAvailable() == null && request.getPrice() == null
                 && request.getMinLOS() == null && request.getMaxLOS() == null
                 && request.getClosedForSale() == null && request.getClosedForArrival() == null
-                && request.getClosedForDeparture() == null){
+                && request.getClosedForDeparture() == null && request.getCommission() == null){
             throw new BadRequestException("All data fields for calendar entry are empty. At least one field should be provided.");
         }
 
@@ -821,6 +881,9 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             }
             if (request.getPrice() != null) {
                 entity.setPrice(request.getPrice());
+            }
+            if (request.getCommission() != null) {
+                entity.setCommission(request.getCommission());
             }
             if (request.getMinLOS() != null) {
                 entity.setMinLOS(request.getMinLOS());

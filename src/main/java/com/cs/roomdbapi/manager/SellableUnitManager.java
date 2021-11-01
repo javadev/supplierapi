@@ -36,6 +36,12 @@ public interface SellableUnitManager {
 
     List<SUPriceResult> setPricesToSellableUnitForDateRange(SUPriceDateRangeRequest request);
 
+    List<SUCommissionResult> getCommissionsBySellableUnitId(Integer sellableUnitId);
+
+    List<SUCommissionResult> setCommissionsToSellableUnit(Integer sellableUnitId, List<SUCommissionSave> commissions);
+
+    List<SUCommissionResult> setCommissionsToSellableUnitForDateRange(SUCommissionDateRangeRequest request);
+
     List<SUMinLOSResult> getMinLOSRecordsBySellableUnitId(Integer sellableUnitId);
 
     List<SUMinLOSResult> setMinLOSRecordsToSellableUnit(Integer sellableUnitId, List<SUMinLOSSave> minLOSRecords);

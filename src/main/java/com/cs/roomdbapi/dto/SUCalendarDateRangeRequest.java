@@ -31,6 +31,11 @@ public class SUCalendarDateRangeRequest extends SUDateRangeRequest {
 
     @JsonProperty
     @Min(0)
+    @Schema(description = "Commission for the sellable unit for this date", example = "11.40")
+    private BigDecimal commission;
+
+    @JsonProperty
+    @Min(0)
     @Schema(description = "Minimum length of stay for sellable unit for this date.", example = "1")
     private Integer minLOS;
 

@@ -161,6 +161,67 @@ public class SellableUnitCalendarController {
     }
 
     @Operation(
+            summary = "Get sellable unit commissions."
+    )
+    @GetMapping({"/commission/{sellableUnitId}"})
+    public ResponseEntity<List<SUCommissionResult>> getSellableUnitCommissions(
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<SUCommissionResult> all = sellableUnitManager.getCommissionsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Set/add commissions to sellable unit.",
+            description = "If commission for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/commission/set"})
+    public ResponseEntity<List<SUCommissionResult>> setCommissions(
+            @Valid
+            @RequestBody
+                    SUCommissionRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        List<SUCommissionResult> all = sellableUnitManager.setCommissionsToSellableUnit(request.getSellableUnitId(), request.getCommissions());
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Set/add commissions to sellable unit. For date range.",
+            description = "Start and end date of the date range should be provided. Both start and end date will be **included**.<br/>" +
+                    "It's possible to specify which week days from range should be included. " +
+                    "If weekday is **not specified** or if it's set to **false** it will not be included. <br/><br/>" +
+                    "If commission for specific date exists in RoomDB it will be overridden with provided data. <br/>" +
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "If time segment provided existing data will be overridden with provided data."
+    )
+    @PostMapping({"/commission/set/date-range"})
+    public ResponseEntity<List<SUCommissionResult>> setCommissionsDateRange(
+            @Valid
+            @RequestBody
+                    SUCommissionDateRangeRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(request.getSellableUnitId(), req);
+
+        List<SUCommissionResult> all = sellableUnitManager.setCommissionsToSellableUnitForDateRange(request);
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
             summary = "Get sellable unit minimum length of stay records."
     )
     @GetMapping({"/minLOS/{sellableUnitId}"})

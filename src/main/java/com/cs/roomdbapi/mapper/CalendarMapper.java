@@ -24,6 +24,12 @@ public interface CalendarMapper {
     @IterableMapping(qualifiedByName="toPrice")
     List<SUPriceResult> toListPrice(List<CalendarEntity> list);
 
+    @Named("toCommission")
+    SUCommissionResult toCommission(CalendarEntity e);
+
+    @IterableMapping(qualifiedByName="toCommission")
+    List<SUCommissionResult> toListCommission(List<CalendarEntity> list);
+
     @Named("toMinLOS")
     SUMinLOSResult toMinLOS(CalendarEntity e);
 

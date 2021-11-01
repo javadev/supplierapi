@@ -36,6 +36,9 @@ public class CalendarEntity {
     @Column
     private BigDecimal price;
 
+    @Column
+    private BigDecimal commission;
+
     @Column(name = "min_los")
     private Integer minLOS;
     

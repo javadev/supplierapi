@@ -23,6 +23,9 @@ public interface CalendarRepository extends JpaRepository<CalendarEntity, Intege
     List<CalendarEntity> findAllBySellableUnitIdAndPriceIsNotNull(Integer sellableUnitId);
 
     @Transactional(readOnly = true)
+    List<CalendarEntity> findAllBySellableUnitIdAndCommissionIsNotNull(Integer sellableUnitId);
+
+    @Transactional(readOnly = true)
     List<CalendarEntity> findAllBySellableUnitIdAndMinLOSIsNotNull(Integer sellableUnitId);
 
     @Transactional(readOnly = true)
