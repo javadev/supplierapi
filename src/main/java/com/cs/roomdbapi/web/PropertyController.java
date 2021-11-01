@@ -509,7 +509,7 @@ public class PropertyController {
             summary = "Set/Update home currency by currency id.",
             description = "Existing value will be updated."
     )
-    @PostMapping({"/home-currency/by-id"})
+    @PatchMapping({"/home-currency/by-id"})
     public ResponseEntity<Currency> setHomeCurrencyById(
             @Valid
             @RequestBody
@@ -529,7 +529,7 @@ public class PropertyController {
             summary = "Set/Update home currency by currency 3 latter code (ISO 4217).",
             description = "Existing value will be updated."
     )
-    @PostMapping({"/home-currency/by-code"})
+    @PatchMapping({"/home-currency/by-code"})
     public ResponseEntity<Currency> setHomeCurrencyByCode(
             @Valid
             @RequestBody
