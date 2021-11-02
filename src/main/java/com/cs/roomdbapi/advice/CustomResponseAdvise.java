@@ -25,9 +25,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -138,6 +140,16 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
     public void handleException(HttpServletResponse res, Exception ex) throws IOException {
         log.error("ExceptionHandled: ", ex);
         res.sendError(HttpStatus.BAD_REQUEST.value(), "Something went wrong");
+    }
+
+    @ExceptionHandler({
+            ConstraintViolationException.class,
+            MethodArgumentTypeMismatchException.class
+    })
+    public void handleConstraintViolationException(HttpServletResponse res, Exception ex) throws IOException {
+        log.error("ConstraintViolationException: ", ex);
+
+        res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
 }

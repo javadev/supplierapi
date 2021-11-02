@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/v1/properties", produces = MediaType.APPLICATION_JSON_VALUE)
+@Validated
 public class PropertyController {
 
     private final PropertyManager propertyManager;
@@ -97,9 +99,10 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/{id}"})
     public ResponseEntity<Property> getProperty(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(100000)
+            @Min(1000000)
                     Integer id,
             HttpServletRequest req
     ) {
@@ -118,6 +121,7 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/supplier-property-id/{id}"})
     public ResponseEntity<Property> getPropertyBySupplierPropertyId(
+            @Valid
             @PathVariable
             @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
             @Size(min = 1, max = 255)
@@ -139,9 +143,10 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master/{id}"})
     public ResponseEntity<Property> isMasterProperty(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(100000)
+            @Min(1000000)
                     Integer id,
             HttpServletRequest req
     ) {
@@ -162,6 +167,7 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master/supplier-property-id/{id}"})
     public ResponseEntity<Property> isMasterPropertyBySupplierPropertyId(
+            @Valid
             @PathVariable
             @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
             @Size(min = 1, max = 255)
@@ -186,6 +192,7 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/code/{code}"})
     public ResponseEntity<List<Property>> getPropertyByCode(
+            @Valid
             @PathVariable
             @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
             @Size(min = 1, max = 255)
@@ -207,6 +214,7 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/supplier-property-id/get-or-create/{id}"})
     public ResponseEntity<Property> getOrCreatePropertyBySupplierPropertyId(
+            @Valid
             @PathVariable
             @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
             @Size(min = 1, max = 255)
@@ -226,7 +234,9 @@ public class PropertyController {
     )
     @PostMapping
     public ResponseEntity<Property> addProperty(
-            @Valid @RequestBody PropertySaveRequest property,
+            @Valid
+            @RequestBody
+                    PropertySaveRequest property,
             HttpServletRequest req
     ) {
         Property newProperty = propertyManager.addProperty(property, req.getRemoteUser());
@@ -241,10 +251,14 @@ public class PropertyController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<Property> updateProperty(
+            @Valid
             @PathVariable("id")
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(100000) Integer id,
-            @Valid @RequestBody PropertySaveRequest property,
+            @Min(1000000)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    PropertySaveRequest property,
             HttpServletRequest req
     ) {
         Supplier supplier = propertyManager.getSupplierByPropertyId(id);
@@ -264,9 +278,10 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/info/{id}"})
     public ResponseEntity<PropertyInfo> getPropertyInfo(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(100000)
+            @Min(1000000)
                     Integer id,
             HttpServletRequest req
     ) {
@@ -283,7 +298,9 @@ public class PropertyController {
     )
     @PostMapping({"/info"})
     public ResponseEntity<PropertyInfo> addPropertyInfo(
-            @Valid @RequestBody PropertyInfoSaveRequest info,
+            @Valid
+            @RequestBody
+                    PropertyInfoSaveRequest info,
             HttpServletRequest req
     ) {
         Integer propertyId = info.getPropertyId();
@@ -300,7 +317,9 @@ public class PropertyController {
     )
     @PutMapping("/info")
     public ResponseEntity<PropertyInfo> updatePropertyInfo(
-            @Valid @RequestBody PropertyInfoSaveRequest info,
+            @Valid
+            @RequestBody
+                    PropertyInfoSaveRequest info,
             HttpServletRequest req
     ) {
         Integer propertyId = info.getPropertyId();
@@ -317,9 +336,10 @@ public class PropertyController {
     )
     @DeleteMapping("/info/{id}")
     public ResponseEntity<Void> deletePropertyInfo(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(100000)
+            @Min(1000000)
                     Integer id,
             HttpServletRequest req
     ) {
@@ -378,9 +398,10 @@ public class PropertyController {
     )
     @PostMapping({"/description/{propertyId}"})
     public ResponseEntity<Description> addDescription(
+            @Valid
             @PathVariable("propertyId")
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(1)
+            @Min(1000000)
                     Integer propertyId,
             @Valid
             @RequestBody
@@ -400,6 +421,7 @@ public class PropertyController {
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(
+            @Valid
             @PathVariable("id")
             @Parameter(description = "RoomDB internal description Id. Required.")
             @Min(1)
@@ -423,6 +445,7 @@ public class PropertyController {
     )
     @DeleteMapping("/description/{id}")
     public ResponseEntity<Void> deleteDescription(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal description Id. Required.")
             @Min(1)
@@ -446,9 +469,10 @@ public class PropertyController {
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/identifier/{propertyId}"})
     public ResponseEntity<List<PropertyIdentifier>> getPropertyIdentifiers(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(100000)
+            @Min(1000000)
                     Integer propertyId,
             HttpServletRequest req
     ) {
@@ -487,10 +511,12 @@ public class PropertyController {
     )
     @DeleteMapping("/identifier/{propertyId}/{sourceId}")
     public ResponseEntity<Void> deleteIdentifier(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
-            @Min(1)
+            @Min(1000000)
                     Integer propertyId,
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal identifier source Id. Required.")
             @Min(1)

@@ -20,7 +20,7 @@ import java.util.List;
 public class PropertyIdentifierRequest {
 
     @JsonProperty
-    @Min(100000)
+    @Min(1000000)
     @Schema(description = "Room DB internal property id.", example = "1000010")
     private Integer propertyId;
 

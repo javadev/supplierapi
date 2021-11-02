@@ -159,7 +159,7 @@ public class SellableUnitController {
     public ResponseEntity<SellableUnit> getOrCreateSellableUnitBySupplierUnitId(
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required. Will be used to create sellable unit in case it doesn't exists.")
-            @Min(100000)
+            @Min(1000000)
                     Integer propertyId,
             @PathVariable
             @Parameter(description = "Supplier unit id - unit (room, meal, etc.) id that is used on supplier side. Required.")
