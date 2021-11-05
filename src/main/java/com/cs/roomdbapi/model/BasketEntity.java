@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product")
-public class ProductEntity {
+@Table(name = "basket")
+public class BasketEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +32,8 @@ public class ProductEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "media_x_description",
-            joinColumns = @JoinColumn(name = "media_id"),
+            name = "basket_x_description",
+            joinColumns = @JoinColumn(name = "basket_id"),
             inverseJoinColumns = @JoinColumn(name = "description_id"))
     List<DescriptionEntity> descriptions;
 

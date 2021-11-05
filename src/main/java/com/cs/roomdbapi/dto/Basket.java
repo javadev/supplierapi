@@ -18,14 +18,14 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Product {
+public class Basket {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer id;
 
     @JsonProperty
     @Size(min = 1, max = 255)
-    @Schema(description = "Name of the Product", example = "Double room with included massage")
+    @Schema(description = "Name of the Basket", example = "Double room with included massage")
     private String name;
 
     @JsonProperty
@@ -34,7 +34,7 @@ public class Product {
     private Integer propertyId;
 
     @JsonProperty
-    @Schema(description = "Is this product visible.", example = "true")
+    @Schema(description = "Is this basket visible.", example = "true")
     private Boolean isVisible;
 
     @JsonProperty

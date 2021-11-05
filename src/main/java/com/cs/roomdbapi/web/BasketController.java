@@ -1,9 +1,9 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.Product;
+import com.cs.roomdbapi.dto.Basket;
 import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
-import com.cs.roomdbapi.manager.ProductManager;
+import com.cs.roomdbapi.manager.BasketManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,9 +24,9 @@ import java.util.List;
 
 @Slf4j
 @Tag(
-        name = "Product",
-        description = "API endpoints to access Products and additional information about it. <br/>" +
-                "Product is a combination of the Sellable Units. " +
+        name = "Basket",
+        description = "API endpoints to access Baskets and additional information about it. <br/>" +
+                "Basket is a combination of the Sellable Units. " +
                 "It's like a package that include different sellable items"
 )
 @SecurityRequirement(name = "bearerAuth")
@@ -35,21 +35,21 @@ import java.util.List;
 @CrossOrigin
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/v1/product", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ProductController {
+@RequestMapping(value = "/api/v1/basket", produces = MediaType.APPLICATION_JSON_VALUE)
+public class BasketController {
 
-    private final ProductManager productManager;
+    private final BasketManager basketManager;
 
     private final PropertyManager propertyManager;
 
     private final ValidationManager validationManager;
 
     @Operation(
-            summary = "Get list of all products, by property id.",
-            description = "All fields of the product entity will be included in result."
+            summary = "Get list of all baskets, by property id.",
+            description = "All fields of the basket entity will be included in result."
     )
     @GetMapping({"/by-property/{propertyId}"})
-    public ResponseEntity<List<Product>> getAllProducts(
+    public ResponseEntity<List<Basket>> getAllBaskets(
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
             @Min(1000000)
@@ -59,33 +59,33 @@ public class ProductController {
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validationManager.validatePropertyAccess(req, supplier, propertyId);
 
-        List<Product> all = productManager.getAllProductsByPropertyId(propertyId);
+        List<Basket> all = basketManager.getAllBasketsByPropertyId(propertyId);
 
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
     @Operation(
-            summary = "Get product data by id."
+            summary = "Get basket data by id."
     )
     @GetMapping({"/{id}"})
-    public ResponseEntity<Product> getProduct(
+    public ResponseEntity<Basket> getBasket(
             @PathVariable
-            @Parameter(description = "RoomDB internal product Id. Required.")
+            @Parameter(description = "RoomDB internal basket Id. Required.")
             @Min(1)
                     Integer id,
             HttpServletRequest req
     ) {
-        validateProductAccess(id, req);
+        validateBasketAccess(id, req);
 
-        return new ResponseEntity<>(productManager.getProductById(id), HttpStatus.OK);
+        return new ResponseEntity<>(basketManager.getBasketById(id), HttpStatus.OK);
     }
 
-    private void validateProductAccess(Integer productId, HttpServletRequest req) {
-        if (productManager.productNotExistsById(productId)) {
-            throw new BadRequestException("Product with provided id does not exists in a system.");
+    private void validateBasketAccess(Integer basketId, HttpServletRequest req) {
+        if (basketManager.basketNotExistsById(basketId)) {
+            throw new BadRequestException("Basket with provided id does not exists in a system.");
         }
 
-        Integer propertyId = productManager.getPropertyIdByProductId(productId);
+        Integer propertyId = basketManager.getPropertyIdByBasketId(basketId);
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validationManager.validatePropertyAccess(req, supplier, propertyId);
