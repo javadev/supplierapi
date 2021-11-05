@@ -191,7 +191,9 @@ public class PointOfInterestController {
             HttpServletRequest req
     ) {
         Integer poiId = poiManager.getPOIIdByDescriptionId(id);
-
+        if (poiId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Point of interest.", id));
+        }
         validatePOIAccess(poiId, req);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
@@ -211,6 +213,9 @@ public class PointOfInterestController {
             HttpServletRequest req
     ) {
         Integer poiId = poiManager.getPOIIdByDescriptionId(id);
+        if (poiId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Point of interest.", id));
+        }
         validatePOIAccess(poiId, req);
 
         descriptionManager.deletePOIDescription(poiId, id);

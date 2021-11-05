@@ -1,6 +1,7 @@
 package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
+import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
@@ -432,6 +433,9 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
+        if (propertyId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Property.", id));
+        }
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validationManager.validatePropertyAccess(req, supplier, propertyId);
 
@@ -453,6 +457,9 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Integer propertyId = propertyManager.getPropertyIdByDescriptionId(id);
+        if (propertyId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Property.", id));
+        }
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validationManager.validatePropertyAccess(req, supplier, propertyId);
 

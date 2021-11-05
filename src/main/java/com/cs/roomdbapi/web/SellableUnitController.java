@@ -1,6 +1,7 @@
 package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.*;
+import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.SellableUnitManager;
@@ -211,6 +212,9 @@ public class SellableUnitController {
             HttpServletRequest req
     ) {
         Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
+        if (sellableUnitId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Sellable Unit.", id));
+        }
         validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
@@ -230,6 +234,9 @@ public class SellableUnitController {
             HttpServletRequest req
     ) {
         Integer sellableUnitId = sellableUnitManager.getSellableUnitIdByDescriptionId(id);
+        if (sellableUnitId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Sellable Unit.", id));
+        }
         validationManager.validateSellableUnitAccess(sellableUnitId, req);
 
         descriptionManager.deleteSellableUnitDescription(sellableUnitId, id);

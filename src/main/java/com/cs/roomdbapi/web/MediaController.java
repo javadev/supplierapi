@@ -351,7 +351,9 @@ public class MediaController {
             HttpServletRequest req
     ) {
         Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
-
+        if (mediaId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Media.", id));
+        }
         validateMediaAccess(mediaId, req);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
@@ -371,6 +373,9 @@ public class MediaController {
             HttpServletRequest req
     ) {
         Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
+        if (mediaId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Media.", id));
+        }
         validateMediaAccess(mediaId, req);
 
         descriptionManager.deleteMediaDescription(mediaId, id);
