@@ -23,5 +23,7 @@ public interface DescriptionManager {
 
     void deleteSellableUnitDescription(Integer sellableUnitId, Integer id);
 
+    void deleteBasketDescription(Integer basketId, Integer id);
+
 }
                                                                                

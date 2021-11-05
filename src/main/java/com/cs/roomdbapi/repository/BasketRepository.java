@@ -18,8 +18,8 @@ public interface BasketRepository extends JpaRepository<BasketEntity, Integer> {
     @Query("select b.property.id from BasketEntity b where b.id = ?1")
     Integer getPropertyIdByBasketId(Integer basketId);
 
-//    @Transactional(readOnly = true)
-//    @Query(value = "select mxd.media_id from media_x_description mxd where mxd.description_id = ?1", nativeQuery = true)
-//    Integer getMediaIdByDescriptionId(Integer descriptionId);
+    @Transactional(readOnly = true)
+    @Query(value = "select bxd.basket_id from basket_x_description bxd where bxd.description_id = ?1", nativeQuery = true)
+    Integer getBasketIdByDescriptionId(Integer descriptionId);
 
 }

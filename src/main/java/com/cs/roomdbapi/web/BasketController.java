@@ -1,9 +1,12 @@
 package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.Basket;
+import com.cs.roomdbapi.dto.Description;
+import com.cs.roomdbapi.dto.DescriptionSave;
 import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.BasketManager;
+import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,9 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -35,7 +40,8 @@ import java.util.List;
 @CrossOrigin
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/v1/basket", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/baskets", produces = MediaType.APPLICATION_JSON_VALUE)
+@Validated
 public class BasketController {
 
     private final BasketManager basketManager;
@@ -44,12 +50,15 @@ public class BasketController {
 
     private final ValidationManager validationManager;
 
+    private final DescriptionManager descriptionManager;
+
     @Operation(
             summary = "Get list of all baskets, by property id.",
             description = "All fields of the basket entity will be included in result."
     )
     @GetMapping({"/by-property/{propertyId}"})
     public ResponseEntity<List<Basket>> getAllBaskets(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal property Id. Required.")
             @Min(1000000)
@@ -69,6 +78,7 @@ public class BasketController {
     )
     @GetMapping({"/{id}"})
     public ResponseEntity<Basket> getBasket(
+            @Valid
             @PathVariable
             @Parameter(description = "RoomDB internal basket Id. Required.")
             @Min(1)
@@ -91,6 +101,75 @@ public class BasketController {
         validationManager.validatePropertyAccess(req, supplier, propertyId);
     }
 
-    // TODO add API methods for descriptions
+    @Operation(
+            summary = "Add description to basket."
+    )
+    @PostMapping({"/description/{basketId}"})
+    public ResponseEntity<Description> addDescription(
+            @Valid
+            @PathVariable("basketId")
+            @Parameter(description = "RoomDB internal basket Id. Required.")
+            @Min(1)
+                    Integer basketId,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        validateBasketAccess(basketId, req);
+
+        Description description = basketManager.addBasketDescription(basketId, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update description for basket."
+    )
+    @PatchMapping("/description/{id}")
+    public ResponseEntity<Description> updateDescription(
+            @Valid
+            @PathVariable("id")
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    DescriptionSave descriptionSave,
+            HttpServletRequest req
+    ) {
+        Integer basketId = basketManager.getBasketIdByDescriptionId(id);
+        if (basketId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Basket.", id));
+        }
+        validateBasketAccess(basketId, req);
+
+        Description description = descriptionManager.updateDescription(id, descriptionSave);
+
+        return new ResponseEntity<>(description, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Delete description for basket."
+    )
+    @DeleteMapping("/description/{id}")
+    public ResponseEntity<Void> deleteDescription(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal description Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        Integer basketId = basketManager.getBasketIdByDescriptionId(id);
+        if (basketId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Basket.", id));
+        }
+        validateBasketAccess(basketId, req);
+
+        descriptionManager.deleteBasketDescription(basketId, id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

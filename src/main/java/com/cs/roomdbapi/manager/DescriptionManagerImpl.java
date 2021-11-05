@@ -37,6 +37,8 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
     private final SellableUnitRepository sellableUnitRepository;
 
+    private final BasketRepository basketRepository;
+
     @Override
     public List<DescriptionType> getAllDescriptionTypes() {
         List<DescriptionTypeEntity> all = descriptionTypeRepository.findAll();
@@ -154,6 +156,21 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
         sellableUnitEntity.getDescriptions().remove(entity);
         sellableUnitRepository.save(sellableUnitEntity);
+
+        descriptionRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBasketDescription(Integer basketId, Integer id) {
+        BasketEntity basketEntity = basketRepository.findById(basketId)
+                .orElseThrow(() -> new ResourceNotFoundException(BASKET, ID, basketId));
+
+        DescriptionEntity entity = descriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, id));
+
+        basketEntity.getDescriptions().remove(entity);
+        basketRepository.save(basketEntity);
 
         descriptionRepository.delete(entity);
     }
