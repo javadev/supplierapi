@@ -630,6 +630,33 @@ public class PropertyManagerImpl implements PropertyManager {
     public List<PropertyIdentifier> getPropertyIdentifiersByPropertyId(Integer propertyId) {
         List<PropertyIdentifierEntity> all = propertyIdentifierRepository.findAllByPropertyId(propertyId);
 
+        PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        IdentifierSourceEntity rdbSourceEntity = identifierSourceRepository.findByAbbreviation(ROOM_DB_IDENTIFIER_SOURCE_ABBR)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, ROOM_DB_IDENTIFIER_SOURCE_ABBR));
+
+        IdentifierSourceEntity csSourceEntity = identifierSourceRepository.findByAbbreviation(CULT_SWITCH_IDENTIFIER_SOURCE_ABBR)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, CULT_SWITCH_IDENTIFIER_SOURCE_ABBR));
+
+        // Add RoomDB In in result
+        PropertyIdentifierEntity roomDBId = new PropertyIdentifierEntity();
+        roomDBId.setIdentifier(propertyEntity.getId().toString());
+        roomDBId.setPropertyId(propertyEntity.getId());
+        roomDBId.setSource(rdbSourceEntity);
+
+        all.add(roomDBId);
+
+        if (propertyEntity.getSupplierPropertyId() != null) {
+            // Add CultSwitch Id in result
+            PropertyIdentifierEntity cultSwitchId = new PropertyIdentifierEntity();
+            cultSwitchId.setIdentifier(propertyEntity.getSupplierPropertyId());
+            cultSwitchId.setPropertyId(propertyEntity.getId());
+            cultSwitchId.setSource(csSourceEntity);
+
+            all.add(cultSwitchId);
+        }
+
         return PropertyIdentifierMapper.MAPPER.toListDTO(all);
     }
 
@@ -638,6 +665,14 @@ public class PropertyManagerImpl implements PropertyManager {
     public List<PropertyIdentifier> addPropertyIdentifiers(Integer propertyId, List<PropertyIdentifierSave> identifiers) {
         List<PropertyIdentifierEntity> entities = new ArrayList<>();
 
+        IdentifierSourceEntity rdbSourceEntity = identifierSourceRepository.findByAbbreviation(ROOM_DB_IDENTIFIER_SOURCE_ABBR)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, ROOM_DB_IDENTIFIER_SOURCE_ABBR));
+
+        IdentifierSourceEntity csSourceEntity = identifierSourceRepository.findByAbbreviation(CULT_SWITCH_IDENTIFIER_SOURCE_ABBR)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, CULT_SWITCH_IDENTIFIER_SOURCE_ABBR));
+
+        PropertyIdentifierEntity cultSwitchId = null;
+
         for (PropertyIdentifierSave identifier : identifiers) {
             IdentifierSourceEntity sourceEntity = identifierSourceRepository.findById(identifier.getSourceId())
                     .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ID, identifier.getSourceId()));
@@ -645,26 +680,51 @@ public class PropertyManagerImpl implements PropertyManager {
             if (identifier.getIdentifier() == null || identifier.getIdentifier().isBlank()) {
                 throw new BadRequestException("Identifier should not be blank.");
             }
-
-            PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)
-                    .orElseGet(PropertyIdentifierEntity::new);
-
-            if (entity.getPropertyId() == null) {
-                entity.setPropertyId(propertyId);
-                entity.setSource(sourceEntity);
-
-                log.info("REQUEST_ID: {}. New property identifier created for source: '{}'", MDC.get("REQUEST_ID"), sourceEntity.getAbbreviation());
-            } else {
-                log.info("REQUEST_ID: {}. Existing property identifier will be updated for source: '{}'", MDC.get("REQUEST_ID"), sourceEntity.getAbbreviation());
+            if (sourceEntity.getId().equals(rdbSourceEntity.getId())) {
+                throw new BadRequestException("It's not possible to update RoomDB identifier.");
             }
 
-            entity.setIdentifier(identifier.getIdentifier());
-            entities.add(entity);
+            if (sourceEntity.getId().equals(csSourceEntity.getId())) {
+
+                // Update CultSwitch id
+                PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
+                        .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+                propertyEntity.setSupplierPropertyId(identifier.getIdentifier());
+                propertyRepository.save(propertyEntity);
+
+                cultSwitchId = new PropertyIdentifierEntity();
+                cultSwitchId.setIdentifier(propertyEntity.getSupplierPropertyId());
+                cultSwitchId.setPropertyId(propertyEntity.getId());
+                cultSwitchId.setSource(csSourceEntity);
+
+            } else {
+
+                // Update other ids
+                PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)
+                        .orElseGet(PropertyIdentifierEntity::new);
+
+                if (entity.getPropertyId() == null) {
+                    entity.setPropertyId(propertyId);
+                    entity.setSource(sourceEntity);
+
+                    log.info("REQUEST_ID: {}. New property identifier created for source: '{}'", MDC.get("REQUEST_ID"), sourceEntity.getAbbreviation());
+                } else {
+                    log.info("REQUEST_ID: {}. Existing property identifier will be updated for source: '{}'", MDC.get("REQUEST_ID"), sourceEntity.getAbbreviation());
+                }
+
+                entity.setIdentifier(identifier.getIdentifier());
+                entities.add(entity);
+            }
         }
 
         List<PropertyIdentifierEntity> saveAll = new ArrayList<>();
         if (entities.size() > 0) {
             saveAll = propertyIdentifierRepository.saveAll(entities);
+        }
+
+        if (cultSwitchId != null) {
+            saveAll.add(cultSwitchId);
         }
 
         return PropertyIdentifierMapper.MAPPER.toListDTO(saveAll);
@@ -676,10 +736,30 @@ public class PropertyManagerImpl implements PropertyManager {
         IdentifierSourceEntity sourceEntity = identifierSourceRepository.findById(sourceId)
                 .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ID, sourceId));
 
-        PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)
-                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_IDENTIFIER, SOURCE_ID, sourceId));
+        // Check case when source is RoomDB -- it's not possible to remove this id
+        IdentifierSourceEntity rdbSourceEntity = identifierSourceRepository.findByAbbreviation(ROOM_DB_IDENTIFIER_SOURCE_ABBR)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, ROOM_DB_IDENTIFIER_SOURCE_ABBR));
 
-        propertyIdentifierRepository.delete(entity);
+        if (sourceEntity.getId().equals(rdbSourceEntity.getId())) {
+            throw new BadRequestException("It's not possible to delete RoomDB identifier.");
+        }
+
+        // Check case when source is CultSwitch -- this id is stored in different plase than other ids
+        IdentifierSourceEntity csSourceEntity = identifierSourceRepository.findByAbbreviation(CULT_SWITCH_IDENTIFIER_SOURCE_ABBR)
+                .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, CULT_SWITCH_IDENTIFIER_SOURCE_ABBR));
+
+        if (sourceEntity.getId().equals(csSourceEntity.getId())) {
+            PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+            propertyEntity.setSupplierPropertyId(null);
+            propertyRepository.save(propertyEntity);
+        } else {
+            PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_IDENTIFIER, SOURCE_ID, sourceId));
+
+            propertyIdentifierRepository.delete(entity);
+        }
     }
 
 }

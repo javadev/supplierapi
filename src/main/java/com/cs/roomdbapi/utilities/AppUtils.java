@@ -120,4 +120,8 @@ public class AppUtils {
     public static final String DEFAULT_BASKET_DESCRIPTION_TYPE_CODE = "bsk";
 
     public static final String DEFAULT_SELLABLE_UNIT_NAME_TYPE_CODE = "su";
+
+    public static final String ROOM_DB_IDENTIFIER_SOURCE_ABBR = "rdb";
+
+    public static final String CULT_SWITCH_IDENTIFIER_SOURCE_ABBR = "cs";
 }
