@@ -22,4 +22,8 @@ public interface BasketManager {
 
     List<BasketSellableUnit> setSellableUnits(BasketSellableUnitRequest basketSellableUnits);
 
+    BasketSellableUnit addSellableUnit(BasketSellableUnitSaveOne req);
+
+    List<Basket> getBasketsBySellableUnitId(Integer sellableUnitId);
+
 }

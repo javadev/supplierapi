@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.cs.roomdbapi.utilities.AppUtils.*;
 
@@ -112,6 +114,48 @@ public class BasketManagerImpl implements BasketManager {
         }
 
         return BasketSellableUnitMapper.MAPPER.toListDTO(bsu);
+    }
+
+    @Override
+    public BasketSellableUnit addSellableUnit(BasketSellableUnitSaveOne req) {
+        Integer basketId = req.getBasketId();
+
+        Integer suId = req.getSellableUnitId();
+        SellableUnitEntity su = sellableUnitRepository.findById(suId)
+                .orElseThrow(() -> new ResourceNotFoundException(SELLABLE_UNIT, ID, suId));
+
+        Optional<BasketSellableUnitEntity> existing = basketSellableUnitRepository.findTopByBasketIdAndSellableUnit_Id(basketId, suId);
+
+        BasketSellableUnitEntity entity;
+        if (existing.isPresent()) {
+            entity = existing.get();
+        } else {
+            entity = new BasketSellableUnitEntity();
+            entity.setBasketId(basketId);
+            entity.setSellableUnit(su);
+        }
+        entity.setQuantity(req.getQuantity());
+        entity.setConsecutiveOverTime(req.getConsecutiveOverTime());
+
+        BasketSellableUnitEntity save = basketSellableUnitRepository.save(entity);
+
+        return BasketSellableUnitMapper.MAPPER.toDTO(save);
+    }
+
+    @Override
+    public List<Basket> getBasketsBySellableUnitId(Integer sellableUnitId) {
+        List<BasketSellableUnitEntity> basketSellableUnits = basketSellableUnitRepository.findAllBySellableUnit_Id(sellableUnitId);
+
+        List<BasketEntity> all = new ArrayList<>();
+        if (basketSellableUnits.size() > 0) {
+            List<Integer> ids = basketSellableUnits.stream()
+                    .map(BasketSellableUnitEntity::getBasketId)
+                    .collect(Collectors.toList());
+
+            all = basketRepository.findAllById(ids);
+        }
+
+        return BasketMapper.MAPPER.toListDTO(all);
     }
 
 }

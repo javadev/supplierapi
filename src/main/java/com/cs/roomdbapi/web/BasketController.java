@@ -189,7 +189,7 @@ public class BasketController {
     }
 
     @Operation(
-            summary = "Add/set sellable units to basket.",
+            summary = "Set sellable units to basket.",
             description = "Previous sellable units will be removed and only provided in request sellable units will be added to basket. <br/>" +
                     "If provided sellable units array empty all existing sellable units will be removed."
     )
@@ -205,6 +205,44 @@ public class BasketController {
         List<BasketSellableUnit> all = basketManager.setSellableUnits(basketSellableUnitRequest);
 
         return new ResponseEntity<>(all, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Add or update sellable unit in basket.",
+            description = "If Sellable Unit already **in** the provided Basket than it's value will be updated. <br/>" +
+                    "If sellable unit does **not in** basket, it will be added."
+    )
+    @PatchMapping("/sellable-units/add")
+    public ResponseEntity<BasketSellableUnit> addSellableUnit(
+            @Valid
+            @RequestBody
+                    BasketSellableUnitSaveOne basketSellableUnitSaveOne,
+            HttpServletRequest req
+    ) {
+        validateBasketAccess(basketSellableUnitSaveOne.getBasketId(), req);
+
+        BasketSellableUnit result = basketManager.addSellableUnit(basketSellableUnitSaveOne);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get list of baskets in which sellable unit is included."
+    )
+    @GetMapping("/sellable-units/baskets/{sellableUnitId}")
+    public ResponseEntity<List<Basket>> getBasketsBySellableUnitId(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validationManager.validateSellableUnitAccess(sellableUnitId, req);
+
+        List<Basket> result = basketManager.getBasketsBySellableUnitId(sellableUnitId);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
 }
