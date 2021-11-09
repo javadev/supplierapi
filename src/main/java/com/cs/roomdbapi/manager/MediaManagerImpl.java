@@ -248,6 +248,7 @@ public class MediaManagerImpl implements MediaManager {
     }
 
     @Override
+    @Transactional
     public List<MediaAttribute> setMediaAttributes(MediaAttributeRequest mediaAttributes) {
         Integer mediaId = mediaAttributes.getMediaId();
 

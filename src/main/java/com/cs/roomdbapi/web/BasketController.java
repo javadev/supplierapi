@@ -1,9 +1,6 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.Basket;
-import com.cs.roomdbapi.dto.Description;
-import com.cs.roomdbapi.dto.DescriptionSave;
-import com.cs.roomdbapi.dto.Supplier;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.BasketManager;
 import com.cs.roomdbapi.manager.DescriptionManager;
@@ -170,6 +167,44 @@ public class BasketController {
         descriptionManager.deleteBasketDescription(basketId, id);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get list of sellable units that are in basket."
+    )
+    @GetMapping({"/sellable-units/{basketId}"})
+    public ResponseEntity<List<BasketSellableUnit>> getSellableUnitsByBasket(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal basket Id. Required.")
+            @Min(1)
+                    Integer basketId,
+            HttpServletRequest req
+    ) {
+        validateBasketAccess(basketId, req);
+
+        List<BasketSellableUnit> all = basketManager.getSellableUnitsByBasketId(basketId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add/set sellable units to basket.",
+            description = "Previous sellable units will be removed and only provided in request sellable units will be added to basket. <br/>" +
+                    "If provided sellable units array empty all existing sellable units will be removed."
+    )
+    @PostMapping({"/sellable-units/set"})
+    public ResponseEntity<List<BasketSellableUnit>> setSellableUnits(
+            @Valid
+            @RequestBody
+                    BasketSellableUnitRequest basketSellableUnitRequest,
+            HttpServletRequest req
+    ) {
+        validateBasketAccess(basketSellableUnitRequest.getBasketId(), req);
+
+        List<BasketSellableUnit> all = basketManager.setSellableUnits(basketSellableUnitRequest);
+
+        return new ResponseEntity<>(all, HttpStatus.CREATED);
     }
 
 }

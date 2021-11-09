@@ -1,19 +1,23 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.Basket;
-import com.cs.roomdbapi.dto.Description;
-import com.cs.roomdbapi.dto.DescriptionSave;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.BasketMapper;
+import com.cs.roomdbapi.mapper.BasketSellableUnitMapper;
 import com.cs.roomdbapi.mapper.DescriptionMapper;
 import com.cs.roomdbapi.model.BasketEntity;
+import com.cs.roomdbapi.model.BasketSellableUnitEntity;
 import com.cs.roomdbapi.model.DescriptionEntity;
+import com.cs.roomdbapi.model.SellableUnitEntity;
 import com.cs.roomdbapi.repository.BasketRepository;
+import com.cs.roomdbapi.repository.BasketSellableUnitRepository;
+import com.cs.roomdbapi.repository.SellableUnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.cs.roomdbapi.utilities.AppUtils.*;
@@ -26,6 +30,10 @@ public class BasketManagerImpl implements BasketManager {
     private final BasketRepository basketRepository;
 
     private final DescriptionManager descriptionManager;
+
+    private final BasketSellableUnitRepository basketSellableUnitRepository;
+
+    private final SellableUnitRepository sellableUnitRepository;
 
     @Override
     public List<Basket> getAllBasketsByPropertyId(Integer propertyId) {
@@ -69,6 +77,41 @@ public class BasketManagerImpl implements BasketManager {
     @Override
     public Integer getBasketIdByDescriptionId(Integer descriptionId) {
         return basketRepository.getBasketIdByDescriptionId(descriptionId);
+    }
+
+    @Override
+    public List<BasketSellableUnit> getSellableUnitsByBasketId(Integer basketId) {
+        List<BasketSellableUnitEntity> all = basketSellableUnitRepository.findAllByBasketId(basketId);
+
+        return BasketSellableUnitMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    @Transactional
+    public List<BasketSellableUnit> setSellableUnits(BasketSellableUnitRequest basketSellableUnits) {
+        Integer basketId = basketSellableUnits.getBasketId();
+
+        List<BasketSellableUnitEntity> bsu = new ArrayList<>();
+        for (BasketSellableUnitSave unit : basketSellableUnits.getSellableUnits()) {
+
+            SellableUnitEntity su = sellableUnitRepository.findById(unit.getSellableUnitId())
+                    .orElseThrow(() -> new ResourceNotFoundException(SELLABLE_UNIT, ID, unit.getSellableUnitId()));
+
+            BasketSellableUnitEntity entity = new BasketSellableUnitEntity();
+            entity.setBasketId(basketId);
+            entity.setSellableUnit(su);
+            entity.setQuantity(unit.getQuantity());
+            entity.setConsecutiveOverTime(unit.getConsecutiveOverTime());
+
+            bsu.add(entity);
+        }
+
+        basketSellableUnitRepository.deleteByBasketId(basketId);
+        if (bsu.size() > 0) {
+            bsu = basketSellableUnitRepository.saveAll(bsu);
+        }
+
+        return BasketSellableUnitMapper.MAPPER.toListDTO(bsu);
     }
 
 }

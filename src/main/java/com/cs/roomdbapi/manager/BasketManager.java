@@ -1,8 +1,6 @@
 package com.cs.roomdbapi.manager;
 
-import com.cs.roomdbapi.dto.Basket;
-import com.cs.roomdbapi.dto.Description;
-import com.cs.roomdbapi.dto.DescriptionSave;
+import com.cs.roomdbapi.dto.*;
 
 import java.util.List;
 
@@ -19,5 +17,9 @@ public interface BasketManager {
     Description addBasketDescription(Integer basketId, DescriptionSave descriptionToSave);
 
     Integer getBasketIdByDescriptionId(Integer descriptionId);
+
+    List<BasketSellableUnit> getSellableUnitsByBasketId(Integer basketId);
+
+    List<BasketSellableUnit> setSellableUnits(BasketSellableUnitRequest basketSellableUnits);
 
 }
