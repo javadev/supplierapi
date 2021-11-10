@@ -124,7 +124,19 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
             nameRepository.deleteAll(sellableUnitEntity.getNames());
         }
 
-        sellableUnitRepository.delete(sellableUnitEntity);  // TODO check that descriptions are removed
+        List<CalendarEntity> calendar = calendarRepository.findAllBySellableUnitId(id);
+        if (calendar.size() > 0) {
+            calendarRepository.deleteAll(calendar);
+        }
+
+        List<SUCapacityEntity> capacity = suCapacityRepository.findAllBySellableUnitId(id);
+        if (capacity.size() > 0) {
+            suCapacityRepository.deleteAll(capacity);
+        }
+
+        // TODO remove su attributes
+
+        sellableUnitRepository.delete(sellableUnitEntity);
     }
 
     @Override

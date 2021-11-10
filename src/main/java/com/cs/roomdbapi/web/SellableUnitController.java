@@ -177,7 +177,8 @@ public class SellableUnitController {
     }
 
     @Operation(
-            summary = "Add description to sellable unit."
+            summary = "Add description to sellable unit.",
+            description = "Description type is not required and will be set to 'Sellable unit' if not provided."
     )
     @PostMapping({"/description/{sellableUnitId}"})
     public ResponseEntity<Description> addDescription(
@@ -198,7 +199,8 @@ public class SellableUnitController {
     }
 
     @Operation(
-            summary = "Update description for sellable unit."
+            summary = "Update description for sellable unit.",
+            description = "Description type is not required and will be set to 'Sellable unit' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(

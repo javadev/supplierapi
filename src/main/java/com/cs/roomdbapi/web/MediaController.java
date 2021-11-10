@@ -316,7 +316,8 @@ public class MediaController {
     }
 
     @Operation(
-            summary = "Add descriptions to media."
+            summary = "Add descriptions to media.",
+            description = "Description type is not required and will be set to 'Media' if not provided."
     )
     @PostMapping({"/description/{mediaId}"})
     public ResponseEntity<Description> addDescription(
@@ -337,7 +338,8 @@ public class MediaController {
     }
 
     @Operation(
-            summary = "Update description for Media."
+            summary = "Update description for Media.",
+            description = "Description type is not required and will be set to 'Media' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(

@@ -156,7 +156,8 @@ public class PointOfInterestController {
     }
 
     @Operation(
-            summary = "Add description to point of interest."
+            summary = "Add description to point of interest.",
+            description = "Description type is not required and will be set to 'Point Of Interest' if not provided."
     )
     @PostMapping({"/description/{poiId}"})
     public ResponseEntity<Description> addDescription(
@@ -177,7 +178,8 @@ public class PointOfInterestController {
     }
 
     @Operation(
-            summary = "Update description for Point of interest."
+            summary = "Update description for Point of interest.",
+            description = "Description type is not required and will be set to 'Point Of Interest' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(

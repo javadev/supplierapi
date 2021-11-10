@@ -72,7 +72,7 @@ public interface SellableUnitManager {
 
     List<SUClosedForDepartureResult> setClosedForDepartureRecordsToSellableUnitForDateRange(SUClosedForDepartureDateRangeRequest request);
 
-    Description addSellableUnitDescription(Integer sellableUnitId, DescriptionSave descriptionToSave); // TODO
+    Description addSellableUnitDescription(Integer sellableUnitId, DescriptionSave descriptionToSave);
 
     Integer getSellableUnitIdByDescriptionId(Integer descriptionId);
 

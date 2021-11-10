@@ -610,7 +610,7 @@ public class PropertyManagerImpl implements PropertyManager {
     @Override
     @Transactional
     public Description addPropertyDescription(Integer propertyId, DescriptionSave descriptionToSave) {
-        DescriptionEntity savedDescription = descriptionManager.createDescription(descriptionToSave, null);
+        DescriptionEntity savedDescription = descriptionManager.createDescription(descriptionToSave, DEFAULT_PROPERTY_DESCRIPTION_TYPE_CODE);
 
         PropertyEntity entity = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));

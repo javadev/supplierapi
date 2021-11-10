@@ -395,7 +395,8 @@ public class PropertyController {
     }
 
     @Operation(
-            summary = "Add description to property."
+            summary = "Add description to property.",
+            description = "Description type is not required and will be set to 'Point Of Interest' if not provided."
     )
     @PostMapping({"/description/{propertyId}"})
     public ResponseEntity<Description> addDescription(
@@ -418,7 +419,8 @@ public class PropertyController {
     }
 
     @Operation(
-            summary = "Update description for property."
+            summary = "Update description for property.",
+            description = "Description type is not required and will be set to 'Point Of Interest' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(
