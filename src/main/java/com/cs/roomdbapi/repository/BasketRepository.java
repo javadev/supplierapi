@@ -15,6 +15,9 @@ public interface BasketRepository extends JpaRepository<BasketEntity, Integer> {
     List<BasketEntity> findAllByProperty_Id(Integer propertyId);
 
     @Transactional(readOnly = true)
+    Boolean existsByProperty_IdAndName(Integer propertyId, String name);
+
+    @Transactional(readOnly = true)
     @Query("select b.property.id from BasketEntity b where b.id = ?1")
     Integer getPropertyIdByBasketId(Integer basketId);
 

@@ -135,6 +135,7 @@ public class SellableUnitManagerImpl implements SellableUnitManager {
         }
 
         // TODO remove su attributes
+        // TODO check that SU is not included in any Basket - if it is -- error message
 
         sellableUnitRepository.delete(sellableUnitEntity);
     }

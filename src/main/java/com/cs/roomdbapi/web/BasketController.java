@@ -99,7 +99,60 @@ public class BasketController {
     }
 
     @Operation(
-            summary = "Add description to basket."
+            summary = "Add basket."
+    )
+    @PostMapping
+    public ResponseEntity<Basket> addBasket(
+            @Valid
+            @RequestBody
+                    Basket basket
+    ) {
+        Basket added = basketManager.addBasket(basket);
+
+        return new ResponseEntity<>(added, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Update basket."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<Basket> updateBasket(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal basket Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    BasketUpdate basket
+    ) {
+        Basket updatedLang = basketManager.updateBasket(id, basket);
+
+        return ResponseEntity.ok(updatedLang);
+    }
+
+    @Operation(
+            summary = "Delete basket by id."
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBasket(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal basket Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        validateBasketAccess(id, req);
+
+        basketManager.deleteBasket(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add description to basket.",
+            description = "Description type is not required and will be set to 'Basket' if not provided."
     )
     @PostMapping({"/description/{basketId}"})
     public ResponseEntity<Description> addDescription(
@@ -121,7 +174,8 @@ public class BasketController {
     }
 
     @Operation(
-            summary = "Update description for basket."
+            summary = "Update description for basket.",
+            description = "Description type is not required and will be set to 'Basket' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(

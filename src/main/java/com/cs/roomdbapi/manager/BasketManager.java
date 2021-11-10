@@ -12,6 +12,12 @@ public interface BasketManager {
 
     Basket getBasketById(Integer id);
 
+    Basket addBasket(Basket basket);
+
+    Basket updateBasket(Integer id, BasketUpdate basket);
+
+    void deleteBasket(Integer id);
+
     Integer getPropertyIdByBasketId(Integer basketId);
 
     Description addBasketDescription(Integer basketId, DescriptionSave descriptionToSave);

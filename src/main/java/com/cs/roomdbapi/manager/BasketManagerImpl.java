@@ -1,19 +1,19 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.*;
+import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.BasketMapper;
 import com.cs.roomdbapi.mapper.BasketSellableUnitMapper;
 import com.cs.roomdbapi.mapper.DescriptionMapper;
-import com.cs.roomdbapi.model.BasketEntity;
-import com.cs.roomdbapi.model.BasketSellableUnitEntity;
-import com.cs.roomdbapi.model.DescriptionEntity;
-import com.cs.roomdbapi.model.SellableUnitEntity;
+import com.cs.roomdbapi.model.*;
 import com.cs.roomdbapi.repository.BasketRepository;
 import com.cs.roomdbapi.repository.BasketSellableUnitRepository;
+import com.cs.roomdbapi.repository.PropertyRepository;
 import com.cs.roomdbapi.repository.SellableUnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +37,8 @@ public class BasketManagerImpl implements BasketManager {
 
     private final SellableUnitRepository sellableUnitRepository;
 
+    private final PropertyRepository propertyRepository;
+
     @Override
     public List<Basket> getAllBasketsByPropertyId(Integer propertyId) {
         List<BasketEntity> all = basketRepository.findAllByProperty_Id(propertyId);
@@ -55,6 +57,63 @@ public class BasketManagerImpl implements BasketManager {
                 .orElseThrow(() -> new ResourceNotFoundException(BASKET, ID, id));
 
         return BasketMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
+    public Basket addBasket(Basket basket) {
+        if (basketRepository.existsByProperty_IdAndName(basket.getPropertyId(), basket.getName())) {
+            throw new BadRequestException(String.format("Basket with name '%s' already exists for property with id '%s'",
+                    basket.getName(), basket.getPropertyId()));
+        }
+
+        PropertyEntity propertyEntity = propertyRepository.findById(basket.getPropertyId())
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, basket.getPropertyId()));
+
+        BasketEntity entity = BasketMapper.MAPPER.saveRequestToEntity(basket);
+        entity.setProperty(propertyEntity);
+
+        BasketEntity save = basketRepository.save(entity);
+        log.info("REQUEST_ID: {}. Basket added: '{}'", MDC.get("REQUEST_ID"), save.toString());
+
+        return BasketMapper.MAPPER.toDTO(save);
+    }
+
+    @Override
+    public Basket updateBasket(Integer id, BasketUpdate basket) {
+        BasketEntity entity = basketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(BASKET, ID, id));
+
+        if (!basket.getName().equals(entity.getName())) {
+            if (basketRepository.existsByProperty_IdAndName(entity.getProperty().getId(), basket.getName())) {
+                throw new BadRequestException(String.format("Basket with name '%s' already exists for property with id '%s'",
+                        basket.getName(), entity.getProperty().getId()));
+            }
+            entity.setName(basket.getName());
+        }
+
+        entity.setIsVisible(basket.getIsVisible());
+
+        BasketEntity save = basketRepository.save(entity);
+        log.info("REQUEST_ID: {}. Basket with id '{}' updated to: '{}'", MDC.get("REQUEST_ID"), entity.getId(), entity.toString());
+
+        return BasketMapper.MAPPER.toDTO(save);
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteBasket(Integer id) {
+        BasketEntity entity = basketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(BASKET, ID, id));
+
+        // TODO check that basket is not attached to Product. If it is - response with error message.
+
+        List<BasketSellableUnitEntity> all = basketSellableUnitRepository.findAllByBasketId(id);
+        if (all.size() > 0) {
+            basketSellableUnitRepository.deleteAll(all);
+        }
+
+        basketRepository.delete(entity);
     }
 
     @Override

@@ -9,19 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Basket {
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer id;
+public class BasketUpdate {
 
     @JsonProperty
     @Size(min = 1, max = 255)
@@ -29,16 +24,7 @@ public class Basket {
     private String name;
 
     @JsonProperty
-    @Min(1000000)
-    @Schema(description = "Room DB internal property id.", example = "1000003")
-    private Integer propertyId;
-
-    @JsonProperty
     @Schema(description = "Is this basket visible.", example = "true")
     private Boolean isVisible;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Schema(description = "Descriptions for the Basket")
-    private List<Description> descriptions;
 
 }
