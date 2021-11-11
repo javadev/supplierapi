@@ -299,4 +299,28 @@ public class BasketController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Delete one sellable unit from basket."
+    )
+    @DeleteMapping("/sellable-units/remove/{basketId}/{sellableUnitId}")
+    public ResponseEntity<Void> deleteSellableUnitFromBasket(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal basket Id. Required.")
+            @Min(1)
+                    Integer basketId,
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal Sellable Unit Id. Required.")
+            @Min(1)
+                    Integer sellableUnitId,
+            HttpServletRequest req
+    ) {
+        validateBasketAccess(basketId, req);
+
+        basketManager.deleteSellableUnitFromBasket(basketId, sellableUnitId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

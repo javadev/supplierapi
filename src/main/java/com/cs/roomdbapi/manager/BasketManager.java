@@ -32,4 +32,6 @@ public interface BasketManager {
 
     List<Basket> getBasketsBySellableUnitId(Integer sellableUnitId);
 
+    void deleteSellableUnitFromBasket(Integer basketId, Integer sellableUnitId);
+
 }

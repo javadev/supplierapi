@@ -217,4 +217,13 @@ public class BasketManagerImpl implements BasketManager {
         return BasketMapper.MAPPER.toListDTO(all);
     }
 
+    @Override
+    public void deleteSellableUnitFromBasket(Integer basketId, Integer sellableUnitId) {
+        BasketSellableUnitEntity entity = basketSellableUnitRepository.findTopByBasketIdAndSellableUnit_Id(basketId, sellableUnitId)
+                .orElseThrow(() -> new BadRequestException(String.format("Sellable Unit with id '%s' is not included in basket with id '%s'",
+                        sellableUnitId, basketId)));
+
+        basketSellableUnitRepository.delete(entity);
+    }
+
 }
