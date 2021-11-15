@@ -580,11 +580,12 @@ public class PropertyManagerImpl implements PropertyManager {
                     PhoneTypeEntity phoneTypeEntity = phoneTypeRepository.findById(phone.getPhoneTypeId())
                             .orElseThrow(() -> new ResourceNotFoundException(PHONE_TYPE, ID, phone.getPhoneTypeId()));
                     entity.setPhoneType(phoneTypeEntity);
+                } else {
+                    entity.setPhoneType(null);
                 }
 
-                if (phone.getExtension() != null) {
-                    entity.setExtension(phone.getExtension());
-                }
+                entity.setExtension(phone.getExtension());
+                entity.setIsValidated(phone.getIsValidated());
 
                 phoneEntities.add(entity);
             }
