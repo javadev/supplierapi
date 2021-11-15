@@ -57,6 +57,8 @@ public class AppUtils {
 
     public static final String EMAIL_TYPE = "Email type";
 
+    public static final String PRICING_MODEL_TYPE = "Pricing model type";
+
     public static final String STATE = "State";
 
     public static final String COUNTRY = "Country";
