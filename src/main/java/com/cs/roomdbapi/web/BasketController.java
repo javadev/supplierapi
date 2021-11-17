@@ -105,8 +105,13 @@ public class BasketController {
     public ResponseEntity<Basket> addBasket(
             @Valid
             @RequestBody
-                    Basket basket
+                    Basket basket,
+            HttpServletRequest req
     ) {
+        Integer propertyId = basket.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
         Basket added = basketManager.addBasket(basket);
 
         return new ResponseEntity<>(added, HttpStatus.CREATED);
@@ -124,8 +129,11 @@ public class BasketController {
                     Integer id,
             @Valid
             @RequestBody
-                    BasketUpdate basket
+                    BasketUpdate basket,
+            HttpServletRequest req
     ) {
+        validateBasketAccess(id, req);
+
         Basket updatedLang = basketManager.updateBasket(id, basket);
 
         return ResponseEntity.ok(updatedLang);
