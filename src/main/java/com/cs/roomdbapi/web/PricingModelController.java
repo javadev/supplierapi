@@ -1,7 +1,9 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.PricingModelType;
+import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.manager.PricingModelManager;
+import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -31,6 +34,10 @@ import java.util.List;
 public class PricingModelController {
 
     private final PricingModelManager pricingModelManager;
+
+    private final PropertyManager propertyManager;
+
+    private final ValidationManager validationManager;
 
     @Operation(
             summary = "Get list of all pricing model types.",
@@ -56,6 +63,25 @@ public class PricingModelController {
     ) {
 
         return new ResponseEntity<>(pricingModelManager.getPricingModelTypeById(id), HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Add pricing model."
+    )
+    @PostMapping({"/"})
+    public ResponseEntity<PricingModel> addPricingModel(
+            @Valid
+            @RequestBody
+                    PricingModelSaveRequest request,
+            HttpServletRequest req
+    ) {
+        Integer propertyId = request.getPropertyId();
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        PricingModel pricingModel = pricingModelManager.addPricingModel(request);
+
+        return new ResponseEntity<>(pricingModel, HttpStatus.CREATED);
     }
 
 }

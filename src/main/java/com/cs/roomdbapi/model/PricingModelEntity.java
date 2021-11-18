@@ -21,6 +21,11 @@ public class PricingModelEntity {
     private Integer id;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_id")
+    private PropertyEntity property;
+
+    @NotNull
     @Column
     private String name;
 

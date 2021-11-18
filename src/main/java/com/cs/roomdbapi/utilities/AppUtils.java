@@ -128,4 +128,13 @@ public class AppUtils {
     public static final String ROOM_DB_IDENTIFIER_SOURCE_ABBR = "rdb";
 
     public static final String CULT_SWITCH_IDENTIFIER_SOURCE_ABBR = "cs";
+
+    public static final String PRICING_MODEL_CODE_STD = "std"; // Standard pricing model
+
+    public static final String PRICING_MODEL_CODE_DRV = "drv"; // Derived pricing model
+
+    public static final String PRICING_MODEL_CODE_OCC = "occ"; // Occupancy based pricing model
+
+    public static final String PRICING_MODEL_CODE_LEN = "len"; // Length of stay pricing model
+
 }
