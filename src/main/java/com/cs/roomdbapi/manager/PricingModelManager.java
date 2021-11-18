@@ -12,4 +12,14 @@ public interface PricingModelManager {
 
     PricingModel addPricingModel(PricingModelSaveRequest request);
 
+    List<PricingModel> getAllPricingModelsByPropertyId(Integer propertyId);
+
+    PricingModel getPricingModelById(Integer id);
+
+    boolean pricingModelNotExistsById(Integer pricingModelId);
+
+    Integer getPropertyIdByPricingModelId(Integer pricingModelId);
+
+    void deletePricingModel(Integer id);
+
 }

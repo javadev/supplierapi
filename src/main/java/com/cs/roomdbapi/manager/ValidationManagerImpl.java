@@ -18,6 +18,8 @@ public class ValidationManagerImpl implements ValidationManager {
 
     private final SellableUnitManager sellableUnitManager;
 
+    private final PricingModelManager pricingModelManager;
+
     private final PropertyManager propertyManager;
 
     @Override
@@ -27,6 +29,18 @@ public class ValidationManagerImpl implements ValidationManager {
         }
 
         Integer propertyId = sellableUnitManager.getPropertyIdBySellableUnitId(sellableUnitId);
+
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validatePropertyAccess(req, supplier, propertyId);
+    }
+
+    @Override
+    public void validatePricingModelAccess(Integer pricingModelId, HttpServletRequest req) {
+        if (pricingModelManager.pricingModelNotExistsById(pricingModelId)) {
+            throw new BadRequestException("Pricing Model with provided id does not exists in a system.");
+        }
+
+        Integer propertyId = pricingModelManager.getPropertyIdByPricingModelId(pricingModelId);
 
         Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
         validatePropertyAccess(req, supplier, propertyId);

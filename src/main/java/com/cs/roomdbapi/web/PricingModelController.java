@@ -84,4 +84,61 @@ public class PricingModelController {
         return new ResponseEntity<>(pricingModel, HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Get list of all pricing models, by property id.",
+            description = "All fields of the pricing model will be included in result."
+    )
+    @GetMapping({"/by-property/{propertyId}"})
+    public ResponseEntity<List<PricingModel>> getAllPricingModels(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal property Id. Required.")
+            @Min(1000000)
+                    Integer propertyId,
+            HttpServletRequest req
+    ) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
+        validationManager.validatePropertyAccess(req, supplier, propertyId);
+
+        List<PricingModel> all = pricingModelManager.getAllPricingModelsByPropertyId(propertyId);
+
+        return new ResponseEntity<>(all, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Get pricing model data by id."
+    )
+    @GetMapping({"/{id}"})
+    public ResponseEntity<PricingModel> getPricingModel(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal Pricing Model Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        validationManager.validatePricingModelAccess(id, req);
+
+        return new ResponseEntity<>(pricingModelManager.getPricingModelById(id), HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Delete pricing model by id."
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePricingModel(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal pricing model Id. Required.")
+            @Min(1)
+                    Integer id,
+            HttpServletRequest req
+    ) {
+        validationManager.validatePricingModelAccess(id, req);
+
+        pricingModelManager.deletePricingModel(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

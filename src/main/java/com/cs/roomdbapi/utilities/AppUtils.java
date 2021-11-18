@@ -57,7 +57,17 @@ public class AppUtils {
 
     public static final String EMAIL_TYPE = "Email type";
 
+    public static final String PRICING_MODEL = "Pricing model";
+
     public static final String PRICING_MODEL_TYPE = "Pricing model type";
+
+    public static final String PRICING_MODEL_STANDARD = "Standard pricing model";
+
+    public static final String PRICING_MODEL_DERIVED = "Derived pricing model";
+
+    public static final String PRICING_MODEL_OCCUPANCY_BASED = "Occupancy based pricing model";
+    
+    public static final String PRICING_MODEL_LENGTH_OF_STAY = "Length of stay pricing model";
 
     public static final String STATE = "State";
 

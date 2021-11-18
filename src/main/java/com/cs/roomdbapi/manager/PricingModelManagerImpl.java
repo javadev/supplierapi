@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.cs.roomdbapi.utilities.AppUtils.*;
@@ -156,6 +157,110 @@ public class PricingModelManagerImpl implements PricingModelManager {
         }
 
         return result;
+    }
+
+    @Override
+    @Transactional
+    public List<PricingModel> getAllPricingModelsByPropertyId(Integer propertyId) {
+        List<PricingModelEntity> all = pricingModelRepository.findAllByProperty_Id(propertyId);
+        List<PricingModel> result = new ArrayList<>();
+
+        for (PricingModelEntity entity : all) {
+            PricingModel record = getPricingModel(entity);
+            result.add(record);
+        }
+
+        return result;
+    }
+
+    private PricingModel getPricingModel(PricingModelEntity entity) {
+        PricingModel record = PricingModelMapper.MAPPER.toDTO(entity);
+
+        final Integer recordId = entity.getRecordId();
+        if (entity.getPricingModelType() != null && recordId != null) {
+            switch (entity.getPricingModelType().getCode()) {
+                case PRICING_MODEL_CODE_STD: // get and map Standard pricing model
+                    StandardPricingModelEntity spmEntity = standardPricingModelRepository.findById(recordId)
+                            .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL_STANDARD, ID, recordId));
+
+                    record.setStandardPricingModel(StandardPricingModelMapper.MAPPER.toDTO(spmEntity));
+
+                    break;
+                case PRICING_MODEL_CODE_DRV: // get and map Derived pricing model
+                    DerivedPricingModelEntity dpmEntity = derivedPricingModelRepository.findById(recordId)
+                            .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL_DERIVED, ID, recordId));
+
+                    record.setDerivedPricingModel(DerivedPricingModelMapper.MAPPER.toDTO(dpmEntity));
+
+                    break;
+                case PRICING_MODEL_CODE_OCC: // get and map Occupancy based pricing model
+                    OccupancyBasedPricingModelEntity obPmEntity = occupancyBasedPricingModelRepository.findById(recordId)
+                            .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL_OCCUPANCY_BASED, ID, recordId));
+
+                    record.setOccupancyBasedPricingModel(OccupancyBasedPricingModelMapper.MAPPER.toDTO(obPmEntity));
+
+                    break;
+                case PRICING_MODEL_CODE_LEN: // get and map Length of stay pricing model
+                    LengthOfStayPricingModelEntity losPmEntity = lengthOfStayPricingModelRepository.findById(recordId)
+                            .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL_LENGTH_OF_STAY, ID, recordId));
+
+                    record.setLengthOfStayPricingModel(LengthOfStayPricingModelMapper.MAPPER.toDTO(losPmEntity));
+
+                    break;
+            }
+        }
+        return record;
+    }
+
+    @Override
+    public PricingModel getPricingModelById(Integer id) {
+        PricingModelEntity entity = pricingModelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL, ID, id));
+
+        return getPricingModel(entity);
+    }
+
+    @Override
+    public boolean pricingModelNotExistsById(Integer pricingModelId) {
+        return !pricingModelRepository.existsById(pricingModelId);
+    }
+
+    @Override
+    public Integer getPropertyIdByPricingModelId(Integer pricingModelId) {
+        return pricingModelRepository.getPropertyIdByPricingModelId(pricingModelId);
+    }
+
+    @Override
+    @Transactional
+    public void deletePricingModel(Integer id) {
+        PricingModelEntity entity = pricingModelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL, ID, id));
+
+        // TODO check that this pricing model is not used in any product. Else - error
+        
+        final Integer recordId = entity.getRecordId();
+        if (entity.getPricingModelType() != null && recordId != null) {
+            switch (entity.getPricingModelType().getCode()) {
+                case PRICING_MODEL_CODE_STD: // delete Standard pricing model
+                    standardPricingModelRepository.deleteById(recordId);
+
+                    break;
+                case PRICING_MODEL_CODE_DRV: // delete Derived pricing model
+                    derivedPricingModelRepository.deleteById(recordId);
+
+                    break;
+                case PRICING_MODEL_CODE_OCC: // delete Occupancy based pricing model
+                    occupancyBasedPricingModelRepository.deleteById(recordId);
+
+                    break;
+                case PRICING_MODEL_CODE_LEN: // delete Length of stay pricing model
+                    lengthOfStayPricingModelRepository.deleteById(recordId);
+
+                    break;
+            }
+        }
+
+        pricingModelRepository.delete(entity);
     }
 
 }
