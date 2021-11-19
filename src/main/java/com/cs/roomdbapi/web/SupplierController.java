@@ -164,7 +164,7 @@ public class SupplierController {
     }
 
     // comment '@Hidden' annotation if you want to use this endpoint in Swagger
-    @Hidden
+//    @Hidden
     @Operation(
             summary = "Helper method to get encoded password for a provided password"
     )
