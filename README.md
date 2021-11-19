@@ -3,7 +3,8 @@
 ###### APIs project to access RoomDB.
 
 For API calls should be used **https** only. <br/>
-https://api.supplier.roomdb.io
+~~https://api.supplier.roomdb.io~~  <br/>
+https://lb02.loadbalancer-roomdb.io
 
 Calls to http will be returned with Forbidden message by Nginx.
 
@@ -19,15 +20,20 @@ IPv6	2a01:4f8:c010:69cb::/64
 
 **DNS records**: <br/>
 db.roomdb.io A 162.55.164.107 <br/>
-api.supplier.roomdb.io A 116.202.15.234
+~~api.supplier.roomdb.io A 116.202.15.234~~  <br/>
+
+node01.api.supplier.roomdb.io A 157.90.255.180 <br/>
+node02.api.supplier.roomdb.io A 168.119.103.250 <br/>
 
 ## Documentation
 
 Swagger is available here: <br/>
-https://doc.supplier.roomdb.io/swagger
+~~https://doc.supplier.roomdb.io/swagger~~ <br/>
+https://lb02.loadbalancer-roomdb.io/swagger 
 
 ReDoc here: <br/>
-https://doc.supplier.roomdb.io/redoc
+~~https://doc.supplier.roomdb.io/redoc~~ <br/>
+https://lb02.loadbalancer-roomdb.io/redoc 
 
 ## Security
 JWT tokens are used. <br/>
