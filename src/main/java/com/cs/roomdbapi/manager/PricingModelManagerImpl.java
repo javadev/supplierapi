@@ -82,52 +82,28 @@ public class PricingModelManagerImpl implements PricingModelManager {
 
         switch (pmTypeEntity.getCode()) {
             case PRICING_MODEL_CODE_STD: // Process Standard pricing model
-                standardPricingModel = request.getStandardPricingModel();
-                if (standardPricingModel == null) {
-                    throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
-                }
-
-                StandardPricingModelEntity spmEntity = StandardPricingModelMapper.MAPPER.toEntity(standardPricingModel);
-                spmEntity = standardPricingModelRepository.save(spmEntity);
+                StandardPricingModelEntity spmEntity = getStandardPricingModelEntity(request.getStandardPricingModel());
                 recordId = spmEntity.getId();
 
                 standardPricingModel = StandardPricingModelMapper.MAPPER.toDTO(spmEntity);
 
                 break;
             case PRICING_MODEL_CODE_DRV: // Process Derived pricing model
-                derivedPricingModel = request.getDerivedPricingModel();
-                if (derivedPricingModel == null) {
-                    throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
-                }
-
-                DerivedPricingModelEntity dpmEntity = DerivedPricingModelMapper.MAPPER.toEntity(derivedPricingModel);
-                dpmEntity = derivedPricingModelRepository.save(dpmEntity);
+                DerivedPricingModelEntity dpmEntity = getDerivedPricingModelEntity(request.getDerivedPricingModel());
                 recordId = dpmEntity.getId();
 
                 derivedPricingModel = DerivedPricingModelMapper.MAPPER.toDTO(dpmEntity);
 
                 break;
             case PRICING_MODEL_CODE_OCC: // Process Occupancy based pricing model
-                occupancyBasedPricingModel = request.getOccupancyBasedPricingModel();
-                if (occupancyBasedPricingModel == null) {
-                    throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
-                }
-
-                OccupancyBasedPricingModelEntity obPmEntity = OccupancyBasedPricingModelMapper.MAPPER.toEntity(occupancyBasedPricingModel);
-                obPmEntity = occupancyBasedPricingModelRepository.save(obPmEntity);
+                OccupancyBasedPricingModelEntity obPmEntity = getOccupancyBasedPricingModelEntity(request.getOccupancyBasedPricingModel());
                 recordId = obPmEntity.getId();
 
                 occupancyBasedPricingModel = OccupancyBasedPricingModelMapper.MAPPER.toDTO(obPmEntity);
 
                 break;
             case PRICING_MODEL_CODE_LEN: // Process Length of stay pricing model
-                lengthOfStayPricingModel = request.getLengthOfStayPricingModel();
-                if (lengthOfStayPricingModel == null) {
-                    throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
-                }
-
-                LengthOfStayPricingModelEntity losPmEntity = LengthOfStayPricingModelMapper.MAPPER.toEntity(lengthOfStayPricingModel);
-                losPmEntity = lengthOfStayPricingModelRepository.save(losPmEntity);
+                LengthOfStayPricingModelEntity losPmEntity = getLengthOfStayPricingModelEntity(request.getLengthOfStayPricingModel());
                 recordId = losPmEntity.getId();
 
                 lengthOfStayPricingModel = LengthOfStayPricingModelMapper.MAPPER.toDTO(losPmEntity);
@@ -143,20 +119,52 @@ public class PricingModelManagerImpl implements PricingModelManager {
         PricingModelEntity save = pricingModelRepository.save(entity);
 
         PricingModel result = PricingModelMapper.MAPPER.toDTO(save);
-        if (standardPricingModel != null) {
-            result.setStandardPricingModel(standardPricingModel);
-        }
-        if (derivedPricingModel != null) {
-            result.setDerivedPricingModel(derivedPricingModel);
-        }
-        if (occupancyBasedPricingModel != null) {
-            result.setOccupancyBasedPricingModel(occupancyBasedPricingModel);
-        }
-        if (lengthOfStayPricingModel != null) {
-            result.setLengthOfStayPricingModel(lengthOfStayPricingModel);
-        }
+        result.setStandardPricingModel(standardPricingModel);
+        result.setDerivedPricingModel(derivedPricingModel);
+        result.setOccupancyBasedPricingModel(occupancyBasedPricingModel);
+        result.setLengthOfStayPricingModel(lengthOfStayPricingModel);
 
         return result;
+    }
+
+    private LengthOfStayPricingModelEntity getLengthOfStayPricingModelEntity(LengthOfStayPricingModel lengthOfStayPricingModel) {
+        if (lengthOfStayPricingModel == null) {
+            throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
+        }
+
+        LengthOfStayPricingModelEntity losPmEntity = LengthOfStayPricingModelMapper.MAPPER.toEntity(lengthOfStayPricingModel);
+        losPmEntity = lengthOfStayPricingModelRepository.save(losPmEntity);
+        return losPmEntity;
+    }
+
+    private OccupancyBasedPricingModelEntity getOccupancyBasedPricingModelEntity(OccupancyBasedPricingModel occupancyBasedPricingModel) {
+        if (occupancyBasedPricingModel == null) {
+            throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
+        }
+
+        OccupancyBasedPricingModelEntity obPmEntity = OccupancyBasedPricingModelMapper.MAPPER.toEntity(occupancyBasedPricingModel);
+        obPmEntity = occupancyBasedPricingModelRepository.save(obPmEntity);
+        return obPmEntity;
+    }
+
+    private DerivedPricingModelEntity getDerivedPricingModelEntity(DerivedPricingModel derivedPricingModel) {
+        if (derivedPricingModel == null) {
+            throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
+        }
+
+        DerivedPricingModelEntity dpmEntity = DerivedPricingModelMapper.MAPPER.toEntity(derivedPricingModel);
+        dpmEntity = derivedPricingModelRepository.save(dpmEntity);
+        return dpmEntity;
+    }
+
+    private StandardPricingModelEntity getStandardPricingModelEntity(StandardPricingModel standardPricingModel) {
+        if (standardPricingModel == null) {
+            throw new BadRequestException("Pricing model should not be blank for provided pricing model type.");
+        }
+
+        StandardPricingModelEntity spmEntity = StandardPricingModelMapper.MAPPER.toEntity(standardPricingModel);
+        spmEntity = standardPricingModelRepository.save(spmEntity);
+        return spmEntity;
     }
 
     @Override
@@ -240,27 +248,119 @@ public class PricingModelManagerImpl implements PricingModelManager {
         
         final Integer recordId = entity.getRecordId();
         if (entity.getPricingModelType() != null && recordId != null) {
-            switch (entity.getPricingModelType().getCode()) {
-                case PRICING_MODEL_CODE_STD: // delete Standard pricing model
-                    standardPricingModelRepository.deleteById(recordId);
-
-                    break;
-                case PRICING_MODEL_CODE_DRV: // delete Derived pricing model
-                    derivedPricingModelRepository.deleteById(recordId);
-
-                    break;
-                case PRICING_MODEL_CODE_OCC: // delete Occupancy based pricing model
-                    occupancyBasedPricingModelRepository.deleteById(recordId);
-
-                    break;
-                case PRICING_MODEL_CODE_LEN: // delete Length of stay pricing model
-                    lengthOfStayPricingModelRepository.deleteById(recordId);
-
-                    break;
-            }
+            deletePricingModelExactType(entity.getPricingModelType().getCode(), recordId);
         }
 
         pricingModelRepository.delete(entity);
+    }
+
+    private void deletePricingModelExactType(String pricingModelTypeCode, Integer recordId) {
+        switch (pricingModelTypeCode) {
+            case PRICING_MODEL_CODE_STD: // delete Standard pricing model
+                standardPricingModelRepository.deleteById(recordId);
+
+                break;
+            case PRICING_MODEL_CODE_DRV: // delete Derived pricing model
+                derivedPricingModelRepository.deleteById(recordId);
+
+                break;
+            case PRICING_MODEL_CODE_OCC: // delete Occupancy based pricing model
+                occupancyBasedPricingModelRepository.deleteById(recordId);
+
+                break;
+            case PRICING_MODEL_CODE_LEN: // delete Length of stay pricing model
+                lengthOfStayPricingModelRepository.deleteById(recordId);
+
+                break;
+        }
+    }
+
+    @Override
+    public PricingModel updatePricingModel(Integer id, PricingModelUpdateRequest request) {
+        PricingModelEntity entity = pricingModelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL, ID, id));
+
+        // Update name
+        if (request.getName() != null && !entity.getName().equals(request.getName())) {
+            if (pricingModelRepository.existsByProperty_IdAndName(entity.getProperty().getId(), request.getName())) {
+                throw new BadRequestException(String.format("Pricing Model with name '%s' already exists for property with id '%s'",
+                        request.getName(), entity.getProperty().getId()));
+            } else {
+                entity.setName(request.getName());
+            }
+        }
+
+        // Update Pricing Model Type
+        PricingModelTypeEntity pmTypeEntity;
+        String pricingModelTypeCodeForRemove = entity.getPricingModelType().getCode();
+        if (request.getPricingModelTypeId() != null && !entity.getPricingModelType().getId().equals(request.getPricingModelTypeId())) {
+            pmTypeEntity = pricingModelTypeRepository.findById(request.getPricingModelTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException(PRICING_MODEL_TYPE, ID, request.getPricingModelTypeId()));
+            entity.setPricingModelType(pmTypeEntity);
+        } else {
+            pmTypeEntity = entity.getPricingModelType();
+        }
+
+        StandardPricingModel standardPricingModel = null;
+        DerivedPricingModel derivedPricingModel = null;
+        OccupancyBasedPricingModel occupancyBasedPricingModel = null;
+        LengthOfStayPricingModel lengthOfStayPricingModel = null;
+
+        if (request.getStandardPricingModel() != null || request.getDerivedPricingModel() != null
+                || request.getOccupancyBasedPricingModel() != null || request.getLengthOfStayPricingModel() != null) {
+
+            // Remove old model
+            Integer recordId = entity.getRecordId();
+            deletePricingModelExactType(pricingModelTypeCodeForRemove, recordId);
+
+            // Create new model
+            switch (pmTypeEntity.getCode()) {
+                case PRICING_MODEL_CODE_STD: // Process Standard pricing model
+                    StandardPricingModelEntity spmEntity = getStandardPricingModelEntity(request.getStandardPricingModel());
+                    recordId = spmEntity.getId();
+
+                    standardPricingModel = StandardPricingModelMapper.MAPPER.toDTO(spmEntity);
+
+                    break;
+                case PRICING_MODEL_CODE_DRV: // Process Derived pricing model
+                    DerivedPricingModelEntity dpmEntity = getDerivedPricingModelEntity(request.getDerivedPricingModel());
+                    recordId = dpmEntity.getId();
+
+                    derivedPricingModel = DerivedPricingModelMapper.MAPPER.toDTO(dpmEntity);
+
+                    break;
+                case PRICING_MODEL_CODE_OCC: // Process Occupancy based pricing model
+                    OccupancyBasedPricingModelEntity obPmEntity = getOccupancyBasedPricingModelEntity(request.getOccupancyBasedPricingModel());
+                    recordId = obPmEntity.getId();
+
+                    occupancyBasedPricingModel = OccupancyBasedPricingModelMapper.MAPPER.toDTO(obPmEntity);
+
+                    break;
+                case PRICING_MODEL_CODE_LEN: // Process Length of stay pricing model
+                    LengthOfStayPricingModelEntity losPmEntity = getLengthOfStayPricingModelEntity(request.getLengthOfStayPricingModel());
+                    recordId = losPmEntity.getId();
+
+                    lengthOfStayPricingModel = LengthOfStayPricingModelMapper.MAPPER.toDTO(losPmEntity);
+
+                    break;
+            }
+
+            if (recordId == null) {
+                throw new CustomException("Error while saving Pricing Model.", HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+
+            entity.setRecordId(recordId);
+        }
+
+        PricingModelEntity save = pricingModelRepository.save(entity);
+
+        PricingModel result = PricingModelMapper.MAPPER.toDTO(save);
+        result.setStandardPricingModel(standardPricingModel);
+        result.setDerivedPricingModel(derivedPricingModel);
+        result.setOccupancyBasedPricingModel(occupancyBasedPricingModel);
+        result.setLengthOfStayPricingModel(lengthOfStayPricingModel);
+
+        return result;
     }
 
 }

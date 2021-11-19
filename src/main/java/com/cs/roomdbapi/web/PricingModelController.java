@@ -141,4 +141,26 @@ public class PricingModelController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Update pricing model."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<PricingModel> updatePricingModel(
+            @Valid
+            @PathVariable
+            @Parameter(description = "RoomDB internal pricing model Id. Required.")
+            @Min(1)
+                    Integer id,
+            @Valid
+            @RequestBody
+                    PricingModelUpdateRequest request,
+            HttpServletRequest req
+    ) {
+        validationManager.validatePricingModelAccess(id, req);
+
+        PricingModel result = pricingModelManager.updatePricingModel(id, request);
+
+        return ResponseEntity.ok(result);
+    }
+
 }

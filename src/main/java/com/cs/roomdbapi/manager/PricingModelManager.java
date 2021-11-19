@@ -22,4 +22,6 @@ public interface PricingModelManager {
 
     void deletePricingModel(Integer id);
 
+    PricingModel updatePricingModel(Integer id, PricingModelUpdateRequest basket);
+
 }

@@ -99,7 +99,6 @@ public class BasketManagerImpl implements BasketManager {
         return BasketMapper.MAPPER.toDTO(save);
     }
 
-
     @Override
     @Transactional
     public void deleteBasket(Integer id) {
