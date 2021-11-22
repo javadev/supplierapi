@@ -147,7 +147,11 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
             MethodArgumentTypeMismatchException.class
     })
     public void handleConstraintViolationException(HttpServletResponse res, Exception ex) throws IOException {
-        log.error("ConstraintViolationException: ", ex);
+        if (ex.getMessage().contains("must be greater")) {
+            log.error("ConstraintViolationException: {}", ex.getMessage());
+        } else {
+            log.error("ConstraintViolationException: ", ex);
+        }
 
         res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
