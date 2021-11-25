@@ -15,10 +15,10 @@ import java.util.Optional;
 public interface PropertyRepository extends JpaRepository<PropertyEntity, Integer> {
 
     @Transactional(readOnly = true)
-    Optional<PropertyEntity> findBySupplierPropertyId(@NotBlank String id);
+    Optional<PropertyEntity> findByCultSwitchId(@NotBlank String id);
 
     @Transactional(readOnly = true)
-    Boolean existsBySupplierPropertyId(@NotBlank String id);
+    Boolean existsByCultSwitchId(@NotBlank String id);
 
     @Transactional(readOnly = true)
     List<PropertyEntity> findAllBySupplierIs(SupplierEntity s);

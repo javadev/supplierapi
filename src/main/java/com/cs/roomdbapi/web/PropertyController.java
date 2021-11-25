@@ -114,22 +114,22 @@ public class PropertyController {
     }
 
     @Operation(
-            summary = "Get property data by supplier property id.",
+            summary = "Get property data by CultSwitch id.",
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/supplier-property-id/{id}"})
-    public ResponseEntity<Property> getPropertyBySupplierPropertyId(
+    public ResponseEntity<Property> getPropertyByCultSwitchId(
             @Valid
             @PathVariable
-            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Parameter(description = "CultSwitch id - property id that is used in CultSwitch. Also known as ObjectId. Required.")
             @Size(min = 1, max = 255)
                     String id,
             HttpServletRequest req
     ) {
-        Property property = propertyManager.getPropertyBySupplierPropertyId(id);
+        Property property = propertyManager.getPropertyByCultSwitchId(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
         return new ResponseEntity<>(property, HttpStatus.OK);
@@ -160,22 +160,22 @@ public class PropertyController {
     }
 
     @Operation(
-            summary = "Get property isMaster data by supplier property id.",
+            summary = "Get property isMaster data by CultSwitch id.",
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master/supplier-property-id/{id}"})
-    public ResponseEntity<Property> isMasterPropertyBySupplierPropertyId(
+    public ResponseEntity<Property> isMasterPropertyByCultSwitchId(
             @Valid
             @PathVariable
-            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Parameter(description = "CultSwitch id - property id that is used in CultSwitch. Also known as ObjectId. Required.")
             @Size(min = 1, max = 255)
                     String id,
             HttpServletRequest req
     ) {
-        Property property = propertyManager.getPropertyIsMasterBySupplierPropertyId(id);
+        Property property = propertyManager.getPropertyIsMasterByCultSwitchId(id);
         validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
         property.setSupplier(null); // unset, is was needed only for validation
@@ -195,7 +195,7 @@ public class PropertyController {
     public ResponseEntity<List<Property>> getPropertyByCode(
             @Valid
             @PathVariable
-            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Parameter(description = "Properties code. Required.")
             @Size(min = 1, max = 255)
                     String code,
             HttpServletRequest req
@@ -207,22 +207,22 @@ public class PropertyController {
     }
 
     @Operation(
-            summary = "Get or create property by supplier property id.",
+            summary = "Get or create property by CultSwitch id.",
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
             "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/supplier-property-id/get-or-create/{id}"})
-    public ResponseEntity<Property> getOrCreatePropertyBySupplierPropertyId(
+    public ResponseEntity<Property> getOrCreatePropertyByCultSwitchId(
             @Valid
             @PathVariable
-            @Parameter(description = "Supplier property id - property id that is used on supplier side. Required.")
+            @Parameter(description = "CultSwitch id - property id that is used in CultSwitch. Also known as ObjectId. Required.")
             @Size(min = 1, max = 255)
                     String id,
             HttpServletRequest req
     ) {
-        Property property = propertyManager.getOrCreatePropertyBySupplierPropertyId(id, req.getRemoteUser());
+        Property property = propertyManager.getOrCreatePropertyByCultSwitchId(id, req.getRemoteUser());
         validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
 
         return new ResponseEntity<>(property, HttpStatus.OK);

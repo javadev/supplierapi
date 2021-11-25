@@ -104,7 +104,7 @@ public class AppUtils {
 
     public static final String PROPERTY_ID = "propertyId";
 
-    public static final String SUPPLIER_PROPERTY_ID = "SupplierPropertyId";
+    public static final String CULTSWITCH_ID = "CultSwitchId";
 
     public static final String SUPPLIER_UNIT_ID = "SupplierUnitId";
 

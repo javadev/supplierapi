@@ -120,17 +120,17 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
-    public Property getPropertyBySupplierPropertyId(String id) {
-        PropertyEntity entity = propertyRepository.findBySupplierPropertyId(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, SUPPLIER_PROPERTY_ID, id));
+    public Property getPropertyByCultSwitchId(String id) {
+        PropertyEntity entity = propertyRepository.findByCultSwitchId(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, CULTSWITCH_ID, id));
 
         return PropertyMapper.MAPPER.toDTO(entity);
     }
 
     @Override
-    public Property getPropertyIsMasterBySupplierPropertyId(String id) {
-        PropertyEntity entity = propertyRepository.findBySupplierPropertyId(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, SUPPLIER_PROPERTY_ID, id));
+    public Property getPropertyIsMasterByCultSwitchId(String id) {
+        PropertyEntity entity = propertyRepository.findByCultSwitchId(id)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, CULTSWITCH_ID, id));
 
         return PropertyMapper.MAPPER.toDTOIsMaster(entity);
     }
@@ -144,8 +144,8 @@ public class PropertyManagerImpl implements PropertyManager {
 
     @Override
     @Transactional
-    public Property getOrCreatePropertyBySupplierPropertyId(String id, String supplierName) {
-        Optional<PropertyEntity> optional = propertyRepository.findBySupplierPropertyId(id);
+    public Property getOrCreatePropertyByCultSwitchId(String csId, String supplierName) {
+        Optional<PropertyEntity> optional = propertyRepository.findByCultSwitchId(csId);
 
         PropertyEntity entity;
         if (optional.isPresent()) {
@@ -155,7 +155,7 @@ public class PropertyManagerImpl implements PropertyManager {
                     .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
 
             entity = new PropertyEntity();
-            entity.setSupplierPropertyId(id);
+            entity.setCultSwitchId(csId);
             entity.setSupplier(supplier);
 
             PropertyEntity save = propertyRepository.save(entity);
@@ -168,8 +168,8 @@ public class PropertyManagerImpl implements PropertyManager {
     @Override
     @Transactional
     public Property addProperty(PropertySaveRequest property, String supplierName) {
-        if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
-            throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
+        if (propertyRepository.existsByCultSwitchId(property.getCultSwitchId())) {
+            throw new BadRequestException(String.format("Property with '%s' CultSwitch Id already exists", property.getCultSwitchId()), property);
         }
 
         SupplierEntity supplier = supplierRepository.findByName(supplierName)
@@ -199,10 +199,10 @@ public class PropertyManagerImpl implements PropertyManager {
         PropertyEntity entity = propertyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, id));
 
-        if (property.getSupplierPropertyId() != null) {
-            if (!property.getSupplierPropertyId().equals(entity.getSupplierPropertyId())) {
-                if (propertyRepository.existsBySupplierPropertyId(property.getSupplierPropertyId())) {
-                    throw new BadRequestException(String.format("Property with '%s' Supplier Property Id already exists", property.getSupplierPropertyId()), property);
+        if (property.getCultSwitchId() != null) {
+            if (!property.getCultSwitchId().equals(entity.getCultSwitchId())) {
+                if (propertyRepository.existsByCultSwitchId(property.getCultSwitchId())) {
+                    throw new BadRequestException(String.format("Property with '%s' CultSwitch Id already exists", property.getCultSwitchId()), property);
                 }
             }
         }
@@ -210,7 +210,7 @@ public class PropertyManagerImpl implements PropertyManager {
         CurrencyEntity currencyEntity = getCurrencyEntity(property.getHomeCurrencyId(), property.getHomeCurrencyCode());
 
         entity.setHomeCurrency(currencyEntity);
-        entity.setSupplierPropertyId(property.getSupplierPropertyId());
+        entity.setCultSwitchId(property.getCultSwitchId());
         entity.setCode(property.getCode());
         entity.setName(property.getName());
         entity.setAlternativeName(property.getAlternativeName());
@@ -648,10 +648,10 @@ public class PropertyManagerImpl implements PropertyManager {
 
         all.add(roomDBId);
 
-        if (propertyEntity.getSupplierPropertyId() != null) {
+        if (propertyEntity.getCultSwitchId() != null) {
             // Add CultSwitch Id in result
             PropertyIdentifierEntity cultSwitchId = new PropertyIdentifierEntity();
-            cultSwitchId.setIdentifier(propertyEntity.getSupplierPropertyId());
+            cultSwitchId.setIdentifier(propertyEntity.getCultSwitchId());
             cultSwitchId.setPropertyId(propertyEntity.getId());
             cultSwitchId.setSource(csSourceEntity);
 
@@ -691,11 +691,11 @@ public class PropertyManagerImpl implements PropertyManager {
                 PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
                         .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
 
-                propertyEntity.setSupplierPropertyId(identifier.getIdentifier());
+                propertyEntity.setCultSwitchId(identifier.getIdentifier());
                 propertyRepository.save(propertyEntity);
 
                 cultSwitchId = new PropertyIdentifierEntity();
-                cultSwitchId.setIdentifier(propertyEntity.getSupplierPropertyId());
+                cultSwitchId.setIdentifier(propertyEntity.getCultSwitchId());
                 cultSwitchId.setPropertyId(propertyEntity.getId());
                 cultSwitchId.setSource(csSourceEntity);
 
@@ -753,7 +753,7 @@ public class PropertyManagerImpl implements PropertyManager {
             PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
                     .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
 
-            propertyEntity.setSupplierPropertyId(null);
+            propertyEntity.setCultSwitchId(null);
             propertyRepository.save(propertyEntity);
         } else {
             PropertyIdentifierEntity entity = propertyIdentifierRepository.findByPropertyIdAndSource(propertyId, sourceEntity)

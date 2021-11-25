@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -23,8 +22,8 @@ public class PropertySaveRequest {
 
     @JsonProperty
     @Size(min = 1, max = 255)
-    @Schema(description = "Property id that is used in supplier system", example = "1232")
-    private String supplierPropertyId;
+    @Schema(description = "CultSwitch id - property id that is used in CultSwitch. Also known as ObjectId.", example = "1232")
+    private String cultSwitchId;
 
     @JsonProperty
     @Size(min = 1, max = 255)

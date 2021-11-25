@@ -20,13 +20,13 @@ public interface PropertyManager {
 
     Supplier getSupplierByPropertyId(Integer propertyId);
 
-    Property getPropertyBySupplierPropertyId(String id);
+    Property getPropertyByCultSwitchId(String id);
 
-    Property getPropertyIsMasterBySupplierPropertyId(String id);
+    Property getPropertyIsMasterByCultSwitchId(String id);
 
     List<Property> getPropertiesByCode(String code);
 
-    Property getOrCreatePropertyBySupplierPropertyId(String id, String supplierName);
+    Property getOrCreatePropertyByCultSwitchId(String csId, String supplierName);
 
     Property addProperty(PropertySaveRequest property, String supplierName);
 

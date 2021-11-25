@@ -22,7 +22,7 @@ public interface PropertyMapper {
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "name", ignore = true)
     @Mapping(target = "alternativeName", ignore = true)
-    @Mapping(target = "supplierPropertyId", ignore = true)
+    @Mapping(target = "cultSwitchId", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "forTesting", ignore = true)
     @Mapping(target = "homeCurrency", ignore = true)

@@ -26,8 +26,8 @@ public class Property {
 
     @JsonProperty
     @Size(min = 1, max = 255)
-    @Schema(description = "Property id that is used in supplier system", example = "1232")
-    private String supplierPropertyId;
+    @Schema(description = "CultSwitch id - property id that is used in CultSwitch. Also known as ObjectId.", example = "1232")
+    private String cultSwitchId;
 
     @JsonProperty
     @Size(min = 1, max = 255)

@@ -21,8 +21,8 @@ public class PropertyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "supplier_property_id")
-    private String supplierPropertyId;
+    @Column(name = "cultswitch_id")
+    private String cultSwitchId;
 
     @Column
     private String code;
