@@ -69,6 +69,13 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public List<Property> getPropertiesByCultSwitchIds(List<String> csIds) {
+        List<PropertyEntity> all = propertyRepository.findAllByCultSwitchIdIn(csIds);
+
+        return PropertyMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
     public List<Property> getIsMasterProperties() {
         List<PropertyEntity> all = propertyRepository.findAllByIsMaster(true);
 

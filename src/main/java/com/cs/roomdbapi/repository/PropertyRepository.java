@@ -21,6 +21,9 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, Intege
     Boolean existsByCultSwitchId(@NotBlank String id);
 
     @Transactional(readOnly = true)
+    List<PropertyEntity> findAllByCultSwitchIdIn(@NotBlank List<String> csIds);
+
+    @Transactional(readOnly = true)
     List<PropertyEntity> findAllBySupplierIs(SupplierEntity s);
 
     @Transactional(readOnly = true)

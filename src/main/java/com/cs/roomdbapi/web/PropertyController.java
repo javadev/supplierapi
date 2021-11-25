@@ -136,6 +136,28 @@ public class PropertyController {
     }
 
     @Operation(
+            summary = "Get multiply properties by CultSwitch ids.",
+            description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/by-cultswitch-ids/{ids}"})
+    public ResponseEntity<List<Property>> getPropertiesByCultSwitchIds(
+            @Valid
+            @PathVariable
+            @Parameter(description = "CultSwitch ids - property ids that is used in CultSwitch. Also known as ObjectIds. Required.")
+            @Size(min = 1, max = 255)
+                    List<String> ids,
+            HttpServletRequest req
+    ) {
+        List<Property> properties = propertyManager.getPropertiesByCultSwitchIds(ids);
+        validationManager.validatePropertiesList(req, properties);
+
+        return new ResponseEntity<>(properties, HttpStatus.OK);
+    }
+
+    @Operation(
             summary = "Get property isMaster data by id.",
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."

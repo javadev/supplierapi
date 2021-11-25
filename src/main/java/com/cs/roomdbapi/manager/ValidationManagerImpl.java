@@ -1,5 +1,6 @@
 package com.cs.roomdbapi.manager;
 
+import com.cs.roomdbapi.dto.Property;
 import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.model.RoleName;
@@ -10,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,22 @@ public class ValidationManagerImpl implements ValidationManager {
 
         if (!isHasAllPropertiesPermission() && !supplierName.equals(propertySupplierName)) {
             throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", propertyId));
+        }
+    }
+
+    @Override
+    public void validatePropertiesList(HttpServletRequest req, List<Property> properties) {
+        if (isHasAllPropertiesPermission() && properties == null) {
+            return;
+        }
+
+        for (Property property : properties) {
+            String propertySupplierName = property.getSupplier().getName();
+            String supplierName = req.getRemoteUser();
+
+            if (!supplierName.equals(propertySupplierName)) {
+                throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", property.getId()));
+            }
         }
     }
 

@@ -8,6 +8,8 @@ public interface PropertyManager {
 
     List<Property> getProperties();
 
+    List<Property> getPropertiesByCultSwitchIds(List<String> csIds);
+
     List<Property> getIsMasterProperties();
 
     List<Property> getPropertiesBySupplier(String supplierName);
