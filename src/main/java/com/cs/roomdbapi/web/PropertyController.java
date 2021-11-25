@@ -1,16 +1,21 @@
 package com.cs.roomdbapi.web;
 
+import com.cs.roomdbapi.annotation.IgnoreResponseBinding;
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
+import com.cs.roomdbapi.model.PropertyEntity;
+import com.cs.roomdbapi.response.SuccessResponse;
+import com.cs.roomdbapi.utilities.AppUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +71,53 @@ public class PropertyController {
         }
 
         return new ResponseEntity<>(properties, HttpStatus.OK);
+    }
+
+    @IgnoreResponseBinding
+    @Operation(
+            summary = "Get list of all properties.",
+            description = "All fields of the Property entity will be included in result. <br/>" +
+                    "If supplier has role to **read all properties** than this endpoint will return **all** properties in a system. <br/>" +
+                    "If supplier has **no role** to read all properties, result will include **only** properties which **belongs to supplier**."
+    )
+    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
+            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
+    @GetMapping({"/paging"})
+    public SuccessResponse<List<Property>> getAllPropertiesWithPagination(
+            @Valid
+            @Parameter(description = "Page number in paginated request. Default is 0.")
+            @Min(0)
+            @RequestParam(defaultValue = "0")
+                    Integer page,
+            @Valid
+            @Parameter(description = "Size of the page in paginated request. Default is 10.")
+            @Min(1)
+            @RequestParam(defaultValue = "10")
+                    Integer size,
+            @Valid
+            @Parameter(description = "Field name that should be used for sorting in paginated request. Default is 'name'.")
+            @RequestParam(defaultValue = "name")
+                    String sortBy,
+            @Valid
+            @Parameter(description = "Is descending sort should be applied in sorting in paginated request. Default is 'true'.")
+            @RequestParam(defaultValue = "true")
+                    boolean sortDesc,
+            HttpServletRequest req
+    ) {
+        List<Property> properties;
+
+        Page<PropertyEntity> pageResult;
+        if (validationManager.isHasAllPropertiesPermission()) {
+            // all properties
+            pageResult = propertyManager.getPropertiesPagination(page, size, sortBy, sortDesc);
+        } else {
+            // only properties that are belong to supplier
+            pageResult = propertyManager.getPropertiesBySupplierPagination(req.getRemoteUser(), page, size, sortBy, sortDesc);
+        }
+        properties = propertyManager.toListDTO(pageResult.getContent());
+
+        return new SuccessResponse<>(properties, AppUtils.RESPONSE_CODE_SUCCESS_MSG, AppUtils.SUCCESS,
+                pageResult.getTotalElements(), pageResult.getTotalPages());
     }
 
     @Operation(

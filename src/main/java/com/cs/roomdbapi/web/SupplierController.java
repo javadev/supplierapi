@@ -183,7 +183,7 @@ public class SupplierController {
             description = "This API created just to check that out notification system works fine."
     )
     @PostMapping("/test-receive-webhook")
-    public SuccessResponse<String> testReceiveWebhook(
+    public SuccessResponse<Notification> testReceiveWebhook(
             @Valid @RequestBody Notification notification
     ) {
         log.info("Received notification: " + notification.toString());

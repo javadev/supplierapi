@@ -1,18 +1,26 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.*;
+import com.cs.roomdbapi.model.PropertyEntity;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface PropertyManager {
 
+    List<Property> toListDTO(List<PropertyEntity> list);
+
     List<Property> getProperties();
+
+    Page<PropertyEntity> getPropertiesPagination(Integer pageNumber, Integer pageSize, String sortBy, boolean sortDesc);
 
     List<Property> getPropertiesByCultSwitchIds(List<String> csIds);
 
     List<Property> getIsMasterProperties();
 
     List<Property> getPropertiesBySupplier(String supplierName);
+
+    Page<PropertyEntity> getPropertiesBySupplierPagination(String supplierName, Integer pageNumber, Integer pageSize, String sortBy, boolean sortDesc);
 
     List<Property> getIsMasterPropertiesBySupplier(String supplierName);
 

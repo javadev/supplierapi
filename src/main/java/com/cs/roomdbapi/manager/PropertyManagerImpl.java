@@ -6,9 +6,13 @@ import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.*;
 import com.cs.roomdbapi.model.*;
 import com.cs.roomdbapi.repository.*;
+import com.cs.roomdbapi.utilities.Commons;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,10 +66,25 @@ public class PropertyManagerImpl implements PropertyManager {
     private final DescriptionManager descriptionManager;
 
     @Override
+    public List<Property> toListDTO(List<PropertyEntity> list) {
+        return PropertyMapper.MAPPER.toListDTO(list);
+    }
+
+    @Override
     public List<Property> getProperties() {
         List<PropertyEntity> all = propertyRepository.findAll();
 
         return PropertyMapper.MAPPER.toListDTO(all);
+    }
+
+    @Override
+    public Page<PropertyEntity> getPropertiesPagination(Integer pageNumber, Integer pageSize, String sortBy, boolean sortDesc) {
+        Sort sort = Commons.getOrder(sortBy, sortDesc);
+        pageSize = Commons.getPageSize(pageSize);
+
+        PageRequest paging = PageRequest.of(pageNumber, pageSize, sort);
+
+        return propertyRepository.findAll(paging);
     }
 
     @Override
@@ -90,6 +109,19 @@ public class PropertyManagerImpl implements PropertyManager {
         List<PropertyEntity> all = propertyRepository.findAllBySupplierIs(supplier);
 
         return PropertyMapper.MAPPER.toListDTOWithoutSupplier(all);
+    }
+
+    @Override
+    public Page<PropertyEntity> getPropertiesBySupplierPagination(String supplierName, Integer pageNumber, Integer pageSize, String sortBy, boolean sortDesc) {
+        SupplierEntity supplier = supplierRepository.findByName(supplierName)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, NAME, supplierName));
+
+        Sort sort = Commons.getOrder(sortBy, sortDesc);
+        pageSize = Commons.getPageSize(pageSize);
+
+        PageRequest paging = PageRequest.of(pageNumber, pageSize, sort);
+
+        return propertyRepository.findAllBySupplierIs(supplier, paging);
     }
 
     @Override
