@@ -4,7 +4,6 @@ import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.BasketManager;
 import com.cs.roomdbapi.manager.DescriptionManager;
-import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,8 +42,6 @@ public class BasketController {
 
     private final BasketManager basketManager;
 
-    private final PropertyManager propertyManager;
-
     private final ValidationManager validationManager;
 
     private final DescriptionManager descriptionManager;
@@ -62,8 +59,7 @@ public class BasketController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<Basket> all = basketManager.getAllBasketsByPropertyId(propertyId);
 
@@ -94,8 +90,7 @@ public class BasketController {
 
         Integer propertyId = basketManager.getPropertyIdByBasketId(basketId);
 
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
     }
 
     @Operation(
@@ -108,9 +103,7 @@ public class BasketController {
                     Basket basket,
             HttpServletRequest req
     ) {
-        Integer propertyId = basket.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, basket.getPropertyId());
 
         Basket added = basketManager.addBasket(basket);
 

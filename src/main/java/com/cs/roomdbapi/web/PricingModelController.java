@@ -1,8 +1,10 @@
 package com.cs.roomdbapi.web;
 
-import com.cs.roomdbapi.dto.*;
+import com.cs.roomdbapi.dto.PricingModel;
+import com.cs.roomdbapi.dto.PricingModelSaveRequest;
+import com.cs.roomdbapi.dto.PricingModelType;
+import com.cs.roomdbapi.dto.PricingModelUpdateRequest;
 import com.cs.roomdbapi.manager.PricingModelManager;
-import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,8 +36,6 @@ import java.util.List;
 public class PricingModelController {
 
     private final PricingModelManager pricingModelManager;
-
-    private final PropertyManager propertyManager;
 
     private final ValidationManager validationManager;
 
@@ -75,9 +75,7 @@ public class PricingModelController {
                     PricingModelSaveRequest request,
             HttpServletRequest req
     ) {
-        Integer propertyId = request.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, request.getPropertyId());
 
         PricingModel pricingModel = pricingModelManager.addPricingModel(request);
 
@@ -97,8 +95,7 @@ public class PricingModelController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<PricingModel> all = pricingModelManager.getAllPricingModelsByPropertyId(propertyId);
 

@@ -4,7 +4,6 @@ import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PointOfInterestManager;
-import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,8 +38,6 @@ public class PointOfInterestController {
 
     private final PointOfInterestManager poiManager;
 
-    private final PropertyManager propertyManager;
-
     private final DescriptionManager descriptionManager;
 
     private final ValidationManager validationManager;
@@ -57,8 +54,7 @@ public class PointOfInterestController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<PointOfInterest> all = poiManager.getAllPointOfInterestByPropertyId(propertyId);
 
@@ -88,8 +84,7 @@ public class PointOfInterestController {
 
         Integer propertyId = poiManager.getPropertyIdByPOIId(poiId);
 
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
     }
 
     @Operation(
@@ -128,9 +123,7 @@ public class PointOfInterestController {
             @Valid @RequestBody PointOfInterestSaveRequest poi,
             HttpServletRequest req
     ) {
-        Integer propertyId = poi.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, poi.getPropertyId());
 
         PointOfInterest newPOI = poiManager.addPOI(poi);
 

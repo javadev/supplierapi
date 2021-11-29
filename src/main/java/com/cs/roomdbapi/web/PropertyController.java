@@ -336,8 +336,7 @@ public class PropertyController {
                     PropertySaveRequest property,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(id);
-        validationManager.validatePropertyAccess(req, supplier, id);
+        validationManager.validatePropertyAccess(req, id);
 
         Property updatedProperty = propertyManager.updateProperty(id, property, req.getRemoteUser());
 
@@ -360,8 +359,7 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(id);
-        validationManager.validatePropertyAccess(req, supplier, id);
+        validationManager.validatePropertyAccess(req, id);
 
         PropertyInfo propertyInfo = propertyManager.getPropertyInfoByPropertyId(id);
 
@@ -378,9 +376,7 @@ public class PropertyController {
                     PropertyInfoSaveRequest info,
             HttpServletRequest req
     ) {
-        Integer propertyId = info.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, info.getPropertyId());
 
         PropertyInfo propertyInfo = propertyManager.addPropertyInfo(info);
 
@@ -397,9 +393,7 @@ public class PropertyController {
                     PropertyInfoSaveRequest info,
             HttpServletRequest req
     ) {
-        Integer propertyId = info.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, info.getPropertyId());
 
         PropertyInfo updated = propertyManager.updatePropertyInfo(info);
 
@@ -418,8 +412,7 @@ public class PropertyController {
                     Integer id,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(id);
-        validationManager.validatePropertyAccess(req, supplier, id);
+        validationManager.validatePropertyAccess(req, id);
 
         propertyManager.deletePropertyInfoByPropertyId(id);
 
@@ -438,9 +431,7 @@ public class PropertyController {
                     PropertyEmailRequest propertyEmailRequest,
             HttpServletRequest req
     ) {
-        Integer propertyId = propertyEmailRequest.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyEmailRequest.getPropertyId());
 
         List<Email> emails = propertyManager.setPropertyEmails(propertyEmailRequest.getPropertyId(), propertyEmailRequest.getEmails());
 
@@ -459,9 +450,7 @@ public class PropertyController {
                     PropertyPhoneRequest propertyPhoneRequest,
             HttpServletRequest req
     ) {
-        Integer propertyId = propertyPhoneRequest.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyPhoneRequest.getPropertyId());
 
         List<Phone> phones = propertyManager.setPropertyPhones(propertyPhoneRequest.getPropertyId(), propertyPhoneRequest.getPhones());
 
@@ -484,8 +473,7 @@ public class PropertyController {
                     DescriptionSave descriptionSave,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         Description description = propertyManager.addPropertyDescription(propertyId, descriptionSave);
 
@@ -512,8 +500,7 @@ public class PropertyController {
         if (propertyId == null) {
             throw new BadRequestException(String.format("Description with id '%s' does not belong to Property.", id));
         }
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
 
@@ -536,8 +523,7 @@ public class PropertyController {
         if (propertyId == null) {
             throw new BadRequestException(String.format("Description with id '%s' does not belong to Property.", id));
         }
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         descriptionManager.deletePropertyDescription(propertyId, id);
 
@@ -559,8 +545,7 @@ public class PropertyController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<PropertyIdentifier> all = propertyManager.getPropertyIdentifiersByPropertyId(propertyId);
 
@@ -581,8 +566,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Integer propertyId = propertyIdentifierRequest.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<PropertyIdentifier> list = propertyManager.addPropertyIdentifiers(propertyId, propertyIdentifierRequest.getIdentifiers());
 
@@ -606,8 +590,7 @@ public class PropertyController {
                     Integer sourceId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         propertyManager.deletePropertyIdentifier(propertyId, sourceId);
 
@@ -626,8 +609,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Integer propertyId = request.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         Currency currency = propertyManager.setPropertyHomeCurrencyById(propertyId, request.getHomeCurrencyId());
 
@@ -646,8 +628,7 @@ public class PropertyController {
             HttpServletRequest req
     ) {
         Integer propertyId = request.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         Currency currency = propertyManager.setPropertyHomeCurrencyByCode(propertyId, request.getHomeCurrencyCode());
 

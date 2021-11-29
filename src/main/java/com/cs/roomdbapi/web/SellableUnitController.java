@@ -3,7 +3,6 @@ package com.cs.roomdbapi.web;
 import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
-import com.cs.roomdbapi.manager.PropertyManager;
 import com.cs.roomdbapi.manager.SellableUnitManager;
 import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,8 +39,6 @@ public class SellableUnitController {
 
     private final SellableUnitManager sellableUnitManager;
 
-    private final PropertyManager propertyManager;
-
     private final DescriptionManager descriptionManager;
 
     private final ValidationManager validationManager;
@@ -64,9 +61,7 @@ public class SellableUnitController {
             @Valid @RequestBody SellableUnitSaveRequest request,
             HttpServletRequest req
     ) {
-        Integer propertyId = request.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, request.getPropertyId());
 
         SellableUnit sellableUnit = sellableUnitManager.addSellableUnit(request);
 
@@ -119,8 +114,7 @@ public class SellableUnitController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<SellableUnit> all = sellableUnitManager.getAllSellableUnitsByPropertyId(propertyId);
 
@@ -143,10 +137,7 @@ public class SellableUnitController {
 
         SellableUnit sellableUnit = sellableUnitManager.getSellableUnitBySupplierUnitId(id);
 
-        Integer propertyId = sellableUnit.getPropertyId();
-
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, sellableUnit.getPropertyId());
 
         return new ResponseEntity<>(sellableUnit, HttpStatus.OK);
     }
@@ -168,8 +159,7 @@ public class SellableUnitController {
                     String supplierUnitId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validationManager.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         SellableUnit supplierUnit = sellableUnitManager.getOrCreateSellableUnitBySupplierUnitId(supplierUnitId, propertyId);
 
@@ -286,8 +276,8 @@ public class SellableUnitController {
     @Operation(
             summary = "Add capacity data to sellable unit.",
             description = "New capacity entries will be **created** no effect for existing entries. <br/>" +
-            "Time segment is not required and will be empty if not provided. <br/>" +
-            "Only created records will be returned as result."
+                    "Time segment is not required and will be empty if not provided. <br/>" +
+                    "Only created records will be returned as result."
     )
     @PostMapping({"/add-capacities"})
     public ResponseEntity<List<SUCapacity>> addCapacity(
