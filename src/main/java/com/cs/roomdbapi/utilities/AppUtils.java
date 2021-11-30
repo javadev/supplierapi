@@ -51,6 +51,8 @@ public class AppUtils {
 
     public static final String BRAND = "Brand";
 
+    public static final String RATE_PLAN = "Rate Plan";
+
     public static final String SELLABLE_UNIT_TYPE = "Sellable Unit Type";
 
     public static final String PHONE_TYPE = "Phone type";

@@ -19,6 +19,6 @@ public interface PricingModelRepository extends JpaRepository<PricingModelEntity
 
     @Transactional(readOnly = true)
     @Query("select pm.property.id from PricingModelEntity pm where pm.id = ?1")
-    Integer getPropertyIdByPricingModelId(Integer sellableUnitId);
+    Integer getPropertyIdByPricingModelId(Integer pricingModelId);
     
 }

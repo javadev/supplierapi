@@ -22,6 +22,10 @@ public class ValidationManagerImpl implements ValidationManager {
 
     private final PricingModelManager pricingModelManager;
 
+    private final RatePlanManager ratePlanManager;
+
+    private final ProductManager productManager;
+
     private final PropertyManager propertyManager;
 
     @Override
@@ -31,9 +35,7 @@ public class ValidationManagerImpl implements ValidationManager {
         }
 
         Integer propertyId = sellableUnitManager.getPropertyIdBySellableUnitId(sellableUnitId);
-
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+        validatePropertyAccess(req, propertyId);
     }
 
     @Override
@@ -43,13 +45,43 @@ public class ValidationManagerImpl implements ValidationManager {
         }
 
         Integer propertyId = pricingModelManager.getPropertyIdByPricingModelId(pricingModelId);
+        validatePropertyAccess(req, propertyId);
+    }
 
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        validatePropertyAccess(req, supplier, propertyId);
+    @Override
+    public void validateRatePlanAccess(Integer ratePlanId, HttpServletRequest req) {
+        if (ratePlanManager.ratePlanNotExistsById(ratePlanId)) {
+            throw new BadRequestException("Rate Plan with provided id does not exists in a system.");
+        }
+
+        Integer propertyId = ratePlanManager.getPropertyIdByRatePlanId(ratePlanId);
+        validatePropertyAccess(req, propertyId);
+    }
+
+    @Override
+    public void validateProductAccess(Integer productId, HttpServletRequest req) {
+        if (productManager.productNotExistsById(productId)) {
+            throw new BadRequestException("Product with provided id does not exists in a system.");
+        }
+
+        Integer propertyId = productManager.getPropertyIdByProductId(productId);
+        validatePropertyAccess(req, propertyId);
     }
 
     @Override
     public void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId) {
+
+        String propertySupplierName = supplier.getName();
+        String supplierName = req.getRemoteUser();
+
+        if (!isHasAllPropertiesPermission() && !supplierName.equals(propertySupplierName)) {
+            throw new BadRequestException(String.format("Property with id '%s' does not belong to supplier", propertyId));
+        }
+    }
+
+    @Override
+    public void validatePropertyAccess(HttpServletRequest req, Integer propertyId) {
+        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
 
         String propertySupplierName = supplier.getName();
         String supplierName = req.getRemoteUser();

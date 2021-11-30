@@ -10,9 +10,15 @@ public interface ValidationManager {
 
     void validateSellableUnitAccess(Integer sellableUnitId, HttpServletRequest req);
 
-    void validatePricingModelAccess(Integer sellableUnitId, HttpServletRequest req);
+    void validatePricingModelAccess(Integer pricingModelId, HttpServletRequest req);
+
+    void validateRatePlanAccess(Integer ratePlanId, HttpServletRequest req);
+
+    void validateProductAccess(Integer productId, HttpServletRequest req);
 
     void validatePropertyAccess(HttpServletRequest req, Supplier supplier, Integer propertyId);
+
+    void validatePropertyAccess(HttpServletRequest req, Integer propertyId);
 
     void validatePropertiesList(HttpServletRequest req, List<Property> properties);
 
