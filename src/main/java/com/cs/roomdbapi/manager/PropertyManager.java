@@ -32,6 +32,8 @@ public interface PropertyManager {
 
     Property getPropertyByCultSwitchId(String id);
 
+    Property getPropertyByExternalSystemId(String id, String sourceAbbr);
+
     Property getPropertyIsMasterByCultSwitchId(String id);
 
     List<Property> getPropertiesByCode(String code);

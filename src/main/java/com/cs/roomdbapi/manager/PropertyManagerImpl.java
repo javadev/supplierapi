@@ -167,6 +167,31 @@ public class PropertyManagerImpl implements PropertyManager {
     }
 
     @Override
+    public Property getPropertyByExternalSystemId(String id, String sourceAbbr) {
+
+        PropertyEntity entity;
+
+        if (CULT_SWITCH_IDENTIFIER_SOURCE_ABBR.equals(sourceAbbr)) {
+            entity = propertyRepository.findByCultSwitchId(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, CULTSWITCH_ID, id));
+        } else if (ROOM_DB_IDENTIFIER_SOURCE_ABBR.equals(sourceAbbr)) {
+            entity = propertyRepository.findById(Integer.parseInt(id))
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, id));
+        } else {
+            IdentifierSourceEntity sourceEntity = identifierSourceRepository.findByAbbreviation(sourceAbbr)
+                    .orElseThrow(() -> new ResourceNotFoundException(IDENTIFIER_SOURCE, ABBREVIATION, sourceAbbr));
+
+            PropertyIdentifierEntity identifierEntity = propertyIdentifierRepository.findByIdentifierAndSource(id, sourceEntity)
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY_IDENTIFIER, SOURCE_ABBREVIATION, sourceAbbr));
+
+            entity = propertyRepository.findById(identifierEntity.getPropertyId())
+                    .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, identifierEntity.getPropertyId()));
+        }
+        
+        return PropertyMapper.MAPPER.toDTO(entity);
+    }
+
+    @Override
     public Property getPropertyIsMasterByCultSwitchId(String id) {
         PropertyEntity entity = propertyRepository.findByCultSwitchId(id)
                 .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, CULTSWITCH_ID, id));

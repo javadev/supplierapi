@@ -20,4 +20,7 @@ public interface PropertyIdentifierRepository extends JpaRepository<PropertyIden
     @Transactional(readOnly = true)
     Optional<PropertyIdentifierEntity> findByPropertyIdAndSource(@NotBlank Integer propertyId, @NotNull IdentifierSourceEntity source);
 
+    @Transactional(readOnly = true)
+    Optional<PropertyIdentifierEntity> findByIdentifierAndSource(@NotNull String identifier, @NotNull IdentifierSourceEntity source);
+
 }

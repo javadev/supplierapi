@@ -118,6 +118,8 @@ public class AppUtils {
 
     public static final String SOURCE_ID = "sourceId";
 
+    public static final String SOURCE_ABBREVIATION = "sourceAbbreviation";
+
     /*
      * Defaults
      */

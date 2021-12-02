@@ -56,8 +56,6 @@ public class PropertyController {
                     "If supplier has role to **read all properties** than this endpoint will return **all** properties in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will include **only** properties which **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping
     public ResponseEntity<List<Property>> getAllProperties(HttpServletRequest req) {
         List<Property> properties;
@@ -80,8 +78,6 @@ public class PropertyController {
                     "If supplier has role to **read all properties** than this endpoint will return **all** properties in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will include **only** properties which **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/paging"})
     public SuccessResponse<List<Property>> getAllPropertiesWithPagination(
             @Valid
@@ -126,8 +122,6 @@ public class PropertyController {
                     "If supplier has role to **read all properties** than this endpoint will return **all** properties in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will include **only** properties which **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master"})
     public ResponseEntity<List<Property>> getAllIsMasterProperties(HttpServletRequest req) {
         List<Property> properties;
@@ -148,8 +142,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/{id}"})
     public ResponseEntity<Property> getProperty(
             @Valid
@@ -170,8 +162,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/supplier-property-id/{id}"})
     public ResponseEntity<Property> getPropertyByCultSwitchId(
             @Valid
@@ -192,8 +182,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/by-cultswitch-ids/{ids}"})
     public ResponseEntity<List<Property>> getPropertiesByCultSwitchIds(
             @Valid
@@ -214,8 +202,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master/{id}"})
     public ResponseEntity<Property> isMasterProperty(
             @Valid
@@ -238,8 +224,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/is-master/supplier-property-id/{id}"})
     public ResponseEntity<Property> isMasterPropertyByCultSwitchId(
             @Valid
@@ -263,8 +247,6 @@ public class PropertyController {
                     "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/code/{code}"})
     public ResponseEntity<List<Property>> getPropertyByCode(
             @Valid
@@ -285,8 +267,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/supplier-property-id/get-or-create/{id}"})
     public ResponseEntity<Property> getOrCreatePropertyByCultSwitchId(
             @Valid
@@ -302,8 +282,6 @@ public class PropertyController {
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @Operation(
             summary = "Add property."
     )
@@ -319,8 +297,6 @@ public class PropertyController {
         return new ResponseEntity<>(newProperty, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @Operation(
             summary = "Update property."
     )
@@ -348,8 +324,6 @@ public class PropertyController {
             description = "If supplier has role to **read all properties** than this endpoint will return **any** property in a system. <br/>" +
                     "If supplier has **no role** to read all properties, result will return property **only** if it **belongs to supplier**."
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/info/{id}"})
     public ResponseEntity<PropertyInfo> getPropertyInfo(
             @Valid
@@ -534,8 +508,6 @@ public class PropertyController {
             summary = "Get property identifiers by property id.",
             description = "It will return array of the identifiers if supplier has access to the property"
     )
-    @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
-            "or hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_SUPPLIER_COMMON)")
     @GetMapping({"/identifier/{propertyId}"})
     public ResponseEntity<List<PropertyIdentifier>> getPropertyIdentifiers(
             @Valid
@@ -633,6 +605,31 @@ public class PropertyController {
         Currency currency = propertyManager.setPropertyHomeCurrencyByCode(propertyId, request.getHomeCurrencyCode());
 
         return new ResponseEntity<>(currency, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Get property data by External System Id.",
+            description = "Two params are needed: External System Abbreviation and External System Id."
+    )
+    @GetMapping({"/supplier-property-id/{source}/{id}"})
+    public ResponseEntity<Property> getPropertyByExternalSystemId(
+            @Valid
+            @PathVariable
+            @Parameter(description = "External System Abbreviation - abbreviation that is used in RoomDb to identify External system. " +
+                    "In models known as IdentifierSource - abbreviation. Required.")
+            @Size(min = 1, max = 255)
+                    String source,
+            @Valid
+            @PathVariable
+            @Parameter(description = "External System Id - identifier that is used in External system. Required.")
+            @Size(min = 1, max = 255)
+                    String id,
+            HttpServletRequest req
+    ) {
+        Property property = propertyManager.getPropertyByExternalSystemId(id, source);
+        validationManager.validatePropertyAccess(req, property.getSupplier(), property.getId());
+
+        return new ResponseEntity<>(property, HttpStatus.OK);
     }
 
 }
