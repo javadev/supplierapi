@@ -232,8 +232,10 @@ public class PropertyManagerImpl implements PropertyManager {
     @Override
     @Transactional
     public Property addProperty(PropertySaveRequest property, String supplierName) {
-        if (propertyRepository.existsByCultSwitchId(property.getCultSwitchId())) {
-            throw new BadRequestException(String.format("Property with '%s' CultSwitch Id already exists", property.getCultSwitchId()), property);
+        if (property.getCultSwitchId() != null) {
+            if (propertyRepository.existsByCultSwitchId(property.getCultSwitchId())) {
+                throw new BadRequestException(String.format("Property with '%s' CultSwitch Id already exists", property.getCultSwitchId()), property);
+            }
         }
 
         SupplierEntity supplier = supplierRepository.findByName(supplierName)
@@ -372,18 +374,23 @@ public class PropertyManagerImpl implements PropertyManager {
     private AddressEntity prepareAddressEntity(AddressSave addressSave) {
         AddressEntity addressEntity = AddressMapper.MAPPER.toEntity(addressSave);
 
-        LanguageEntity language = languageRepository.findById(addressSave.getLanguageId())
-                .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, addressSave.getLanguageId()));
+        if (addressSave.getLanguageId() != null) {
+            LanguageEntity language = languageRepository.findById(addressSave.getLanguageId())
+                    .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, addressSave.getLanguageId()));
+            addressEntity.setLanguage(language);
+        }
 
-        StateEntity state = stateRepository.findById(addressSave.getStateId())
-                .orElseThrow(() -> new ResourceNotFoundException(STATE, ID, addressSave.getStateId()));
+        if (addressSave.getStateId() != null) {
+            StateEntity state = stateRepository.findById(addressSave.getStateId())
+                    .orElseThrow(() -> new ResourceNotFoundException(STATE, ID, addressSave.getStateId()));
+            addressEntity.setState(state);
+        }
 
-        CountryEntity country = countryRepository.findById(addressSave.getCountryId())
-                .orElseThrow(() -> new ResourceNotFoundException(COUNTRY, ID, addressSave.getCountryId()));
-
-        addressEntity.setLanguage(language);
-        addressEntity.setState(state);
-        addressEntity.setCountry(country);
+        if (addressSave.getCountryId() != null) {
+            CountryEntity country = countryRepository.findById(addressSave.getCountryId())
+                    .orElseThrow(() -> new ResourceNotFoundException(COUNTRY, ID, addressSave.getCountryId()));
+            addressEntity.setCountry(country);
+        }
 
         return addressEntity;
     }
