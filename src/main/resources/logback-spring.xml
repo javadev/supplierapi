@@ -23,7 +23,7 @@
 
             <!-- keep 60 days' worth of history capped at 10GB total size -->
             <maxHistory>30</maxHistory>
-            <totalSizeCap>10GB</totalSizeCap>
+            <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
     </appender>
 

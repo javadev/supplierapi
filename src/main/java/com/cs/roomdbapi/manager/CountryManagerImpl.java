@@ -1,22 +1,24 @@
 package com.cs.roomdbapi.manager;
 
 import com.cs.roomdbapi.dto.Country;
+import com.cs.roomdbapi.exception.ResourceNotFoundException;
 import com.cs.roomdbapi.mapper.CountryMapper;
+import com.cs.roomdbapi.model.CountryCodeFormat;
 import com.cs.roomdbapi.model.CountryEntity;
 import com.cs.roomdbapi.model.CountryTranslationEntity;
 import com.cs.roomdbapi.repository.CountryRepository;
 import com.cs.roomdbapi.repository.TranslationRepository;
 import com.cs.roomdbapi.utilities.AppUtils;
-import com.cs.roomdbapi.model.CountryCodeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.cs.roomdbapi.utilities.AppUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,36 +62,30 @@ public class CountryManagerImpl implements CountryManager {
 
     @Override
     public Country getCountryById(Integer id, String langCode) {
-        Optional<CountryEntity> countryEntity = countryRepository.findById(id);
+        CountryEntity entity = countryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(COUNTRY, ID, id));
 
-        Country country = null;
-        if (countryEntity.isPresent()) {
-            CountryEntity entity = countryEntity.get();
-            country = CountryMapper.MAPPER.toDTO(entity);
+        Country country = CountryMapper.MAPPER.toDTO(entity);
 
-            CountryTranslationEntity translation = translationRepository.findByLanguage_CodeAndCountryId(langCode, id);
-            CountryTranslationEntity defaultTranslation = translationRepository.findByLanguage_CodeAndCountryId(AppUtils.DEFAULT_LANGUAGE_CODE, id);
+        CountryTranslationEntity translation = translationRepository.findByLanguage_CodeAndCountryId(langCode, id);
+        CountryTranslationEntity defaultTranslation = translationRepository.findByLanguage_CodeAndCountryId(AppUtils.DEFAULT_LANGUAGE_CODE, id);
 
-            setNamesForLanguage(country, defaultTranslation, translation);
-        }
+        setNamesForLanguage(country, defaultTranslation, translation);
 
         return country;
     }
 
     @Override
     public Country getCountryByCode(String code, String langCode) {
-        Optional<CountryEntity> countryEntity = countryRepository.findByCode(code.toUpperCase());
+        CountryEntity entity = countryRepository.findByCode(code.toUpperCase())
+                .orElseThrow(() -> new ResourceNotFoundException(COUNTRY, CODE, code));
 
-        Country country = null;
-        if (countryEntity.isPresent()) {
-            CountryEntity entity = countryEntity.get();
-            country = CountryMapper.MAPPER.toDTO(entity);
+        Country country = CountryMapper.MAPPER.toDTO(entity);
 
-            CountryTranslationEntity translation = translationRepository.findByLanguage_CodeAndCountryId(langCode, country.getId());
-            CountryTranslationEntity defaultTranslation = translationRepository.findByLanguage_CodeAndCountryId(AppUtils.DEFAULT_LANGUAGE_CODE, country.getId());
+        CountryTranslationEntity translation = translationRepository.findByLanguage_CodeAndCountryId(langCode, country.getId());
+        CountryTranslationEntity defaultTranslation = translationRepository.findByLanguage_CodeAndCountryId(AppUtils.DEFAULT_LANGUAGE_CODE, country.getId());
 
-            setNamesForLanguage(country, defaultTranslation, translation);
-        }
+        setNamesForLanguage(country, defaultTranslation, translation);
 
         return country;
     }

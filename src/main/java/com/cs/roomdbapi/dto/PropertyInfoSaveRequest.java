@@ -62,7 +62,11 @@ public class PropertyInfoSaveRequest {
     private Integer propertyTypeId;
 
     @JsonProperty
-    @Schema(description = "Language Ids for this property")
+    @Schema(description = "Languages for this property")
     private List<PropertyInfoLanguageSaveRequest> languages;
+
+    @JsonProperty
+    @Schema(description = "Addresses for this property")
+    private List<AddressSave> addresses;
 
 }

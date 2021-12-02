@@ -21,13 +21,12 @@ public class PropertyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "supplier_property_id")
-    private String supplierPropertyId;
+    @Column(name = "cultswitch_id")
+    private String cultSwitchId;
 
     @Column
     private String code;
 
-    @NotNull
     @Column
     private String name;
 
@@ -39,6 +38,9 @@ public class PropertyEntity {
 
     @Column(name = "for_testing")
     private Boolean forTesting = false;
+
+    @Column(name = "is_master")
+    private Boolean isMaster = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "home_currency_id")
@@ -57,6 +59,13 @@ public class PropertyEntity {
             joinColumns = @JoinColumn(name = "property_id"),
             inverseJoinColumns = @JoinColumn(name = "email_id"))
     List<EmailEntity> emails;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "property_x_description",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "description_id"))
+    List<DescriptionEntity> descriptions;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

@@ -31,6 +31,9 @@ public class PhoneEntity {
     @JoinColumn(name = "phone_type_id")
     private PhoneTypeEntity phoneType;
 
+    @Column(name = "is_validated")
+    private Boolean isValidated = false;
+
     @Column
     @UpdateTimestamp
     private Timestamp last_update;

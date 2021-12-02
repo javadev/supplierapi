@@ -19,4 +19,11 @@ public interface DescriptionManager {
 
     void deletePOIDescription(Integer poiId, Integer id);
 
+    void deletePropertyDescription(Integer propertyId, Integer id);
+
+    void deleteSellableUnitDescription(Integer sellableUnitId, Integer id);
+
+    void deleteBasketDescription(Integer basketId, Integer id);
+
 }
+                                                                               

@@ -20,7 +20,8 @@ IPv6	2a01:4f8:c010:69cb::/64
 
 **DNS records**: <br/>
 db.roomdb.io A 162.55.164.107 <br/>
-~~api.supplier.roomdb.io A 116.202.15.234~~  <br/>
+doc.supplier.roomdb.io A 65.21.48.152 <br/>
+api.supplier.roomdb.io A 65.21.48.152 <br/>
 
 node01.api.supplier.roomdb.io A 157.90.255.180 <br/>
 node02.api.supplier.roomdb.io A 168.119.103.250 <br/>
@@ -28,11 +29,13 @@ node02.api.supplier.roomdb.io A 168.119.103.250 <br/>
 ## Documentation
 
 Swagger is available here: <br/>
-~~https://doc.supplier.roomdb.io/swagger~~ <br/>
+https://doc.supplier.roomdb.io/swagger <br/>
+or <br/>
 https://lb02.loadbalancer-roomdb.io/swagger 
 
 ReDoc here: <br/>
-~~https://doc.supplier.roomdb.io/redoc~~ <br/>
+https://doc.supplier.roomdb.io/redoc <br/>
+or <br/>
 https://lb02.loadbalancer-roomdb.io/redoc 
 
 ## Security
@@ -52,7 +55,8 @@ On a Swagger UI you need to add token in "Authorize" popup. This will automatica
 
 There are two possible ways to update token.
 1. Check expiration time of the current token. If it's expired then recall `get-token` API using supplierId and supplierSecret. If it's still valid but will expire in less than a minute (some small amount of time) `refresh-token` with token.
-2. Implement logic that will extract expiration period, save this period. Use expiration period (a bit less than it is) for scheduled call of the `refresh-token` API.         
+2. Implement logic that will extract expiration period, save this period. Use expiration period (a bit less than it is) for scheduled call of the `refresh-token` API.
+3. Implement cache and use expiration time from token response as time to live.         
 
 ## Encode password
 There is a helper endpoint to encode password `"/api/v1/suppliers/encode-password"`. <br/>

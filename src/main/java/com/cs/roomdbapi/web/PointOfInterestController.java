@@ -4,7 +4,7 @@ import com.cs.roomdbapi.dto.*;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.PointOfInterestManager;
-import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,13 +35,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/v1/poi", produces = MediaType.APPLICATION_JSON_VALUE)
+@Validated
 public class PointOfInterestController {
 
     private final PointOfInterestManager poiManager;
 
-    private final PropertyManager propertyManager;
-
     private final DescriptionManager descriptionManager;
+
+    private final ValidationManager validationManager;
 
     @Operation(
             summary = "Get list of all points of interest, by property id.",
@@ -54,8 +56,7 @@ public class PointOfInterestController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<PointOfInterest> all = poiManager.getAllPointOfInterestByPropertyId(propertyId);
 
@@ -85,8 +86,7 @@ public class PointOfInterestController {
 
         Integer propertyId = poiManager.getPropertyIdByPOIId(poiId);
 
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
     }
 
     @Operation(
@@ -110,8 +110,6 @@ public class PointOfInterestController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete POI called with id: {}.", id);
-
         validatePOIAccess(id, req);
 
         poiManager.deletePOI(id);
@@ -127,9 +125,7 @@ public class PointOfInterestController {
             @Valid @RequestBody PointOfInterestSaveRequest poi,
             HttpServletRequest req
     ) {
-        Integer propertyId = poi.getPropertyId();
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, poi.getPropertyId());
 
         PointOfInterest newPOI = poiManager.addPOI(poi);
 
@@ -155,7 +151,8 @@ public class PointOfInterestController {
     }
 
     @Operation(
-            summary = "Add descriptions to point of interest."
+            summary = "Add description to point of interest.",
+            description = "Description type is not required and will be set to 'Point Of Interest' if not provided."
     )
     @PostMapping({"/description/{poiId}"})
     public ResponseEntity<Description> addDescription(
@@ -176,7 +173,8 @@ public class PointOfInterestController {
     }
 
     @Operation(
-            summary = "Update description for Point of interest."
+            summary = "Update description for Point of interest.",
+            description = "Description type is not required and will be set to 'Point Of Interest' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(
@@ -190,7 +188,9 @@ public class PointOfInterestController {
             HttpServletRequest req
     ) {
         Integer poiId = poiManager.getPOIIdByDescriptionId(id);
-
+        if (poiId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Point of interest.", id));
+        }
         validatePOIAccess(poiId, req);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
@@ -209,9 +209,10 @@ public class PointOfInterestController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete point of interests description called with id: {}.", id);
-
         Integer poiId = poiManager.getPOIIdByDescriptionId(id);
+        if (poiId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Point of interest.", id));
+        }
         validatePOIAccess(poiId, req);
 
         descriptionManager.deletePOIDescription(poiId, id);

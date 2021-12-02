@@ -5,7 +5,7 @@ import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.DescriptionManager;
 import com.cs.roomdbapi.manager.MediaManager;
 import com.cs.roomdbapi.manager.PredefinedTagManager;
-import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,15 +40,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/v1/media", produces = MediaType.APPLICATION_JSON_VALUE)
+@Validated
 public class MediaController {
 
     private final MediaManager mediaManager;
 
     private final PredefinedTagManager predefinedTagManager;
 
-    private final PropertyManager propertyManager;
-
     private final DescriptionManager descriptionManager;
+
+    private final ValidationManager validationManager;
 
     @Operation(
             summary = "Get list of all media, by property id.",
@@ -61,8 +63,7 @@ public class MediaController {
                     Integer propertyId,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         List<Media> all = mediaManager.getAllMediaByPropertyId(propertyId);
 
@@ -122,8 +123,7 @@ public class MediaController {
                     Integer sortOrder,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         if (file.isEmpty()) {
             throw new BadRequestException("File not provided.");
@@ -199,8 +199,7 @@ public class MediaController {
 
         Integer propertyId = mediaManager.getPropertyIdByMediaId(mediaId);
 
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
     }
 
     @Operation(
@@ -309,8 +308,6 @@ public class MediaController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete media called with id: {}.", id);
-
         validateMediaAccess(id, req);
 
         mediaManager.deleteMedia(id);
@@ -319,7 +316,8 @@ public class MediaController {
     }
 
     @Operation(
-            summary = "Add descriptions to media."
+            summary = "Add descriptions to media.",
+            description = "Description type is not required and will be set to 'Media' if not provided."
     )
     @PostMapping({"/description/{mediaId}"})
     public ResponseEntity<Description> addDescription(
@@ -340,7 +338,8 @@ public class MediaController {
     }
 
     @Operation(
-            summary = "Update description for Media."
+            summary = "Update description for Media.",
+            description = "Description type is not required and will be set to 'Media' if not provided."
     )
     @PatchMapping("/description/{id}")
     public ResponseEntity<Description> updateDescription(
@@ -354,7 +353,9 @@ public class MediaController {
             HttpServletRequest req
     ) {
         Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
-
+        if (mediaId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Media.", id));
+        }
         validateMediaAccess(mediaId, req);
 
         Description description = descriptionManager.updateDescription(id, descriptionSave);
@@ -373,9 +374,10 @@ public class MediaController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete media description called with id: {}.", id);
-
         Integer mediaId = mediaManager.getMediaIdByDescriptionId(id);
+        if (mediaId == null) {
+            throw new BadRequestException(String.format("Description with id '%s' does not belong to Media.", id));
+        }
         validateMediaAccess(mediaId, req);
 
         descriptionManager.deleteMediaDescription(mediaId, id);

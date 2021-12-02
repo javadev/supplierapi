@@ -72,7 +72,7 @@ public class SupplierController {
     @Operation(
             summary = "Refresh token.",
             description = "This API can be used by authorized users to get new token. <br/>" +
-                    "Potentially could be used to avoid token expire, just need to refresh before experation time."
+                    "Potentially could be used to avoid token expire, just need to refresh before expiration time."
     )
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole(T(com.cs.roomdbapi.model.RoleName).ROLE_ADMIN) " +
@@ -164,15 +164,13 @@ public class SupplierController {
     }
 
     // comment '@Hidden' annotation if you want to use this endpoint in Swagger
-    @Hidden
+//    @Hidden
     @Operation(
             summary = "Helper method to get encoded password for a provided password"
     )
     @GetMapping("/encode-password")
     public SuccessResponse<String> encodePassword(String password) {
         String encodedPassword = passwordEncoder.encode(password);
-
-        log.info("Encode password called.");
 
         return new SuccessResponse<>(encodedPassword, "Success password encode.", AppUtils.SUCCESS);
     }
@@ -185,7 +183,7 @@ public class SupplierController {
             description = "This API created just to check that out notification system works fine."
     )
     @PostMapping("/test-receive-webhook")
-    public SuccessResponse<String> testReceiveWebhook(
+    public SuccessResponse<Notification> testReceiveWebhook(
             @Valid @RequestBody Notification notification
     ) {
         log.info("Received notification: " + notification.toString());

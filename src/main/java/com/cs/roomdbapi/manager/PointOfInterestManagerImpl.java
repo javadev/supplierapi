@@ -71,7 +71,7 @@ public class PointOfInterestManagerImpl implements PointOfInterestManager {
         PointOfInterestEntity entity = pointOfInterestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(POINT_OF_INTEREST, ID, id));
 
-        pointOfInterestRepository.delete(entity);
+        pointOfInterestRepository.delete(entity); // TODO check that descriptions are removed
     }
 
     @Override

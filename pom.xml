@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cs</groupId>
     <artifactId>roomdbapi</artifactId>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>0.0.32-SNAPSHOT</version>
     <name>roomdbapi</name>
 
     <description>API application for Room DB</description>
@@ -97,6 +97,12 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -141,6 +147,13 @@
             </plugin>
 
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 </project>

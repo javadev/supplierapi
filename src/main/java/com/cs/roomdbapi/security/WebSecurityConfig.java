@@ -21,6 +21,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final JwtAuthenticationEntryPoint jwtEntryPoint;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -32,15 +34,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()//
-                .antMatchers("/api/v1/suppliers/get-token").permitAll()//
-                .antMatchers("/api/v1/suppliers/encode-password").permitAll()//
-                .antMatchers("/api/v1/suppliers/test-receive-webhook").permitAll()//
+                .antMatchers("/api/v1/suppliers/get-token").permitAll()
+                .antMatchers("/api/v1/suppliers/encode-password").permitAll()
+                .antMatchers("/api/v1/suppliers/test-receive-webhook").permitAll()
+                .antMatchers("/api/v1/health/test").permitAll()
 //                .antMatchers("/users/signup").permitAll()//
                 // Disallow everything else..
                 .anyRequest().authenticated();
 
-        // If a user try to access a resource without having enough permissions
-        http.exceptionHandling().accessDeniedPage("/login");
+        http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
 
         // Apply JWT
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));

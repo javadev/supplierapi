@@ -16,8 +16,22 @@ public interface PropertyMapper {
 
     PropertyMapper MAPPER = Mappers.getMapper(PropertyMapper.class);
 
+    @Named("common")
     Property toDTO(PropertyEntity e);
 
+    @Mapping(target = "code", ignore = true)
+    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "alternativeName", ignore = true)
+    @Mapping(target = "cultSwitchId", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "forTesting", ignore = true)
+    @Mapping(target = "homeCurrency", ignore = true)
+    @Mapping(target = "phones", ignore = true)
+    @Mapping(target = "emails", ignore = true)
+    @Mapping(target = "descriptions", ignore = true)
+    Property toDTOIsMaster(PropertyEntity e);
+
+    @IterableMapping(qualifiedByName="common")
     List<Property> toListDTO(List<PropertyEntity> list);
 
     @IterableMapping(qualifiedByName="mapWithoutSupplier")
@@ -34,6 +48,7 @@ public interface PropertyMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "last_update", ignore = true)
     @Mapping(target = "homeCurrency", ignore = true)
+    @Mapping(target = "descriptions", ignore = true)
     @Mapping(target = "supplier", ignore = true)
     PropertyEntity saveRequestToEntity(PropertySaveRequest dto);
 

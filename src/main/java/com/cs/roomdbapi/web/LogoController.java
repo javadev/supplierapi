@@ -2,11 +2,9 @@ package com.cs.roomdbapi.web;
 
 import com.cs.roomdbapi.dto.Media;
 import com.cs.roomdbapi.dto.MediaSaveRequest;
-import com.cs.roomdbapi.dto.Property;
-import com.cs.roomdbapi.dto.Supplier;
 import com.cs.roomdbapi.exception.BadRequestException;
 import com.cs.roomdbapi.manager.MediaManager;
-import com.cs.roomdbapi.manager.PropertyManager;
+import com.cs.roomdbapi.manager.ValidationManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,11 +41,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/v1/logo", produces = MediaType.APPLICATION_JSON_VALUE)
+@Validated
 public class LogoController {
 
     private final MediaManager mediaManager;
 
-    private final PropertyManager propertyManager;
+    private final ValidationManager validationManager;
 
     @Operation(
             summary = "Get list of all logo(s), by property id.",
@@ -87,8 +87,7 @@ public class LogoController {
                     Integer sortOrder,
             HttpServletRequest req
     ) {
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
 
         if (file.isEmpty()) {
             throw new BadRequestException("File not provided.");
@@ -124,8 +123,7 @@ public class LogoController {
 
         Integer propertyId = mediaManager.getPropertyIdByMediaId(logoId);
 
-        Supplier supplier = propertyManager.getSupplierByPropertyId(propertyId);
-        PropertyController.validatePropertyAccess(req, supplier, propertyId);
+        validationManager.validatePropertyAccess(req, propertyId);
     }
 
     @Operation(
@@ -139,8 +137,6 @@ public class LogoController {
                     Integer id,
             HttpServletRequest req
     ) {
-        log.info("API delete logo called with id: {}.", id);
-
         validateLogoAccess(id, req);
 
         mediaManager.deleteMedia(id);

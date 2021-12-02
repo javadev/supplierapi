@@ -35,4 +35,8 @@ public class PhoneSave {
     @Schema(description = "Phone extension", example = "#43")
     private String extension;
 
+    @JsonProperty
+    @Schema(description = "Is provided phone validated.", example = "false")
+    private Boolean isValidated;
+
 }

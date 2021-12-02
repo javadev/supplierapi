@@ -33,6 +33,12 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
     private final PointOfInterestRepository pointOfInterestRepository;
 
+    private final PropertyRepository propertyRepository;
+
+    private final SellableUnitRepository sellableUnitRepository;
+
+    private final BasketRepository basketRepository;
+
     @Override
     public List<DescriptionType> getAllDescriptionTypes() {
         List<DescriptionTypeEntity> all = descriptionTypeRepository.findAll();
@@ -49,8 +55,14 @@ public class DescriptionManagerImpl implements DescriptionManager {
             throw new BadRequestException(String.format("Description text should not be blank for language '%s'.", language.getName()));
         }
 
-        DescriptionTypeEntity descriptionType = descriptionTypeRepository.findByCode(descriptionTypeCode)
-                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, CODE, descriptionTypeCode));
+        DescriptionTypeEntity descriptionType;
+        if (descriptionToSave.getDescriptionTypeId() != null) {
+            descriptionType = descriptionTypeRepository.findById(descriptionToSave.getDescriptionTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, ID, descriptionToSave.getDescriptionTypeId()));
+        } else {
+            descriptionType = descriptionTypeRepository.findByCode(descriptionTypeCode)
+                    .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, CODE, descriptionTypeCode));
+        }
 
         DescriptionEntity descriptionEntity = new DescriptionEntity();
         descriptionEntity.setLanguage(language);
@@ -60,20 +72,27 @@ public class DescriptionManagerImpl implements DescriptionManager {
         return descriptionRepository.save(descriptionEntity);
     }
 
-
     @Override
     public Description updateDescription(Integer descriptionId, DescriptionSave descriptionToSave) {
         DescriptionEntity descriptionEntity = descriptionRepository.findById(descriptionId)
                 .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, descriptionId));
 
-        LanguageEntity language = languageRepository.findById(descriptionToSave.getLanguageId())
-                .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, descriptionToSave.getLanguageId()));
-
-        if (descriptionToSave.getText().isBlank()) {
-            throw new BadRequestException(String.format("Description text should not be blank for language '%s'.", language.getName()));
+        if (descriptionToSave.getDescriptionTypeId() != null) {
+            DescriptionTypeEntity descriptionType = descriptionTypeRepository.findById(descriptionToSave.getDescriptionTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION_TYPE, ID, descriptionToSave.getDescriptionTypeId()));
+            descriptionEntity.setDescriptionType(descriptionType);
         }
 
-        descriptionEntity.setLanguage(language);
+        if (descriptionToSave.getLanguageId() != null) {
+            LanguageEntity language = languageRepository.findById(descriptionToSave.getLanguageId())
+                    .orElseThrow(() -> new ResourceNotFoundException(LANGUAGE, ID, descriptionToSave.getLanguageId()));
+            descriptionEntity.setLanguage(language);
+        }
+
+        if (descriptionToSave.getText().isBlank()) {
+            throw new BadRequestException("Description text should not be blank.");
+        }
+
         descriptionEntity.setText(descriptionToSave.getText());
 
         DescriptionEntity save = descriptionRepository.save(descriptionEntity);
@@ -107,6 +126,51 @@ public class DescriptionManagerImpl implements DescriptionManager {
 
         poiEntity.getDescriptions().remove(entity);
         pointOfInterestRepository.save(poiEntity);
+
+        descriptionRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deletePropertyDescription(Integer propertyId, Integer id) {
+        PropertyEntity propertyEntity = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResourceNotFoundException(PROPERTY, ID, propertyId));
+
+        DescriptionEntity entity = descriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, id));
+
+        propertyEntity.getDescriptions().remove(entity);
+        propertyRepository.save(propertyEntity);
+
+        descriptionRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteSellableUnitDescription(Integer sellableUnitId, Integer id) {
+        SellableUnitEntity sellableUnitEntity = sellableUnitRepository.findById(sellableUnitId)
+                .orElseThrow(() -> new ResourceNotFoundException(SELLABLE_UNIT, ID, sellableUnitId));
+
+        DescriptionEntity entity = descriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, id));
+
+        sellableUnitEntity.getDescriptions().remove(entity);
+        sellableUnitRepository.save(sellableUnitEntity);
+
+        descriptionRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBasketDescription(Integer basketId, Integer id) {
+        BasketEntity basketEntity = basketRepository.findById(basketId)
+                .orElseThrow(() -> new ResourceNotFoundException(BASKET, ID, basketId));
+
+        DescriptionEntity entity = descriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(DESCRIPTION, ID, id));
+
+        basketEntity.getDescriptions().remove(entity);
+        basketRepository.save(basketEntity);
 
         descriptionRepository.delete(entity);
     }
