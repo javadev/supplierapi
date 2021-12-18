@@ -10,6 +10,7 @@ import com.cs.roomdbapi.response.SuccessResponse;
 import com.cs.roomdbapi.utilities.AppUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
@@ -99,8 +100,8 @@ public class CustomResponseAdvise implements ResponseBodyAdvice<Object> {
         // Hide exception field in the return object
         return new DefaultErrorAttributes() {
             @Override
-            public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+            public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
+                Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, options);
                 errorAttributes.remove("exception");
                 errorAttributes.remove("trace");
                 return errorAttributes;
